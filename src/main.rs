@@ -1,4 +1,4 @@
-use rusted_punk::{Attribute, Character, Inventory, Item, List, Skill};
+use rusted_punk::{Armor, Attribute, Character, Inventory, Item, List, Skill};
 
 fn main() {
     character_test();
@@ -22,13 +22,21 @@ fn character_test() {
         tec: Attribute::new(10, 10),
         inventory: Inventory::new(),
     };
-    cool_guy.inventory.push(Item::new(
+    cool_guy.inventory.push(Box::new(Item::new(
         "Broomstick".to_string(),
         1,
         1500,
         0,
         "Alright you primitive Screwheads, listen up, this is my BROOMSTICK".to_string(),
-    ));
+    )));
+    cool_guy.inventory.push(Box::new(Armor::new(
+        "Leather Armor".to_string(),
+        2,
+        1000,
+        100,
+        "A simple leather armor".to_string(),
+        5,
+    )));
     cool_guy.print();
 }
 

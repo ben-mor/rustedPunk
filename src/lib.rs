@@ -1,4 +1,6 @@
+mod armor;
 mod inventory;
+pub use self::armor::Armor;
 pub use self::inventory::Inventory;
 pub use self::inventory::Item;
 use std::fmt;
@@ -97,9 +99,9 @@ impl Skill {
     pub fn print(self) {
         println!(
             "Skillname {} {{
-            \ttotal: {} 
-            \tbase: {} 
-            \tlevel: {} 
+            \ttotal: {}
+            \tbase: {}
+            \tlevel: {}
             \tlevel up modifeier: {}
         }}",
             self.name,
