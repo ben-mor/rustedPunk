@@ -1,4 +1,4 @@
-use rusted_punk::{Armor, Attribute, Character, Inventory, Item, List, Skill};
+use rusted_punk::{Armor, Attribute, Character, HitZone, Inventory, Item, List, Skill};
 
 fn main() {
     character_test();
@@ -36,6 +36,7 @@ fn character_test() {
         100,
         "A simple leather armor".to_string(),
         5,
+        vec![HitZone::Chest],
     )));
     cool_guy.print();
 }
