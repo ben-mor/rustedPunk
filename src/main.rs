@@ -14,9 +14,10 @@ fn armor_test() {
         1000,
         100,
         "A simple leather armor".to_string(),
-        5,
+        4,
         vec![HitZone::Chest],
         false,
+        0,
     );
     leather.hit(1, HitZone::Chest, DamageType::ArmorPiercing);
     leather.print();
@@ -40,6 +41,7 @@ fn armor_test() {
             HitZone::Stomach,
         ],
         true,
+        1,
     );
     println!(
         "ArmorPiercing {:?}",
@@ -83,9 +85,10 @@ fn character_test() {
         1000,
         100,
         "A simple leather armor".to_string(),
-        5,
+        4,
         vec![HitZone::Chest],
         false,
+        0,
     )));
     cool_guy.print();
     cool_guy.hit(15, HitZone::Chest, DamageType::ArmorPiercing);

@@ -9,6 +9,7 @@ pub struct Armor {
     pub protection_max: usize,
     pub protection_current: HashMap<HitZone, usize>,
     pub is_hard: bool,
+    pub encumbrance: usize,
 }
 
 #[derive(Debug)]
@@ -71,6 +72,7 @@ impl Armor {
         protection_max: usize,
         protected_zones: Vec<HitZone>,
         is_hard: bool,
+        encumbrance: usize,
     ) -> Self {
         let mut protection_current = HashMap::new();
         for zone in protected_zones {
@@ -81,6 +83,7 @@ impl Armor {
             protection_max,
             protection_current: protection_current,
             is_hard: is_hard,
+            encumbrance: encumbrance,
         }
     }
 
@@ -117,12 +120,7 @@ impl Armor {
                     }
                 }
                 DamageType::ArmorPiercing => {
-                    let mut protection = self.protection_current[&zone];
-                    if self.is_hard {
-                        protection = protection / 2;
-                    } else {
-                        protection = protection / 4;
-                    }
+                    let protection = self.protection_current[&zone] / 2;
 
                     if protection > remaining_damage {
                         absorbed_damage = remaining_damage;
@@ -170,5 +168,63 @@ impl Armor {
         for (zone, protection) in &self.protection_current {
             println!("    {}: {}", zone, protection);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn flak_vest() -> Armor {
+        Armor::new(
+            "Flak Vest".to_string(),
+            2,
+            1000,
+            100,
+            "Hard armor with 20 SP".to_string(),
+            20,
+            vec![
+                HitZone::Chest,
+                HitZone::LeftArm,
+                HitZone::RightArm,
+                HitZone::Vitals,
+                HitZone::Stomach,
+            ],
+            true,
+            1,
+        )
+    }
+    fn kevlar_shirt() -> Armor {
+        Armor::new(
+            "Kevlar Shirt".to_string(),
+            2,
+            1000,
+            100,
+            "Soft armor with 10 SP".to_string(),
+            10,
+            vec![HitZone::Chest, HitZone::Vitals, HitZone::Stomach],
+            false,
+            0,
+        )
+    }
+
+    #[test]
+    fn test_armor_hit_ap_hard() {
+        let mut vest = flak_vest();
+        let damage = 10;
+        let result = vest.hit(damage, HitZone::Chest, DamageType::ArmorPiercing);
+        assert_eq!(result.remaining_damage, 0);
+        assert_eq!(result.absorbed_damage, 10);
+        assert_eq!(vest.protection_current.get(&HitZone::Chest), Some(&19));
+    }
+
+    #[test]
+    fn test_armor_hit_ap_soft() {
+        let mut vest = kevlar_shirt();
+        let damage = 10;
+        let result = vest.hit(damage, HitZone::Chest, DamageType::ArmorPiercing);
+        assert_eq!(result.remaining_damage, 2);
+        assert_eq!(result.absorbed_damage, 5);
+        assert_eq!(vest.protection_current.get(&HitZone::Chest), Some(&9));
     }
 }
