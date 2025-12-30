@@ -1,9 +1,57 @@
-use rusted_punk::{Armor, Attribute, Character, HitZone, Inventory, Item, List, Skill};
+use rusted_punk::{Armor, Attribute, Character, DamageType, HitZone, Inventory, Item, List, Skill};
 
 fn main() {
+    armor_test();
     character_test();
     skill_test();
     list_test();
+}
+
+fn armor_test() {
+    let mut leather = Armor::new(
+        "Leather Armor".to_string(),
+        2,
+        1000,
+        100,
+        "A simple leather armor".to_string(),
+        5,
+        vec![HitZone::Chest],
+        false,
+    );
+    leather.hit(1, HitZone::Chest, DamageType::ArmorPiercing);
+    leather.print();
+    leather.hit(6, HitZone::Chest, DamageType::Blunt);
+    leather.print();
+    leather.hit(3, HitZone::Chest, DamageType::ArmorPiercing);
+    leather.print();
+
+    let mut flak_vest = Armor::new(
+        "Flak Vest".to_string(),
+        2,
+        1000,
+        100,
+        "A simple leather armor".to_string(),
+        20,
+        vec![
+            HitZone::Chest,
+            HitZone::LeftArm,
+            HitZone::RightArm,
+            HitZone::Vitals,
+            HitZone::Stomach,
+        ],
+        true,
+    );
+    println!(
+        "ArmorPiercing {:?}",
+        flak_vest.hit(10, HitZone::Chest, DamageType::ArmorPiercing)
+    );
+    flak_vest.print();
+    flak_vest.hit(10, HitZone::Chest, DamageType::Blunt);
+    flak_vest.print();
+    flak_vest.hit(30, HitZone::Chest, DamageType::Blunt);
+    flak_vest.print();
+    flak_vest.hit(10, HitZone::Chest, DamageType::ArmorPiercing);
+    flak_vest.print();
 }
 
 fn character_test() {
@@ -37,7 +85,10 @@ fn character_test() {
         "A simple leather armor".to_string(),
         5,
         vec![HitZone::Chest],
+        false,
     )));
+    cool_guy.print();
+    cool_guy.hit(15, HitZone::Chest, DamageType::ArmorPiercing);
     cool_guy.print();
 }
 

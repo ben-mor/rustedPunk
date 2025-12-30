@@ -1,4 +1,5 @@
-use crate::inventory::Inventory;
+use crate::armor::HitZone;
+use crate::{inventory::Inventory, DamageType};
 use std::fmt;
 
 pub struct Character {
@@ -35,7 +36,7 @@ impl fmt::Display for Attribute {
 }
 
 impl Character {
-    pub fn print(self) {
+    pub fn print(&self) {
         println!(
             "\
 Character {{ \n\
@@ -67,6 +68,11 @@ Character {{ \n\
             self.tec,
             self.inventory,
         );
+    }
+
+    #[allow(unused_variables)]
+    pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) {
+        todo!();
     }
 }
 
