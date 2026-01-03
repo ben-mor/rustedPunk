@@ -93,59 +93,16 @@ impl Armor {
             let absorbed_damage;
             match damage_type {
                 DamageType::ArmorPiercing => {
-                    let protection = self.protection_current[&zone] / 2;
-
-                    if protection >= remaining_damage {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = protection;
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                        remaining_damage = (remaining_damage + 1) / 2;
-                    }
+                    absorbed_damage = self.hit_armor_piercing(zone, &mut remaining_damage);
                 }
                 DamageType::Blunt => {
-                    if self.protection_current[&zone] >= remaining_damage {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = self.protection_current[&zone];
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                    }
+                    absorbed_damage = self.hit_blunt(zone, &mut remaining_damage);
                 }
                 DamageType::HollowPoint => {
-                    let protection = self.protection_current[&zone];
-                    remaining_damage = (remaining_damage + 1) / 2;
-
-                    if protection >= remaining_damage {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = self.protection_current[&zone];
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                    }
+                    absorbed_damage = self.hit_hollow_point(zone, &mut remaining_damage);
                 }
                 DamageType::Slashing => {
-                    let mut protection = self.protection_current[&zone];
-                    if !self.is_hard {
-                        protection = (protection + 1) / 2;
-                    }
-
-                    if protection >= remaining_damage {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = protection;
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                    }
+                    absorbed_damage = self.hit_slashing(zone, &mut remaining_damage);
                 }
             }
             DamageResult {
@@ -158,6 +115,74 @@ impl Armor {
                 absorbed_damage: 0,
             }
         }
+    }
+
+    fn hit_armor_piercing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+        let protection = self.protection_current[&zone] / 2;
+        let absorbed_damage;
+
+        if protection >= *remaining_damage {
+            absorbed_damage = *remaining_damage;
+            *remaining_damage = 0;
+        } else {
+            absorbed_damage = protection;
+            self.protection_current
+                .insert(zone, self.protection_current[&zone] - 1);
+            *remaining_damage -= absorbed_damage;
+            *remaining_damage = (*remaining_damage + 1) / 2;
+        }
+        absorbed_damage
+    }
+
+    fn hit_blunt(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+        let absorbed_damage;
+
+        if self.protection_current[&zone] >= *remaining_damage {
+            absorbed_damage = *remaining_damage;
+            *remaining_damage = 0;
+        } else {
+            absorbed_damage = self.protection_current[&zone];
+            self.protection_current
+                .insert(zone, self.protection_current[&zone] - 1);
+            *remaining_damage -= absorbed_damage;
+        }
+        absorbed_damage
+    }
+
+    fn hit_hollow_point(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+        let protection = self.protection_current[&zone];
+        *remaining_damage = (*remaining_damage + 1) / 2;
+        let absorbed_damage;
+
+        if protection >= *remaining_damage {
+            absorbed_damage = *remaining_damage;
+            *remaining_damage = 0;
+        } else {
+            absorbed_damage = self.protection_current[&zone];
+            self.protection_current
+                .insert(zone, self.protection_current[&zone] - 1);
+            *remaining_damage -= absorbed_damage;
+        }
+        absorbed_damage
+    }
+
+    fn hit_slashing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+        let mut protection = self.protection_current[&zone];
+        if !self.is_hard {
+            protection = (protection + 1) / 2;
+        }
+        let absorbed_damage;
+
+        if protection >= *remaining_damage {
+            absorbed_damage = *remaining_damage;
+            *remaining_damage = 0;
+        } else {
+            absorbed_damage = protection;
+            self.protection_current
+                .insert(zone, self.protection_current[&zone] - 1);
+            *remaining_damage -= absorbed_damage;
+        }
+        absorbed_damage
     }
 
     pub fn print(&self) {
