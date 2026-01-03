@@ -92,8 +92,36 @@ impl Armor {
             let mut remaining_damage = damage;
             let absorbed_damage;
             match damage_type {
+                DamageType::ArmorPiercing => {
+                    let protection = self.protection_current[&zone] / 2;
+
+                    if protection >= remaining_damage {
+                        absorbed_damage = remaining_damage;
+                        remaining_damage = 0;
+                    } else {
+                        absorbed_damage = protection;
+                        self.protection_current
+                            .insert(zone, self.protection_current[&zone] - 1);
+                        remaining_damage -= absorbed_damage;
+                        remaining_damage = (remaining_damage + 1) / 2;
+                    }
+                }
                 DamageType::Blunt => {
-                    if self.protection_current[&zone] > remaining_damage {
+                    if self.protection_current[&zone] >= remaining_damage {
+                        absorbed_damage = remaining_damage;
+                        remaining_damage = 0;
+                    } else {
+                        absorbed_damage = self.protection_current[&zone];
+                        self.protection_current
+                            .insert(zone, self.protection_current[&zone] - 1);
+                        remaining_damage -= absorbed_damage;
+                    }
+                }
+                DamageType::HollowPoint => {
+                    let protection = self.protection_current[&zone];
+                    remaining_damage = (remaining_damage + 1) / 2;
+
+                    if protection >= remaining_damage {
                         absorbed_damage = remaining_damage;
                         remaining_damage = 0;
                     } else {
@@ -106,23 +134,10 @@ impl Armor {
                 DamageType::Slashing => {
                     let mut protection = self.protection_current[&zone];
                     if !self.is_hard {
-                        protection = protection / 2;
+                        protection = (protection + 1) / 2;
                     }
 
-                    if protection > remaining_damage {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = self.protection_current[&zone];
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                    }
-                }
-                DamageType::ArmorPiercing => {
-                    let protection = self.protection_current[&zone] / 2;
-
-                    if protection > remaining_damage {
+                    if protection >= remaining_damage {
                         absorbed_damage = remaining_damage;
                         remaining_damage = 0;
                     } else {
@@ -130,21 +145,6 @@ impl Armor {
                         self.protection_current
                             .insert(zone, self.protection_current[&zone] - 1);
                         remaining_damage -= absorbed_damage;
-                        remaining_damage = remaining_damage / 2;
-                    }
-                }
-                DamageType::HollowPoint => {
-                    let protection = self.protection_current[&zone];
-
-                    if protection > remaining_damage * 2 {
-                        absorbed_damage = remaining_damage;
-                        remaining_damage = 0;
-                    } else {
-                        absorbed_damage = self.protection_current[&zone];
-                        self.protection_current
-                            .insert(zone, self.protection_current[&zone] - 1);
-                        remaining_damage -= absorbed_damage;
-                        remaining_damage = remaining_damage / 2;
                     }
                 }
             }
@@ -194,7 +194,7 @@ mod tests {
             1,
         )
     }
-    fn kevlar_shirt() -> Armor {
+    fn kev_shirt() -> Armor {
         Armor::new(
             "Kevlar Shirt".to_string(),
             2,
@@ -209,22 +209,81 @@ mod tests {
     }
 
     #[test]
-    fn test_armor_hit_ap_hard() {
-        let mut vest = flak_vest();
-        let damage = 10;
-        let result = vest.hit(damage, HitZone::Chest, DamageType::ArmorPiercing);
-        assert_eq!(result.remaining_damage, 0);
-        assert_eq!(result.absorbed_damage, 10);
-        assert_eq!(vest.protection_current.get(&HitZone::Chest), Some(&19));
+    fn test_armor_hits() {
+        test_armor_hit(&mut flak_vest(), 10, DamageType::ArmorPiercing, 0, 10, 20);
+        test_armor_hit(&mut kev_shirt(), 10, DamageType::ArmorPiercing, 3, 5, 9);
+        test_armor_hit(&mut flak_vest(), 10, DamageType::Blunt, 0, 10, 20);
+        test_armor_hit(&mut kev_shirt(), 10, DamageType::Blunt, 0, 10, 10);
+        test_armor_hit(&mut flak_vest(), 10, DamageType::HollowPoint, 0, 5, 20);
+        test_armor_hit(&mut kev_shirt(), 10, DamageType::HollowPoint, 0, 5, 10);
+        test_armor_hit(&mut flak_vest(), 10, DamageType::Slashing, 0, 10, 20);
+        test_armor_hit(&mut kev_shirt(), 10, DamageType::Slashing, 5, 5, 9);
+
+        test_armor_hit(&mut flak_vest(), 7, DamageType::ArmorPiercing, 0, 7, 20);
+        test_armor_hit(&mut kev_shirt(), 7, DamageType::ArmorPiercing, 1, 5, 9);
+        test_armor_hit(&mut flak_vest(), 7, DamageType::Blunt, 0, 7, 20);
+        test_armor_hit(&mut kev_shirt(), 7, DamageType::Blunt, 0, 7, 10);
+        test_armor_hit(&mut flak_vest(), 7, DamageType::HollowPoint, 0, 4, 20);
+        test_armor_hit(&mut kev_shirt(), 7, DamageType::HollowPoint, 0, 4, 10);
+        test_armor_hit(&mut flak_vest(), 7, DamageType::Slashing, 0, 7, 20);
+        test_armor_hit(&mut kev_shirt(), 7, DamageType::Slashing, 2, 5, 9);
+
+        test_armor_hit(&mut flak_vest(), 29, DamageType::ArmorPiercing, 10, 10, 19);
+        test_armor_hit(&mut kev_shirt(), 29, DamageType::ArmorPiercing, 12, 5, 9);
+        test_armor_hit(&mut flak_vest(), 29, DamageType::Blunt, 9, 20, 19);
+        test_armor_hit(&mut kev_shirt(), 29, DamageType::Blunt, 19, 10, 9);
+        test_armor_hit(&mut flak_vest(), 29, DamageType::HollowPoint, 0, 15, 20);
+        test_armor_hit(&mut flak_vest(), 49, DamageType::HollowPoint, 5, 20, 19);
+        test_armor_hit(&mut kev_shirt(), 29, DamageType::HollowPoint, 5, 10, 9);
+        test_armor_hit(&mut flak_vest(), 29, DamageType::Slashing, 9, 20, 19);
+        test_armor_hit(&mut kev_shirt(), 29, DamageType::Slashing, 24, 5, 9);
+
+        test_armor_hit(&mut flak_vest(), 12, DamageType::ArmorPiercing, 1, 10, 19);
+        test_armor_hit(&mut kev_shirt(), 12, DamageType::ArmorPiercing, 4, 5, 9);
+        test_armor_hit(&mut flak_vest(), 12, DamageType::Blunt, 0, 12, 20);
+        test_armor_hit(&mut kev_shirt(), 12, DamageType::Blunt, 2, 10, 9);
+        test_armor_hit(&mut flak_vest(), 12, DamageType::HollowPoint, 0, 6, 20);
+        test_armor_hit(&mut kev_shirt(), 12, DamageType::HollowPoint, 0, 6, 10);
+        test_armor_hit(&mut flak_vest(), 12, DamageType::Slashing, 0, 12, 20);
+        test_armor_hit(&mut kev_shirt(), 12, DamageType::Slashing, 7, 5, 9);
+
+        test_armor_hit(&mut flak_vest(), 13, DamageType::ArmorPiercing, 2, 10, 19);
+        test_armor_hit(&mut kev_shirt(), 13, DamageType::ArmorPiercing, 4, 5, 9);
+        test_armor_hit(&mut flak_vest(), 13, DamageType::Blunt, 0, 13, 20);
+        test_armor_hit(&mut kev_shirt(), 13, DamageType::Blunt, 3, 10, 9);
+        test_armor_hit(&mut flak_vest(), 13, DamageType::HollowPoint, 0, 7, 20);
+        test_armor_hit(&mut kev_shirt(), 13, DamageType::HollowPoint, 0, 7, 10);
+        test_armor_hit(&mut flak_vest(), 13, DamageType::Slashing, 0, 13, 20);
+        test_armor_hit(&mut kev_shirt(), 13, DamageType::Slashing, 8, 5, 9);
     }
 
-    #[test]
-    fn test_armor_hit_ap_soft() {
-        let mut vest = kevlar_shirt();
-        let damage = 10;
-        let result = vest.hit(damage, HitZone::Chest, DamageType::ArmorPiercing);
-        assert_eq!(result.remaining_damage, 2);
-        assert_eq!(result.absorbed_damage, 5);
-        assert_eq!(vest.protection_current.get(&HitZone::Chest), Some(&9));
+    fn test_armor_hit(
+        armor: &mut Armor,
+        damage: usize,
+        damage_type: DamageType,
+        expected_remaining_damage: usize,
+        expected_absorbed_damage: usize,
+        expected_remaining_protection: usize,
+    ) {
+        let context = format!("{} {:?} against {}", damage, damage_type, armor.item.name);
+        let result = armor.hit(damage, HitZone::Chest, damage_type);
+        assert_eq!(
+            result.remaining_damage, expected_remaining_damage,
+            "{}: expected {} remaining damage, but was {}",
+            context, expected_remaining_damage, result.remaining_damage
+        );
+        assert_eq!(
+            result.absorbed_damage, expected_absorbed_damage,
+            "{}: expected {} absorbed damage, but was {}",
+            context, expected_absorbed_damage, result.absorbed_damage
+        );
+        assert_eq!(
+            armor.protection_current.get(&HitZone::Chest),
+            Some(&expected_remaining_protection),
+            "{}: expected {} remaining protection, but was {:?}",
+            context,
+            expected_remaining_protection,
+            armor.protection_current.get(&HitZone::Chest)
+        );
     }
 }
