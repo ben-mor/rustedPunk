@@ -316,6 +316,24 @@ mod tests {
         test_armor_hit(&mut kev_shirt(), 13, DamageType::HollowPoint, 0, 7, 10);
         test_armor_hit(&mut flak_vest(), 13, DamageType::Slashing, 0, 13, 20);
         test_armor_hit(&mut kev_shirt(), 13, DamageType::Slashing, 8, 5, 9);
+
+        test_armor_hit(&mut flak_vest(), 0, DamageType::ArmorPiercing, 0, 0, 20);
+        test_armor_hit(&mut kev_shirt(), 0, DamageType::ArmorPiercing, 0, 0, 10);
+        test_armor_hit(&mut flak_vest(), 0, DamageType::Blunt, 0, 0, 20);
+        test_armor_hit(&mut kev_shirt(), 0, DamageType::Blunt, 0, 0, 10);
+        test_armor_hit(&mut flak_vest(), 0, DamageType::HollowPoint, 0, 0, 20);
+        test_armor_hit(&mut kev_shirt(), 0, DamageType::HollowPoint, 0, 0, 10);
+        test_armor_hit(&mut flak_vest(), 0, DamageType::Slashing, 0, 0, 20);
+        test_armor_hit(&mut kev_shirt(), 0, DamageType::Slashing, 0, 0, 10);
+    }
+
+    #[test]
+    fn test_armor_hit_nowhere() {
+        let mut armor = kev_shirt();
+        let damage_result = armor.hit(1000, HitZone::Head, DamageType::ArmorPiercing);
+        assert_eq!(damage_result.remaining_damage, 1000);
+        assert_eq!(damage_result.absorbed_damage, 0);
+        assert_eq!(armor.protection_current.get(&HitZone::Chest), Some(&10));
     }
 
     fn test_armor_hit(
