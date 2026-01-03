@@ -87,6 +87,29 @@ impl Armor {
         }
     }
 
+    /// Applies damage to the armor at a specific hit zone.
+    ///
+    /// Different damage types interact with armor in different ways:
+    ///
+    /// * `ArmorPiercing` - Halves effective protection, halves remaining damage that penetrates
+    /// * `Blunt` - Uses full protection value, no damage modifications
+    /// * `HollowPoint` - Halves incoming damage before armor calculation
+    /// * `Slashing` - Hard armor protects fully. Soft armor protects half. Damage isn't halved like armor piercing.
+    ///
+    /// When armor protection is insufficient to stop the attack, the armor's durability
+    /// is reduced by 1 for that hit zone.
+    ///
+    /// If the hit zone is not protected by this armor, all damage passes through unmodified.
+    ///
+    /// # Arguments
+    ///
+    /// * `damage` - The amount of incoming damage
+    /// * `zone` - The hit zone being attacked
+    /// * `damage_type` - The type of damage being applied
+    ///
+    /// # Returns
+    ///
+    /// A `DamageResult` containing the remaining damage and the amount absorbed by the armor
     pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) -> DamageResult {
         if self.protection_current.contains_key(&zone) {
             let mut remaining_damage = damage;
@@ -117,6 +140,9 @@ impl Armor {
         }
     }
 
+    /// Armor-piercing weapons halve the effective protection of the armor.
+    /// Any remaining damage is halved at the end.
+    /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
     fn hit_armor_piercing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
         let protection = self.protection_current[&zone] / 2;
         let absorbed_damage;
@@ -134,6 +160,9 @@ impl Armor {
         absorbed_damage
     }
 
+    /// Blunt weapons use the full protection value of the armor.
+    /// No additional damage modifications are applied.
+    /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
     fn hit_blunt(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
         let absorbed_damage;
 
@@ -149,6 +178,9 @@ impl Armor {
         absorbed_damage
     }
 
+    /// Hollow-point weapons halve the incoming damage before armor calculation.
+    /// The armor uses its full protection value against the reduced damage.
+    /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
     fn hit_hollow_point(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
         let protection = self.protection_current[&zone];
         *remaining_damage = (*remaining_damage + 1) / 2;
@@ -166,6 +198,10 @@ impl Armor {
         absorbed_damage
     }
 
+    /// Slashing weapons use full protection against hard armor.
+    /// Against soft armor, the effective protection is halved.
+    /// Other then armor piercing damage, the remaining damage is not halved.
+    /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
     fn hit_slashing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
         let mut protection = self.protection_current[&zone];
         if !self.is_hard {
