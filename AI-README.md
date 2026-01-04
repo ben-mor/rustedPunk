@@ -58,11 +58,13 @@ Each damage type has a private helper method. Full mechanics documented on publi
 - All `Item` instances have unique `Uuid` (uuid crate with v4 feature)
 - `Item::new(uuid: Option<Uuid>, ...)` - Pass `None` to auto-generate, `Some(uuid)` for loading from storage
 
-### Planned: Armor Layering
-- Characters will wear armor in ordered layers (innermost to outermost)
-- `Character.worn_armor: Vec<Uuid>` will reference items in inventory by ID
-- Damage processes layers from outside-in (reverse iteration)
-- Dropping equipped items automatically unequips them (single source of truth)
+### Armor Layering (Implemented)
+- Characters wear armor in ordered layers: `Character.worn_armor: Vec<Uuid>`
+- Index 0 = innermost layer, higher indices = outer layers
+- `wear_armor(uuid, underneath: Option<Uuid>)` - wear armor at outermost or under specific armor
+- `Inventory.get_item(uuid)` and `get_all_armor()` - lookup by UUID or filter by type
+- Uses `InventoryItem.as_any()` for downcasting trait objects to concrete `Armor` type
+- Damage will process layers from outside-in (reverse iteration) - TODO in `Character.hit()`
 
 ---
 
