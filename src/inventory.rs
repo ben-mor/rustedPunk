@@ -1,8 +1,14 @@
+use crate::armor::Armor;
 use std::fmt;
+use uuid::Uuid;
 
 pub trait InventoryItem: fmt::Display {
     fn get_item(&self) -> &Item;
     fn get_item_mut(&mut self) -> &mut Item;
+    fn is_armor(&self) -> bool {
+        false
+    }
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 pub struct Inventory {
@@ -10,6 +16,7 @@ pub struct Inventory {
 }
 
 pub struct Item {
+    pub uuid: Uuid,
     pub name: String,
     pub amount: usize,
     pub weight_grams: usize,
@@ -23,6 +30,10 @@ impl InventoryItem for Item {
     }
 
     fn get_item_mut(&mut self) -> &mut Item {
+        self
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
@@ -41,6 +52,32 @@ impl Inventory {
         Inventory { items: Vec::new() }
     }
 
+    pub fn get_all_armor(&self) -> Vec<&Armor> {
+        self.items
+            .iter()
+            .filter_map(|item| item.as_any().downcast_ref::<Armor>())
+            .collect()
+    }
+
+    pub fn get_item(&self, uuid: Uuid) -> Option<&Item> {
+        let item = self.items.iter().find(|item| item.get_item().uuid == uuid);
+        if item.is_some() {
+            return Some(item.unwrap().get_item());
+        }
+        None
+    }
+
+    pub fn get_item_mut(&mut self, uuid: Uuid) -> Option<&mut Item> {
+        let item = self
+            .items
+            .iter_mut()
+            .find(|item| item.get_item().uuid == uuid);
+        if item.is_some() {
+            return Some(item.unwrap().get_item_mut());
+        }
+        None
+    }
+
     pub fn calc_total_weight(&self) -> usize {
         let mut total = 0;
         for item in &self.items {
@@ -56,6 +93,7 @@ impl Inventory {
 
 impl Item {
     pub fn new(
+        uuid: Option<Uuid>,
         name: String,
         amount: usize,
         weight_grams: usize,
@@ -63,6 +101,7 @@ impl Item {
         comment: String,
     ) -> Self {
         Item {
+            uuid: uuid.unwrap_or(Uuid::new_v4()),
             name,
             amount,
             weight_grams,

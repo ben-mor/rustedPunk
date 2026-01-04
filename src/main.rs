@@ -1,4 +1,4 @@
-use rusted_punk::{Armor, Attribute, Character, DamageType, HitZone, Inventory, Item, List, Skill};
+use rusted_punk::{Armor, Character, DamageType, HitZone, Item, List, Skill};
 
 fn main() {
     armor_test();
@@ -57,22 +57,22 @@ fn armor_test() {
 }
 
 fn character_test() {
-    let mut cool_guy = Character {
-        name: "Erwin Müller".to_string(),
-        role: "Corporate".to_string(),
-        age: 23,
-        att: Attribute::new(3, 3),
-        mov: Attribute::new(4, 4),
-        coo: Attribute::new(1, 3),
-        emp: Attribute::new(3, 3),
-        luck: Attribute::new(3, 3),
-        int: Attribute::new(10, 10),
-        body: Attribute::new(7, 7),
-        refl: Attribute::new(6, 6),
-        tec: Attribute::new(10, 10),
-        inventory: Inventory::new(),
-    };
+    let mut cool_guy = Character::new(
+        "Erwin Müller".to_string(),
+        "Corporate".to_string(),
+        23,
+        3,
+        4,
+        3,
+        3,
+        3,
+        10,
+        7,
+        6,
+        10,
+    );
     cool_guy.inventory.push(Box::new(Item::new(
+        None,
         "Broomstick".to_string(),
         1,
         1500,

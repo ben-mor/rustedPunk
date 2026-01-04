@@ -1,7 +1,7 @@
 # AI-README: RustedPunk Project Structure
 
 ## Overview
-Cyberpunk 2020/RED RPG character management system. Currency: `eb` = Eurobucks.
+Cyberpunk 2020 RPG character management system. Currency: `eb` = Eurobucks.
 
 ---
 
@@ -39,6 +39,30 @@ Cyberpunk 2020/RED RPG character management system. Currency: `eb` = Eurobucks.
 ## Units & Conventions
 - Weight: grams (`weight_grams`)
 - Display implementations delegate to Debug for enums (e.g., `HitZone`)
+
+---
+
+## Damage Type Mechanics (`armor.rs`)
+- **ArmorPiercing**: Halves effective protection, halves remaining penetrating damage
+- **Blunt**: Uses full protection, no damage modifications
+- **HollowPoint**: Halves incoming damage before armor calculation
+- **Slashing**: Full protection vs hard armor, halved vs soft armor (does NOT halve penetrating damage)
+
+Each damage type has a private helper method. Full mechanics documented on public `hit()` method.
+
+---
+
+## Item Identity System
+
+### UUID Usage (`inventory.rs`)
+- All `Item` instances have unique `Uuid` (uuid crate with v4 feature)
+- `Item::new(uuid: Option<Uuid>, ...)` - Pass `None` to auto-generate, `Some(uuid)` for loading from storage
+
+### Planned: Armor Layering
+- Characters will wear armor in ordered layers (innermost to outermost)
+- `Character.worn_armor: Vec<Uuid>` will reference items in inventory by ID
+- Damage processes layers from outside-in (reverse iteration)
+- Dropping equipped items automatically unequips them (single source of truth)
 
 ---
 

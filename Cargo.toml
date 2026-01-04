@@ -1,9 +1,10 @@
 [package]
 name = "rusted-punk"
 version = "0.1.0"
-authors = ["Benedikt <Sayrin@web.de>"]
+authors = ["Benedikt <Sayrin@web.de>", "Ben Mor Fuchs <ben@sommerfuchs.info>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+uuid = { version = "1.19", features = ["v4"] }

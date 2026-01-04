@@ -50,6 +50,12 @@ impl InventoryItem for Armor {
     fn get_item_mut(&mut self) -> &mut Item {
         &mut self.item
     }
+    fn is_armor(&self) -> bool {
+        true
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl fmt::Display for Armor {
@@ -79,7 +85,7 @@ impl Armor {
             protection_current.insert(zone, protection_max);
         }
         Armor {
-            item: Item::new(name, amount, weight_grams, price_eb, comment),
+            item: Item::new(None, name, amount, weight_grams, price_eb, comment),
             protection_max,
             protection_current: protection_current,
             is_hard: is_hard,
