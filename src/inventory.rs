@@ -1,9 +1,13 @@
 use std::fmt;
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Inventory {
     items: Vec<Item>,
 }
 
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Item {
     pub name: String,
     pub amount: usize,
