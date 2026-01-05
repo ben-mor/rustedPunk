@@ -1,4 +1,4 @@
-use rusted_punk::{Attribute, Character, Inventory, Item, List, Skill};
+use rusted_punk::{Attribute, Attributes, Character, Inventory, Item, List, Skill};
 
 fn main() {
     character_test();
@@ -11,16 +11,14 @@ fn character_test() {
         name: "Erwin Müller".to_string(),
         role: "Corporate".to_string(),
         age: 23,
-        att: Attribute::new(3, 3),
-        mov: Attribute::new(4, 4),
-        coo: Attribute::new(1, 3),
-        emp: Attribute::new(3, 3),
-        luck: Attribute::new(3, 3),
-        int: Attribute::new(10, 10),
-        body: Attribute::new(7, 7),
-        refl: Attribute::new(6, 6),
-        tec: Attribute::new(10, 10),
+        attributes: Attributes::new(),
         inventory: Inventory::new(),
+        skills: vec![Skill::new(
+            "schleichen".to_string(),
+            Attribute::Reflexes,
+            2,
+            3,
+        )],
     };
     cool_guy.inventory.push(Item::new(
         "Broomstick".to_string(),
@@ -30,19 +28,22 @@ fn character_test() {
         "Alright you primitive Screwheads, listen up, this is my BROOMSTICK".to_string(),
     ));
     cool_guy.print();
+
+    cool_guy.print_skills();
 }
 
 fn skill_test() {
-    let skill = Skill::new("Schleichen".to_string(), 7, 2, 3);
+    let skill = Skill::new("Schleichen".to_string(), Attribute::Reflexes, 2, 3);
     skill.print()
 }
 
 // keine ahnung warum aber es geht
 fn list_test() {
     let v = List(vec![
-        Skill::new("schleichen".to_string(), 4, 2, 3),
-        Skill::new("schiesen".to_string(), 7, 4, 3),
-        Skill::new("werfen".to_string(), 6, 2, 3),
+        Skill::new("schleichen".to_string(), Attribute::Reflexes, 2, 3),
+        Skill::new("schiesen".to_string(), Attribute::Reflexes, 4, 3),
+        Skill::new("werfen".to_string(), Attribute::Reflexes, 2, 3),
+        Skill::new("Erste Hilfe".to_string(), Attribute::Tech, 2, 3),
     ]);
     println!("{}", v);
 }

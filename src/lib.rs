@@ -1,6 +1,8 @@
 mod inventory;
 pub use self::inventory::Inventory;
 pub use self::inventory::Item;
+
+use std::collections::HashMap;
 use std::fmt;
 
 // Name: Erwin Müller
@@ -21,74 +23,103 @@ pub struct Character {
     pub name: String,
     pub role: String,
     pub age: usize,
-    pub att: Attribute,
-    pub mov: Attribute,
-    pub coo: Attribute,
-    pub emp: Attribute,
-    pub luck: Attribute,
-    pub int: Attribute,
-    pub body: Attribute,
-    pub refl: Attribute,
-    pub tec: Attribute,
+    pub attributes: Attributes,
     pub inventory: Inventory,
+    pub skills: Vec<Skill>,
 }
 
-pub struct Attribute {
+pub struct Attributes(HashMap<Attribute, AttributeValue>);
+
+impl Attributes {
+    pub fn new() -> Self {
+        let mut m = HashMap::new();
+
+        m.insert(Attribute::Attractiveness, AttributeValue::new(0, 0));
+        m.insert(Attribute::Move, AttributeValue::new(0, 0));
+        m.insert(Attribute::Coolness, AttributeValue::new(0, 0));
+        m.insert(Attribute::Empathy, AttributeValue::new(0, 0));
+        m.insert(Attribute::Luck, AttributeValue::new(0, 0));
+        m.insert(Attribute::Intelligence, AttributeValue::new(0, 0));
+        m.insert(Attribute::Body, AttributeValue::new(0, 0));
+        m.insert(Attribute::Reflexes, AttributeValue::new(0, 0));
+        m.insert(Attribute::Tech, AttributeValue::new(0, 0));
+
+        Attributes(m)
+    }
+
+    pub fn get(&self, attr: &Attribute) -> Option<&AttributeValue> {
+        self.0.get(attr)
+    }
+}
+
+impl fmt::Display for Attributes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Attributes {{")?;
+        for (key, value) in &self.0 {
+            writeln!(f, "\t{:?}: {}", key, value)?;
+        }
+        writeln!(f, "}}")
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum Attribute {
+    Attractiveness,
+    Move,
+    Coolness,
+    Empathy,
+    Luck,
+    Intelligence,
+    Body,
+    Reflexes,
+    Tech,
+}
+
+pub struct AttributeValue {
     pub base: usize,
     pub actual: usize,
 }
 
-impl Attribute {
+impl AttributeValue {
     pub fn new(actual: usize, base: usize) -> Self {
-        Attribute { base, actual }
+        AttributeValue { base, actual }
     }
 }
 
-impl fmt::Display for Attribute {
+impl fmt::Display for AttributeValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}", self.actual, self.base)
     }
 }
 
 impl Character {
-    pub fn print(self) {
+    pub fn print(&self) {
         println!(
             "\
 Character {{ \n\
 \tname: {}\n\
 \trole: {}\n\
 \tage: {}\n\
-\tatt: {}\n\
-\tmov: {}\n\
-\tcoo: {}\n\
-\temp: {}\n\
-\tluck: {}\n\
-\tint: {}\n\
-\tbody: {}\n\
-\tref: {}\n\
-\ttec: {}\n\
+\t{}\n
 \tInventory: {}\n\
 }}",
-            self.name,
-            self.role,
-            self.age,
-            self.att,
-            self.mov,
-            self.coo,
-            self.emp,
-            self.luck,
-            self.int,
-            self.body,
-            self.refl,
-            self.tec,
-            self.inventory,
+            self.name, self.role, self.age, self.attributes, self.inventory,
         );
+    }
+
+    pub fn print_skills(&self) {
+        println!("Skills:");
+        for skill in &self.skills {
+            let attr = self.attributes.get(&skill.base).unwrap();
+            let total = skill.level + attr.actual;
+            println!("\t {}: {}", skill.name, total);
+        }
     }
 }
 
 pub struct Skill {
     pub name: String,
-    pub base: usize,
+    pub base: Attribute,
     pub level: usize,
     pub level_up_modifierer: usize,
 }
@@ -97,20 +128,15 @@ impl Skill {
     pub fn print(self) {
         println!(
             "Skillname {} {{
-            \ttotal: {} 
-            \tbase: {} 
+            \tbase: {:?} 
             \tlevel: {} 
             \tlevel up modifeier: {}
         }}",
-            self.name,
-            self.base + self.level,
-            self.base,
-            self.level,
-            self.level_up_modifierer
+            self.name, self.base, self.level, self.level_up_modifierer
         )
     }
 
-    pub fn new(name: String, base: usize, level: usize, level_up_modifierer: usize) -> Self {
+    pub fn new(name: String, base: Attribute, level: usize, level_up_modifierer: usize) -> Self {
         Skill {
             name,
             base,
@@ -122,7 +148,11 @@ impl Skill {
 
 impl fmt::Display for Skill {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "name: {} total: {}", self.name, self.level + self.base)
+        write!(
+            f,
+            "name: {} base: {:?} level: {}",
+            self.name, self.base, self.level
+        )
     }
 }
 
