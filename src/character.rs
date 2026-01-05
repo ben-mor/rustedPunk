@@ -1,4 +1,4 @@
-use crate::armor::HitZone;
+use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
 use std::fmt;
 use uuid::Uuid;
@@ -16,6 +16,8 @@ pub struct Character {
     pub body: Attribute,
     pub refl: Attribute,
     pub tec: Attribute,
+    pub current_damage: usize,
+    pub damage_notes: String,
     pub inventory: Inventory,
     pub worn_armor: Vec<Uuid>,
 }
@@ -67,6 +69,8 @@ impl Character {
             tec: Attribute::new(tec, tec),
             inventory: Inventory::new(),
             worn_armor: Vec::new(),
+            current_damage: 0,
+            damage_notes: "".to_string(),
         }
     }
 
@@ -104,6 +108,19 @@ Character {{ \n\
         );
     }
 
+    /// Body Type Modifier
+    /// How much damage gets reduced when being hit, based on the body stat.
+    pub fn btm(&self) -> usize {
+        match self.body.actual {
+            0..=2 => 0,
+            3..=4 => 1,
+            5..=7 => 2,
+            8..=9 => 3,
+            10 => 4,
+            _ => 5,
+        }
+    }
+
     pub fn wear_armor(&mut self, armor_uuid: Uuid, underneath: Option<Uuid>) {
         if self.inventory.get_item(armor_uuid).is_none() {
             panic!("Armor_uuid not found in inventory");
@@ -127,9 +144,61 @@ Character {{ \n\
         }
     }
 
-    #[allow(unused_variables)]
     pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) {
-        todo!();
+        let mut remaining_damage = damage;
+        let mut absorbed_damage = 0;
+
+        for i in (0..self.worn_armor.len()).rev() {
+            let armor_uuid = self.worn_armor[i];
+            let armor_item = self.inventory.get_item_mut(armor_uuid);
+            let armor_opt = armor_item.expect(&format!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
+                .as_any_mut().downcast_mut::<Armor>();
+            let armor = armor_opt.expect(&format!(
+                "There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
+                armor_uuid
+            ));
+            let damage_result = armor.hit(remaining_damage, zone, damage_type);
+            remaining_damage = damage_result.remaining_damage;
+            absorbed_damage += damage_result.absorbed_damage;
+        }
+        // House rule: 20% of absorbed damage becomes real damage through blunt trauma.
+        // TODO: implement variable for this so it rotates through subsequent hits as well.
+        // TODO: implement different handlings of DamageType (HollowPoint double damage)
+        // TODO: implement full penetration (can't do more then 4+1d10 damage, everything else goes out on the back)
+        remaining_damage += absorbed_damage / 5;
+        self.take_damage(remaining_damage, zone);
+    }
+
+    /// This ignores all armor and applies damage directly.
+    /// It will subtract the BTM first.
+    pub fn take_damage(&mut self, damage: usize, zone: HitZone) {
+        let mut remaining_damage = damage;
+        if remaining_damage > 0 {
+            remaining_damage = remaining_damage.saturating_sub(self.btm());
+            if remaining_damage < 1 {
+                remaining_damage = 1;
+            }
+
+            // TODO: Need to implement the House Rule that this doubling only takes effect after the check if it will kill you immediately.
+            if zone == HitZone::Head {
+                remaining_damage = remaining_damage * 2;
+            }
+            self.current_damage += remaining_damage;
+            if remaining_damage >= 8 {
+                if matches!(zone, HitZone::Head | HitZone::Chest | HitZone::Vitals) {
+                    self.current_damage = 100;
+                    self.damage_notes = format!("YOU ARE DEAD!\n{}", self.damage_notes);
+                } else {
+                    self.damage_notes = format!(
+                        "HitZone {} destroyed. You are now at least Mortal 0 and about to die.\n{}",
+                        zone, self.damage_notes
+                    );
+                    if self.current_damage <= 12 {
+                        self.current_damage = 13;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -202,111 +271,203 @@ impl fmt::Display for List {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::armor::Armor;
+    use crate::armor::tests::*;
 
-    fn kevlar_shirt() -> Armor {
-        Armor::new(
-            "Kevlar Shirt".to_string(),
-            1,
-            500,
-            200,
-            "Soft body armor".to_string(),
+    fn populated_character() -> Character {
+        let mut character = Character::new(
+            "test-Name".to_string(),
+            "test-Role".to_string(),
+            25,
             10,
-            vec![
-                HitZone::Chest,
-                HitZone::Shoulders,
-                HitZone::Vitals,
-                HitZone::Stomach,
-            ],
-            false,
-            1,
-        )
-    }
-
-    fn kevlar_tights() -> Armor {
-        Armor::new(
-            "Kevlar Tights".to_string(),
-            1,
-            400,
-            150,
-            "Soft leg armor".to_string(),
             10,
-            vec![
-                HitZone::LeftLeg,
-                HitZone::RightLeg,
-                HitZone::LeftFoot,
-                HitZone::RightFoot,
-                HitZone::Thighs,
-            ],
-            false,
-            1,
-        )
-    }
-
-    fn braces() -> Armor {
-        Armor::new(
-            "Braces".to_string(),
-            1,
-            200,
-            100,
-            "Arm braces".to_string(),
             10,
-            vec![HitZone::LeftArm, HitZone::RightArm],
-            false,
-            0,
-        )
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+        );
+        let kevlar_shirt = kev_shirt();
+        let kevlar_shirt_uuid = kevlar_shirt.item.uuid;
+        let flak_vest = flak_vest();
+        let flak_vest_uuid = flak_vest.item.uuid;
+        let kevlar_tights = kevlar_tights();
+        let kevlar_tights_uuid = kevlar_tights.item.uuid;
+        let leather_boots = leather_boots();
+        let leather_boots_uuid = leather_boots.item.uuid;
+        let long_leather_cloak = long_leather_cloak();
+        let long_leather_cloak_uuid = long_leather_cloak.item.uuid;
+        let braces = braces();
+        let braces_uuid = braces.item.uuid;
+        let helmet = helmet();
+        let helmet_uuid = helmet.item.uuid;
+
+        character.inventory.push(Box::new(kevlar_shirt));
+        character.inventory.push(Box::new(flak_vest));
+        character.inventory.push(Box::new(kevlar_tights));
+        character.inventory.push(Box::new(leather_boots));
+        character.inventory.push(Box::new(long_leather_cloak));
+        character.inventory.push(Box::new(braces));
+        character.inventory.push(Box::new(helmet));
+
+        character.wear_armor(kevlar_shirt_uuid, None);
+        character.wear_armor(flak_vest_uuid, None);
+        character.wear_armor(kevlar_tights_uuid, Some(flak_vest_uuid));
+        character.wear_armor(leather_boots_uuid, None);
+        character.wear_armor(long_leather_cloak_uuid, None);
+        character.wear_armor(braces_uuid, Some(flak_vest_uuid));
+        character.wear_armor(helmet_uuid, None);
+
+        character
     }
 
-    fn long_leather_cloak() -> Armor {
-        Armor::new(
-            "Long Leather Cloak".to_string(),
-            1,
-            1500,
-            300,
-            "Long protective cloak".to_string(),
-            4,
-            vec![
-                HitZone::LeftArm,
-                HitZone::RightArm,
-                HitZone::Chest,
-                HitZone::Shoulders,
-                HitZone::Vitals,
-                HitZone::Thighs,
-                HitZone::Stomach,
-                HitZone::LeftLeg,
-                HitZone::RightLeg,
-            ],
-            false,
-            2,
-        )
+    #[test]
+    #[rustfmt::skip]
+    fn test_multi_layer_armor_penetration_blunt_arm_noncrippling() {
+        let mut character = populated_character();
+        let zone = HitZone::RightArm;
+        let damage = 45;
+        character.hit(damage, zone, DamageType::Blunt);
+        let test_context = "multi-layer-arm";
+        assert_armor_protection(&character,test_context,"Kevlar Shirt",       zone,  0, HitZone::Chest,   10,);
+        assert_armor_protection(&character,test_context,"Flak Vest",          zone, 19, HitZone::Chest,   20,);
+        assert_armor_protection(&character,test_context,"Kevlar Tights",      zone,  0, HitZone::LeftLeg, 10,);
+        assert_armor_protection(&character,test_context,"Leather Boots",      zone,  0, HitZone::LeftFoot, 4,);
+        assert_armor_protection(&character,test_context,"Long Leather Cloak", zone,  3, HitZone::Chest,    4,);
+        assert_armor_protection(&character,test_context,"Braces",             zone,  9, HitZone::LeftArm, 10,);
+        assert_armor_protection(&character,test_context,"Helmet",             zone,  0, HitZone::Head,    15,);
+
+        let expected_armor_on_arm = 20 + 10 + 4;
+        let expected_blunt_trauma = expected_armor_on_arm / 5;
+        let body_type_modifier = 4;
+
+        let expected_damage = (damage - expected_armor_on_arm) + expected_blunt_trauma - body_type_modifier;
+        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
     }
 
-    fn leather_boots() -> Armor {
-        Armor::new(
-            "Leather Boots".to_string(),
-            1,
-            800,
-            100,
-            "Hard leather boots".to_string(),
-            4,
-            vec![HitZone::LeftFoot, HitZone::RightFoot],
-            true,
-            0,
-        )
+    #[test]
+    #[rustfmt::skip]
+    fn test_multi_layer_armor_penetration_blunt_head_noncrippling() {
+        let mut character = populated_character();
+        let zone = HitZone::Head;
+        let damage = 16;
+        character.hit(damage, zone, DamageType::Blunt);
+        let test_context = "multi-layer-head";
+        assert_armor_protection(&character,test_context,"Kevlar Shirt",       zone,  0, HitZone::Chest,   10,);
+        assert_armor_protection(&character,test_context,"Flak Vest",          zone,  0, HitZone::Chest,   20,);
+        assert_armor_protection(&character,test_context,"Kevlar Tights",      zone,  0, HitZone::LeftLeg, 10,);
+        assert_armor_protection(&character,test_context,"Leather Boots",      zone,  0, HitZone::LeftFoot, 4,);
+        assert_armor_protection(&character,test_context,"Long Leather Cloak", zone,  0, HitZone::Chest,    4,);
+        assert_armor_protection(&character,test_context,"Braces",             zone,  0, HitZone::LeftArm, 10,);
+        assert_armor_protection(&character,test_context,"Helmet",             zone, 14, HitZone::Vitals,   0,);
+
+        // armor on head: 15
+        // blunt trauma: 3
+        // body type modifier: 4 (but can't reduce lower than 0)
+        // damage on head is doubled
+
+        let expected_damage = 2;
+        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
     }
 
-    fn helmet() -> Armor {
-        Armor::new(
-            "Helmet".to_string(),
-            1,
-            1000,
-            250,
-            "Hard head protection".to_string(),
-            15,
-            vec![HitZone::Head],
-            true,
-            1,
-        )
+    #[test]
+    fn test_take_crippling_arm_damage() {
+        let mut character = populated_character();
+        let zone = HitZone::LeftArm;
+        let damage = 15; // -4 BTM!
+        character.take_damage(damage, zone);
+        let test_context = "crippling-arm";
+
+        // damage of 8 or more is crippling and the person immediately goes into mortal 0 state, BTM or not.
+
+        let expected_damage = 13;
+        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+    }
+
+    #[test]
+    fn test_take_crippling_vitals_damage() {
+        let mut character = populated_character();
+        let zone = HitZone::Vitals;
+        let damage = 12;
+        character.take_damage(damage, zone);
+        let test_context = "crippling-vitals";
+
+        // damage of 8 or more is crippling and on the vitals you just die.
+
+        let expected_damage = 100;
+        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+    }
+
+    #[test]
+    fn test_take_crippling_head_damage() {
+        let mut character = populated_character();
+        let zone = HitZone::Head;
+        let damage = 8;
+        character.take_damage(damage, zone);
+        let test_context = "crippling-head";
+
+        // damage of 8 or more is crippling on the head you just die, also damage is doubled.
+
+        let expected_damage = 100;
+        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+    }
+
+    fn assert_armor_protection(
+        character: &Character,
+        test_context: &str,
+        armor_name: &str,
+        hit_zone: HitZone,
+        expected_remaining_protection: usize,
+        unhit_zone: HitZone,
+        expected_original_protection_in_unhit_zone: usize,
+    ) {
+        let armor_list = character.inventory.get_all_armor();
+        let armor = armor_list
+            .iter()
+            .find(|armor_piece| armor_piece.item.name.eq(&armor_name))
+            .unwrap();
+        assert_armor_on_hit_zone(
+            test_context,
+            armor_name,
+            hit_zone,
+            expected_remaining_protection,
+            armor,
+        );
+        assert_armor_on_hit_zone(
+            test_context,
+            armor_name,
+            unhit_zone,
+            expected_original_protection_in_unhit_zone,
+            armor,
+        );
+    }
+
+    fn assert_armor_on_hit_zone(
+        test_context: &str,
+        armor_name: &str,
+        hit_zone: HitZone,
+        expected_remaining_protection: usize,
+        armor: &Armor,
+    ) {
+        let current_protection = armor.protection_current.get(&hit_zone);
+        if expected_remaining_protection == 0 {
+            assert!(
+                current_protection.is_none() || current_protection.unwrap() == &0,
+                "{}: Expected no protection, but some was found on {} {}",
+                test_context,
+                armor_name,
+                hit_zone
+            );
+        } else {
+            assert!(
+                current_protection.is_some() && current_protection.unwrap() == &expected_remaining_protection,
+                "{}: Expected some protection, but none was found on {} {}",
+                test_context,
+                armor_name,
+                hit_zone
+            )
+        }
     }
 
     #[test]
@@ -337,9 +498,6 @@ mod tests {
 
         character.wear_armor(outer_armor_uuid, None);
         character.wear_armor(inner_armor_uuid, Some(outer_armor_uuid));
-        assert_eq!(
-            character.worn_armor,
-            vec![inner_armor_uuid, outer_armor_uuid]
-        );
+        assert_eq!(character.worn_armor, vec![inner_armor_uuid, outer_armor_uuid]);
     }
 }

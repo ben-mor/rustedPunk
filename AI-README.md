@@ -3,6 +3,13 @@
 ## Overview
 Cyberpunk 2020 RPG character management system. Currency: `eb` = Eurobucks.
 
+## Instructions for the AI
+I'm learning Rust and you are my teacher.
+Don't generate code unless I explicitly ask for it.
+Mention situations where I mistype or misspell words / grammar.
+
+**Note:** This file is maintained by the AI to track project structure and design decisions.
+
 ---
 
 ## Key Abbreviations
@@ -33,6 +40,8 @@ Cyberpunk 2020 RPG character management system. Currency: `eb` = Eurobucks.
 ### InventoryItem Trait (`inventory.rs`)
 - Polymorphic inventory: `Vec<Box<dyn InventoryItem>>`
 - Composition pattern: `Armor` contains `Item`, accessed via `get_item()`
+- Uses `InventoryItem.as_any()` and `as_any_mut()` for downcasting trait objects to concrete types
+- `Inventory.get_item()` and `get_item_mut()` return `Option<&dyn InventoryItem>` and `Option<&mut dyn InventoryItem>`
 
 ---
 
@@ -63,8 +72,28 @@ Each damage type has a private helper method. Full mechanics documented on publi
 - Index 0 = innermost layer, higher indices = outer layers
 - `wear_armor(uuid, underneath: Option<Uuid>)` - wear armor at outermost or under specific armor
 - `Inventory.get_item(uuid)` and `get_all_armor()` - lookup by UUID or filter by type
-- Uses `InventoryItem.as_any()` for downcasting trait objects to concrete `Armor` type
-- Damage will process layers from outside-in (reverse iteration) - TODO in `Character.hit()`
+- Uses `InventoryItem.as_any_mut()` for downcasting trait objects to concrete `Armor` type
+- Damage processes layers from outside-in (reverse iteration) - IMPLEMENTED in `Character.hit()`
+
+---
+
+## Character Damage Mechanics (`character.rs`)
+
+### `Character.hit(damage, zone, damage_type)` - IMPLEMENTED
+- Processes damage through all worn armor layers (outside-in, reverse iteration)
+- Each layer's `Armor.hit()` returns remaining damage to pass to next layer
+- Applies 20% blunt trauma house rule: `absorbed_damage / 5` added back as damage
+- Calls `take_damage()` with final remaining damage after all armor
+
+### `Character.take_damage(damage, zone)` - IMPLEMENTED
+- Bypasses armor, applies damage directly to character
+- Applies Body Type Modifier (BTM) with minimum 1 damage rule (CP2020 RAW)
+- Uses `saturating_sub()` to prevent underflow when BTM > damage
+- **Head damage doubles** after BTM calculation
+- **Crippling damage** (8+ points after BTM):
+  - **Critical zones (Head/Chest/Vitals)**: Instant death, sets `current_damage = 100`
+  - **Other zones**: Mortal 0 state, minimum `current_damage = 13` (doesn't reduce if already higher)
+- Updates `damage_notes` with death/crippling messages
 
 ---
 

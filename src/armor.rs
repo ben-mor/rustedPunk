@@ -56,6 +56,9 @@ impl InventoryItem for Armor {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 impl fmt::Display for Armor {
@@ -239,10 +242,10 @@ impl Armor {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
 
-    fn flak_vest() -> Armor {
+    pub fn flak_vest() -> Armor {
         Armor::new(
             "Flak Vest".to_string(),
             2,
@@ -261,7 +264,8 @@ mod tests {
             1,
         )
     }
-    fn kev_shirt() -> Armor {
+
+    pub fn kev_shirt() -> Armor {
         Armor::new(
             "Kevlar Shirt".to_string(),
             2,
@@ -272,6 +276,92 @@ mod tests {
             vec![HitZone::Chest, HitZone::Vitals, HitZone::Stomach],
             false,
             0,
+        )
+    }
+
+    pub fn kevlar_tights() -> Armor {
+        Armor::new(
+            "Kevlar Tights".to_string(),
+            1,
+            400,
+            150,
+            "Soft leg armor".to_string(),
+            10,
+            vec![
+                HitZone::LeftLeg,
+                HitZone::RightLeg,
+                HitZone::LeftFoot,
+                HitZone::RightFoot,
+                HitZone::Thighs,
+            ],
+            false,
+            1,
+        )
+    }
+
+    pub fn braces() -> Armor {
+        Armor::new(
+            "Braces".to_string(),
+            1,
+            200,
+            100,
+            "Arm braces".to_string(),
+            10,
+            vec![HitZone::LeftArm, HitZone::RightArm],
+            false,
+            0,
+        )
+    }
+
+    pub fn long_leather_cloak() -> Armor {
+        Armor::new(
+            "Long Leather Cloak".to_string(),
+            1,
+            1500,
+            300,
+            "Long protective cloak".to_string(),
+            4,
+            vec![
+                HitZone::LeftArm,
+                HitZone::RightArm,
+                HitZone::Chest,
+                HitZone::Shoulders,
+                HitZone::Vitals,
+                HitZone::Thighs,
+                HitZone::Stomach,
+                HitZone::LeftLeg,
+                HitZone::RightLeg,
+            ],
+            false,
+            2,
+        )
+    }
+
+    pub fn leather_boots() -> Armor {
+        Armor::new(
+            "Leather Boots".to_string(),
+            1,
+            800,
+            100,
+            "Hard leather boots".to_string(),
+            4,
+            vec![HitZone::LeftFoot, HitZone::RightFoot],
+            true,
+            0,
+        )
+    }
+
+    pub fn helmet() -> Armor {
+        Armor::new(
+            "Helmet".to_string(),
+            1,
+            1000,
+            250,
+            "Hard head protection".to_string(),
+            15,
+            vec![HitZone::Head],
+            true,
+            1,
         )
     }
 

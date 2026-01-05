@@ -9,6 +9,7 @@ pub trait InventoryItem: fmt::Display {
         false
     }
     fn as_any(&self) -> &dyn std::any::Any;
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }
 
 pub struct Inventory {
@@ -36,6 +37,10 @@ impl InventoryItem for Item {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
 }
 
 impl fmt::Display for Inventory {
@@ -59,21 +64,21 @@ impl Inventory {
             .collect()
     }
 
-    pub fn get_item(&self, uuid: Uuid) -> Option<&Item> {
+    pub fn get_item(&self, uuid: Uuid) -> Option<&dyn InventoryItem> {
         let item = self.items.iter().find(|item| item.get_item().uuid == uuid);
         if item.is_some() {
-            return Some(item.unwrap().get_item());
+            return Some(item.unwrap().as_ref());
         }
         None
     }
 
-    pub fn get_item_mut(&mut self, uuid: Uuid) -> Option<&mut Item> {
+    pub fn get_item_mut(&mut self, uuid: Uuid) -> Option<&mut dyn InventoryItem> {
         let item = self
             .items
             .iter_mut()
             .find(|item| item.get_item().uuid == uuid);
         if item.is_some() {
-            return Some(item.unwrap().get_item_mut());
+            return Some(item.unwrap().as_mut());
         }
         None
     }
