@@ -144,6 +144,10 @@ Character {{ \n\
         }
     }
 
+    /// Hit the character with some damage
+    ///
+    /// This will apply damage to the armor (outer to inner) and then to the character.
+    ///
     pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) {
         let mut remaining_damage = damage;
         let mut absorbed_damage = 0;
