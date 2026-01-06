@@ -186,11 +186,11 @@ Character {{ \n\
 
     pub fn wear_armor(&mut self, armor_uuid: Uuid, underneath: Option<Uuid>) {
         if self.inventory.get_item(armor_uuid).is_none() {
-            panic!("Armor_uuid not found in inventory");
+            unreachable!("Armor_uuid not found in inventory");
         }
         if underneath.is_some() {
             if self.inventory.get_item(underneath.unwrap()).is_none() {
-                panic!("underneath_uuid not found in inventory");
+                unreachable!("underneath_uuid not found in inventory");
             }
             if let Some(index) = self
                 .worn_armor
@@ -200,7 +200,7 @@ Character {{ \n\
                 // Insert the new armor at that index (pushes existing armor one position higher)
                 self.worn_armor.insert(index, armor_uuid);
             } else {
-                self.worn_armor.push(armor_uuid);
+                panic!("tried to wear something underneath an armor that isn't worn.");
             }
         } else {
             self.worn_armor.push(armor_uuid);
