@@ -1,4 +1,4 @@
-use rusted_punk::{Armor, Character, DamageType, HitZone, Item, List, Skill};
+use rusted_punk::{Armor, Attribute, Character, DamageType, HitZone, Item, List, Skill};
 
 fn main() {
     armor_test();
@@ -93,19 +93,22 @@ fn character_test() {
     cool_guy.print();
     cool_guy.hit(15, HitZone::Chest, DamageType::ArmorPiercing);
     cool_guy.print();
+
+    cool_guy.print_skills();
 }
 
 fn skill_test() {
-    let skill = Skill::new("Schleichen".to_string(), 7, 2, 3);
+    let skill = Skill::new("Schleichen".to_string(), Attribute::Reflexes, 2, 3);
     skill.print()
 }
 
 // keine ahnung warum aber es geht
 fn list_test() {
     let v = List(vec![
-        Skill::new("schleichen".to_string(), 4, 2, 3),
-        Skill::new("schiesen".to_string(), 7, 4, 3),
-        Skill::new("werfen".to_string(), 6, 2, 3),
+        Skill::new("schleichen".to_string(), Attribute::Reflexes, 2, 3),
+        Skill::new("schiesen".to_string(), Attribute::Reflexes, 4, 3),
+        Skill::new("werfen".to_string(), Attribute::Reflexes, 2, 3),
+        Skill::new("Erste Hilfe".to_string(), Attribute::Tech, 2, 3),
     ]);
     println!("{}", v);
 }

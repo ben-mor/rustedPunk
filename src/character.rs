@@ -1,39 +1,113 @@
+use std::ops::{Deref, DerefMut};
 use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
+use std::collections::BTreeMap;
 use std::fmt;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use serde_with::{serde_as, DisplayFromStr};
 
+#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Character {
     pub name: String,
     pub role: String,
     pub age: usize,
-    pub att: Attribute,
-    pub mov: Attribute,
-    pub coo: Attribute,
-    pub emp: Attribute,
-    pub luck: Attribute,
-    pub int: Attribute,
-    pub body: Attribute,
-    pub refl: Attribute,
-    pub tec: Attribute,
     pub current_damage: usize,
     pub damage_notes: String,
-    pub inventory: Inventory,
     pub worn_armor: Vec<Uuid>,
+    pub skills: Vec<Skill>,
+    pub attributes: Attributes,
+    pub inventory: Inventory,
 }
 
-pub struct Attribute {
-    pub base: usize,
-    pub actual: usize,
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, Serialize, Deserialize, PartialOrd, Ord)]
+pub enum Attribute {
+    Attractiveness,
+    Move,
+    Coolness,
+    Empathy,
+    Luck,
+    Intelligence,
+    Body,
+    Reflexes,
+    Tech,
 }
 
-impl Attribute {
-    pub fn new(actual: usize, base: usize) -> Self {
-        Attribute { base, actual }
+impl fmt::Display for Character {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
 impl fmt::Display for Attribute {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::str::FromStr for Attribute {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match &*s.to_lowercase() {
+            "attractiveness" => Ok(Self::Attractiveness),
+            "move" => Ok(Self::Move),
+            "coolness" => Ok(Self::Coolness),
+            "empathy" => Ok(Self::Empathy),
+            "luck" => Ok(Self::Luck),
+            "intelligence" => Ok(Self::Intelligence),
+            "body" => Ok(Self::Body),
+            "reflexes" => Ok(Self::Reflexes),
+            "tech" => Ok(Self::Tech),
+            _ => Err(format!("Unknown attribute: {}", s)),
+        }
+    }
+}
+
+#[serde_as]
+#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Attributes(
+    #[serde_as(as = "BTreeMap<DisplayFromStr, _>")]
+    BTreeMap<Attribute, AttributeValue>
+);
+
+impl Deref for Attributes {
+    type Target = BTreeMap<Attribute, AttributeValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Attributes {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl fmt::Display for Attributes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for (attr, value) in &self.0 {
+            writeln!(f, "\t{}: {}", attr, value)?;
+        }
+        Ok(())
+    }
+}
+
+#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct AttributeValue {
+    pub base: usize,
+    pub actual: usize,
+}
+
+impl AttributeValue {
+    pub fn new(actual: usize, base: usize) -> Self {
+        AttributeValue { base, actual }
+    }
+}
+
+impl fmt::Display for AttributeValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}", self.actual, self.base)
     }
@@ -54,24 +128,29 @@ impl Character {
         refl: usize,
         tec: usize,
     ) -> Self {
-        Character {
+        let mut character = Character {
             name,
             role,
             age,
-            att: Attribute::new(att, att),
-            mov: Attribute::new(mov, mov),
-            coo: Attribute::new(coo, coo),
-            emp: Attribute::new(emp, emp),
-            luck: Attribute::new(luck, luck),
-            int: Attribute::new(int, int),
-            body: Attribute::new(body, body),
-            refl: Attribute::new(refl, refl),
-            tec: Attribute::new(tec, tec),
+            attributes: Attributes(BTreeMap::new()),
             inventory: Inventory::new(),
             worn_armor: Vec::new(),
             current_damage: 0,
             damage_notes: "".to_string(),
-        }
+            skills: Vec::new(),
+        };
+
+        character.attributes.insert(Attribute::Attractiveness, AttributeValue { base: att, actual: att });
+        character.attributes.insert(Attribute::Move, AttributeValue { base: mov, actual: mov });
+        character.attributes.insert(Attribute::Coolness, AttributeValue { base: coo, actual: coo });
+        character.attributes.insert(Attribute::Empathy, AttributeValue { base: emp, actual: emp });
+        character.attributes.insert(Attribute::Luck, AttributeValue { base: luck, actual: luck });
+        character.attributes.insert(Attribute::Intelligence, AttributeValue { base: int, actual: int });
+        character.attributes.insert(Attribute::Body, AttributeValue { base: body, actual: body });
+        character.attributes.insert(Attribute::Reflexes, AttributeValue { base: refl, actual: refl });
+        character.attributes.insert(Attribute::Tech, AttributeValue { base: tec, actual: tec });
+
+        character
     }
 
     pub fn print(&self) {
@@ -81,29 +160,13 @@ Character {{ \n\
 \tname: {}\n\
 \trole: {}\n\
 \tage: {}\n\
-\tatt: {}\n\
-\tmov: {}\n\
-\tcoo: {}\n\
-\temp: {}\n\
-\tluck: {}\n\
-\tint: {}\n\
-\tbody: {}\n\
-\tref: {}\n\
-\ttec: {}\n\
+\tAttributes: {}\n\
 \tInventory: {}\n\
 }}",
             self.name,
             self.role,
             self.age,
-            self.att,
-            self.mov,
-            self.coo,
-            self.emp,
-            self.luck,
-            self.int,
-            self.body,
-            self.refl,
-            self.tec,
+            self.attributes,
             self.inventory,
         );
     }
@@ -111,7 +174,7 @@ Character {{ \n\
     /// Body Type Modifier
     /// How much damage gets reduced when being hit, based on the body stat.
     pub fn btm(&self) -> usize {
-        match self.body.actual {
+        match self.attributes.get(&Attribute::Body).unwrap().actual {
             0..=2 => 0,
             3..=4 => 1,
             5..=7 => 2,
@@ -204,45 +267,52 @@ Character {{ \n\
             }
         }
     }
+    pub fn print_skills(&self) {
+        println!("Skills:");
+        for skill in &self.skills {
+            let attr = self.attributes.get(&skill.base).unwrap();
+            let total = skill.level + attr.actual;
+            println!("\t {}: {}", skill.name, total);
+        }
+    }
 }
 
+#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Skill {
     pub name: String,
-    pub base: usize,
+    pub base: Attribute,
     pub level: usize,
-    pub level_up_modifierer: usize,
+    pub level_up_modifier: usize,
 }
 
 impl Skill {
     pub fn print(self) {
         println!(
             "Skillname {} {{
-            \ttotal: {}
             \tbase: {}
             \tlevel: {}
-            \tlevel up modifeier: {}
+            \tlevel up modifier: {}
         }}",
             self.name,
-            self.base + self.level,
             self.base,
             self.level,
-            self.level_up_modifierer
+            self.level_up_modifier
         )
     }
 
-    pub fn new(name: String, base: usize, level: usize, level_up_modifierer: usize) -> Self {
+    pub fn new(name: String, base: Attribute, level: usize, level_up_modifierer: usize) -> Self {
         Skill {
             name,
             base,
             level,
-            level_up_modifierer,
+            level_up_modifier: level_up_modifierer,
         }
     }
 }
 
 impl fmt::Display for Skill {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "name: {} total: {}", self.name, self.level + self.base)
+        write!(f, "name: {}, level: {}, base: {}", self.name, self.level, self.base)
     }
 }
 
@@ -276,6 +346,7 @@ impl fmt::Display for List {
 mod tests {
     use super::*;
     use crate::armor::tests::*;
+    use toml;
 
     fn populated_character() -> Character {
         let mut character = Character::new(
@@ -503,5 +574,49 @@ mod tests {
         character.wear_armor(outer_armor_uuid, None);
         character.wear_armor(inner_armor_uuid, Some(outer_armor_uuid));
         assert_eq!(character.worn_armor, vec![inner_armor_uuid, outer_armor_uuid]);
+    }
+
+    #[test]
+    fn test_attribute_value_serialization() {
+        let attribute_value = AttributeValue::new(5, 5);
+        let serialized_attribute = toml::to_string(&attribute_value).unwrap();
+        let deserialized_attribute: AttributeValue = toml::from_str(&serialized_attribute).unwrap();
+        assert_eq!(attribute_value, deserialized_attribute);
+    }
+
+    #[test]
+    fn test_attribute_enum_serialization() {
+        let attribute = Attribute::Reflexes;
+        let serialized = toml::to_string(&attribute).unwrap();
+        let deserialized: Attribute = toml::from_str(&serialized).unwrap();
+        assert_eq!(attribute, deserialized);
+    }
+
+    #[test]
+    fn test_skill_serialization() {
+        let skill = Skill::new("Schleichen".to_string(), Attribute::Reflexes, 2, 3);
+        let serialized = toml::to_string(&skill).unwrap();
+        let deserialized: Skill = toml::from_str(&serialized).unwrap();
+        assert_eq!(skill, deserialized);
+    }
+
+    #[test]
+    fn test_attributes_serialization() {
+        let mut attributes = Attributes(BTreeMap::new());
+        attributes.insert(Attribute::Body, AttributeValue::new(7, 7));
+        attributes.insert(Attribute::Reflexes, AttributeValue::new(6, 6));
+        let serialized = toml::to_string(&attributes).unwrap();
+        let deserialized: Attributes = toml::from_str(&serialized).unwrap();
+        assert_eq!(attributes, deserialized);
+    }
+
+    #[test]
+    fn test_character_serialization() {
+        let character = populated_character();
+        let serialized_character_option = toml::to_string(&character);
+        let serialized_character = serialized_character_option.unwrap();
+        print!("serialized_character: {:?}", serialized_character);
+        let deserialized_character: Character = toml::from_str(&serialized_character).unwrap();
+        assert_eq!(character, deserialized_character, "character serialization round-trip didn't work {}", character);
     }
 }

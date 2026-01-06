@@ -1,24 +1,30 @@
 use crate::inventory::InventoryItem;
 use crate::inventory::Item;
 use crate::weapons::DamageType;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fmt;
+use std::str::FromStr;
+use serde::{Serialize, Deserialize};
+use serde_with::{serde_as, DisplayFromStr};
 
+#[serde_as]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct Armor {
-    pub item: Item,
     pub protection_max: usize,
-    pub protection_current: HashMap<HitZone, usize>,
     pub is_hard: bool,
     pub encumbrance: usize,
+    pub item: Item,
+    #[serde_as(as = "BTreeMap<DisplayFromStr, _>")]
+    pub protection_current: BTreeMap<HitZone, usize>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DamageResult {
     pub remaining_damage: usize,
     pub absorbed_damage: usize,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum HitZone {
     Head,
     LeftHand,
@@ -34,6 +40,30 @@ pub enum HitZone {
     RightLeg,
     LeftFoot,
     RightFoot,
+}
+
+impl FromStr for HitZone {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match &*s.to_lowercase() {
+            "head" => Ok(HitZone::Head),
+            "lefthand" => Ok(HitZone::LeftHand),
+            "righthand" => Ok(HitZone::RightHand),
+            "leftarm" => Ok(HitZone::LeftArm),
+            "rightarm" => Ok(HitZone::RightArm),
+            "shoulders" => Ok(HitZone::Shoulders),
+            "chest" => Ok(HitZone::Chest),
+            "stomach" => Ok(HitZone::Stomach),
+            "vitals" => Ok(HitZone::Vitals),
+            "thighs" => Ok(HitZone::Thighs),
+            "leftleg" => Ok(HitZone::LeftLeg),
+            "rightleg" => Ok(HitZone::RightLeg),
+            "leftfoot" => Ok(HitZone::LeftFoot),
+            "rightfoot" => Ok(HitZone::RightFoot),
+            _ => Err(format!("Invalid hit zone: {}", s)),
+        }
+    }
 }
 
 impl fmt::Display for HitZone {
@@ -59,6 +89,13 @@ impl InventoryItem for Armor {
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
+    fn equals(&self, other: &dyn InventoryItem) -> bool {
+        if let Some(other_armor) = other.as_any().downcast_ref::<Armor>() {
+            self == other_armor
+        } else {
+            false
+        }
+    }
 }
 
 impl fmt::Display for Armor {
@@ -83,7 +120,7 @@ impl Armor {
         is_hard: bool,
         encumbrance: usize,
     ) -> Self {
-        let mut protection_current = HashMap::new();
+        let mut protection_current = BTreeMap::new();
         for zone in protected_zones {
             protection_current.insert(zone, protection_max);
         }
@@ -421,6 +458,33 @@ pub mod tests {
         test_armor_hit(&mut kev_shirt(), 0, DamageType::HollowPoint, 0, 0, 10);
         test_armor_hit(&mut flak_vest(), 0, DamageType::Slashing, 0, 0, 20);
         test_armor_hit(&mut kev_shirt(), 0, DamageType::Slashing, 0, 0, 10);
+    }
+
+    #[test]
+    fn test_hit_zone_serialization() {
+        let zone = HitZone::RightArm;
+        let serialized = toml::to_string(&zone).unwrap();
+        let deserialized: HitZone = toml::from_str(&serialized).unwrap();
+        assert_eq!(zone, deserialized);
+    }
+
+    #[test]
+    fn test_damage_result_serialization() {
+        let result = DamageResult {
+            remaining_damage: 10,
+            absorbed_damage: 5,
+        };
+        let serialized = toml::to_string(&result).unwrap();
+        let deserialized: DamageResult = toml::from_str(&serialized).unwrap();
+        assert_eq!(result, deserialized);
+    }
+
+    #[test]
+    fn test_armor_serialization() {
+        let armor = flak_vest();
+        let serialized = toml::to_string(&armor).unwrap();
+        let deserialized: Armor = toml::from_str(&serialized).unwrap();
+        assert_eq!(armor, deserialized);
     }
 
     #[test]
