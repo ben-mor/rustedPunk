@@ -1,10 +1,11 @@
 [package]
 name = "rusted-punk"
 version = "0.1.0"
-authors = ["Benedikt <Sayrin@web.de>"]
+authors = ["Benedikt <Sayrin@web.de>", "Ben Mor Fuchs <ben@sommerfuchs.info>"]
 edition = "2018"
 
 [dependencies]
+uuid = { version = "1.19", features = ["v4", "serde"] }
 serde = { version = "1.0.118", features = ["derive"] }
 toml = "0.5.8"
 serde_with = "1.6.0"
