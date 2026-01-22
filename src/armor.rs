@@ -285,7 +285,7 @@ pub mod tests {
     pub fn flak_vest() -> Armor {
         Armor::new(
             "Flak Vest".to_string(),
-            2,
+            1,
             1000,
             100,
             "Hard armor with 20 SP".to_string(),
@@ -305,7 +305,7 @@ pub mod tests {
     pub fn kev_shirt() -> Armor {
         Armor::new(
             "Kevlar Shirt".to_string(),
-            2,
+            1,
             1000,
             100,
             "Soft armor with 10 SP".to_string(),

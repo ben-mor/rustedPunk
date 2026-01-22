@@ -184,6 +184,32 @@ Character {{ \n\
         }
     }
 
+    /// Calculates the malus to movement and reflexes based on encumberance
+    pub fn encumberance(&self) -> usize {
+        let inventory_weight = self.inventory.calculate_total_weight();
+        let capacity = self.carry_capacity();
+        match (inventory_weight*10) / capacity {
+            0..=4 => 0,
+            5..=6 => 1,
+            7..=9 => 2,
+            10..=12 => 4,
+            13..=15 => 6,
+            _ => 8,
+        }
+    }
+
+    /// Looks up the carry capacity of the character
+    /// Returns grams.
+    pub fn carry_capacity(&self) -> usize {
+        self.attributes.get(&Attribute::Body).unwrap().actual * 10000
+    }
+
+    /// Looks up the deadlift capacity of the character
+    /// Returns grams.
+    pub fn deadlift(&self) -> usize {
+        self.carry_capacity() * 4
+    }
+
     pub fn wear_armor(&mut self, armor_uuid: Uuid, underneath: Option<Uuid>) {
         if self.inventory.get_item(armor_uuid).is_none() {
             unreachable!("Armor_uuid not found in inventory");
@@ -618,5 +644,62 @@ mod tests {
         print!("serialized_character: {:?}", serialized_character);
         let deserialized_character: Character = toml::from_str(&serialized_character).unwrap();
         assert_eq!(character, deserialized_character, "character serialization round-trip didn't work {}", character);
+    }
+
+    #[test]
+    fn test_character_carry_capacity() {
+        let character = populated_character();
+        let carry_capacity = character.carry_capacity();
+        assert_eq!(carry_capacity, 100_000);
+    }
+
+    #[test]
+    fn test_character_deadlift() {
+        let character = populated_character();
+        let deadlift = character.deadlift();
+        assert_eq!(deadlift, 400_000);
+    }
+
+    #[test]
+    fn test_character_encumberance() {
+        let mut character = populated_character();
+        assert_eq!(character.encumberance(), 0);
+        assert_eq!(character.inventory.calculate_total_weight(), 5_900);
+        for _i in 0..44 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 49_900);
+        assert_eq!(character.encumberance(), 0);
+        character.inventory.push(Box::new(kev_shirt()));
+        assert_eq!(character.inventory.calculate_total_weight(), 50_900);
+        assert_eq!(character.encumberance(), 1);
+        for _i in 0..20 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 70_900);
+        assert_eq!(character.encumberance(), 2);
+        for _i in 0..20 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 90_900);
+        assert_eq!(character.encumberance(), 2);
+        for _i in 0..9 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 99_900);
+        assert_eq!(character.encumberance(), 2);
+        character.inventory.push(Box::new(kev_shirt()));
+        assert_eq!(character.inventory.calculate_total_weight(), 100_900);
+        assert_eq!(character.encumberance(), 4);
+        for _i in 0..30 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 130_900);
+        assert_eq!(character.encumberance(), 6);
+        for _i in 0..30 {
+            character.inventory.push(Box::new(kev_shirt()));
+        }
+        assert_eq!(character.inventory.calculate_total_weight(), 160_900);
+        assert_eq!(character.encumberance(), 8);
     }
 }

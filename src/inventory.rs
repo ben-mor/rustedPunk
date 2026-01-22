@@ -254,6 +254,7 @@ mod tests {
         use crate::armor::tests::flak_vest;
         let mut inv = create_simple_inventory();
         inv.push(Box::new(flak_vest()));
+        inv.push(Box::new(flak_vest()));
 
         inv
     }
