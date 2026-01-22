@@ -12,7 +12,7 @@ use serde_with::{serde_as, DisplayFromStr};
 pub struct Armor {
     pub protection_max: usize,
     pub is_hard: bool,
-    pub encumbrance: usize,
+    pub encumberance: usize,
     pub item: Item,
     #[serde_as(as = "BTreeMap<DisplayFromStr, _>")]
     pub protection_current: BTreeMap<HitZone, usize>,
@@ -118,7 +118,7 @@ impl Armor {
         protection_max: usize,
         protected_zones: Vec<HitZone>,
         is_hard: bool,
-        encumbrance: usize,
+        encumberance: usize,
     ) -> Self {
         let mut protection_current = BTreeMap::new();
         for zone in protected_zones {
@@ -129,7 +129,7 @@ impl Armor {
             protection_max,
             protection_current: protection_current,
             is_hard: is_hard,
-            encumbrance: encumbrance,
+            encumberance: encumberance,
         }
     }
 
@@ -332,7 +332,7 @@ pub mod tests {
                 HitZone::Thighs,
             ],
             false,
-            1,
+            0,
         )
     }
 
@@ -370,7 +370,7 @@ pub mod tests {
                 HitZone::RightLeg,
             ],
             false,
-            2,
+            0,
         )
     }
 
@@ -398,7 +398,7 @@ pub mod tests {
             15,
             vec![HitZone::Head],
             true,
-            1,
+            0,
         )
     }
 

@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::fmt;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -199,7 +199,8 @@ Character {{ \n\
         let base_value = self.attributes[&attr].actual;
 
         match attr {
-            Attribute::Reflexes => base_value.saturating_sub(self.encumberance()),
+            Attribute::Reflexes => base_value.saturating_sub(self.encumberance()
+                + self.calculate_armor_encumberance()),
             Attribute::Move => base_value.saturating_sub(self.encumberance()),
             _ => base_value
         }
@@ -314,6 +315,44 @@ Character {{ \n\
             }
         }
     }
+
+    pub fn calculate_armor_encumberance(&self) -> usize {
+        let mut encumberance = 0;
+        let mut covered_zones = HashSet::new();
+        for i in (0..self.worn_armor.len()).rev() {
+            let armor = self.get_armor_ref_on_index(i);
+            let zones: Vec<HitZone> = armor.protection_current.keys().copied().collect();
+            // if there is already armor covering that zone, add the encumberance of the new
+            // armor, but at least 1
+            let mut any_zone_covered = false;
+            for zone in zones {
+                if covered_zones.contains(&zone) {
+                    any_zone_covered = true;
+                } else {
+                    covered_zones.insert(zone);
+                }
+            }
+            if any_zone_covered {
+                encumberance += armor.encumberance.max(1);
+            } else {
+                encumberance += armor.encumberance;
+            }
+        }
+        encumberance
+    }
+
+    fn get_armor_ref_on_index(&self, i: usize) -> &Armor {
+        let armor_uuid = self.worn_armor[i];
+        let armor_item = self.inventory.get_item(armor_uuid);
+        let armor_opt = armor_item.expect(&format!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
+            .as_any().downcast_ref::<Armor>();
+        let armor = armor_opt.expect(&format!(
+            "There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
+            armor_uuid
+        ));
+        armor
+    }
+
     pub fn print_skills(&self) {
         println!("Skills:");
         for skill in &self.skills {
@@ -682,8 +721,27 @@ mod tests {
     }
 
     #[test]
+    fn test_character_armor_encumberance() {
+        let mut character = populated_character();
+        assert_eq!(character.calculate_armor_encumberance(), 4);
+        for _i in 0..3 {
+            let kev_shirt = kev_shirt();
+            let uuid = kev_shirt.item.uuid;
+            character.inventory.push(Box::new(kev_shirt));
+            character.worn_armor.push(uuid);
+        }
+        assert_eq!(character.calculate_armor_encumberance(), 7); // +1 per layer
+        let flak_vest = flak_vest();
+        let uuid = flak_vest.item.uuid;
+        character.inventory.push(Box::new(flak_vest));
+        character.worn_armor.push(uuid);
+        assert_eq!(character.calculate_armor_encumberance(), 9); // +1 per layer +1 vest
+    }
+
+    #[test]
     fn test_character_encumberance() {
         let mut character = populated_character();
+        let basic_ref = character.effective_attribute(Attribute::Reflexes);
         assert_eq!(character.encumberance(), 0);
         assert_eq!(character.inventory.calculate_total_weight(), 5_900);
         for _i in 0..44 {
@@ -694,7 +752,7 @@ mod tests {
         character.inventory.push(Box::new(kev_shirt()));
         assert_eq!(character.inventory.calculate_total_weight(), 50_900);
         assert_eq!(character.encumberance(), 1);
-        assert_eq!(character.effective_attribute(Attribute::Reflexes), 9);
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), basic_ref -1);
         assert_eq!(character.effective_attribute(Attribute::Move), 9);
         for _i in 0..20 {
             character.inventory.push(Box::new(kev_shirt()));
@@ -724,7 +782,7 @@ mod tests {
         }
         assert_eq!(character.inventory.calculate_total_weight(), 160_900);
         assert_eq!(character.encumberance(), 8);
-        assert_eq!(character.effective_attribute(Attribute::Reflexes), 2);
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), basic_ref.saturating_sub(8));
         assert_eq!(character.effective_attribute(Attribute::Move), 2);
     }
 }
