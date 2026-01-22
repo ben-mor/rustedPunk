@@ -97,6 +97,37 @@ Each damage type has a private helper method. Full mechanics documented on publi
 
 ---
 
+## Encumbrance & Weight System (`character.rs`, `inventory.rs`)
+
+### Weight Tracking
+- `Inventory.calculate_total_weight()` - Sums `weight_grams` of all items
+- `Character.carry_capacity()` - Returns `Body * 10,000` grams (Body 5 = 50kg)
+- `Character.deadlift()` - Returns `carry_capacity() * 4`
+
+### Encumbrance Penalties
+Calculated as ratio of `inventory_weight / carry_capacity`:
+- **0.0-0.49**: No penalty (0)
+- **0.5-0.69**: -1 penalty
+- **0.7-0.99**: -2 penalty
+- **1.0-1.29**: -4 penalty (overloaded!)
+- **1.3-1.59**: -6 penalty
+- **1.6+**: -8 penalty
+
+Implementation uses integer math: `(inventory_weight * 10) / capacity` to avoid floating point.
+
+### Attribute System: Base vs Actual vs Effective
+- **`base`**: Natural attribute at character creation (never changes)
+- **`actual`**: "Current" value shown on character sheet, includes semi-permanent mods (cyberware, training, long-term injuries). Persists between sessions.
+- **`effective_attribute(attr)`**: Calculated on-demand for dice rolls. Includes temporary modifiers (drugs, encumbrance, combat effects).
+
+Design pattern: Calculate effective values on-demand rather than caching. Avoids synchronization issues with multiple modifier sources.
+
+Encumbrance affects:
+- **Reflexes**: Reduced by inventory encumbrance + armor encumbrance
+- **Move**: Reduced by inventory encumbrance only
+
+---
+
 ## Quick Reference
 
 | What | Where |
