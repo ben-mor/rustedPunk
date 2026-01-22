@@ -95,6 +95,15 @@ impl fmt::Display for Attributes {
     }
 }
 
+/// Represents a character attribute with base and current values.
+///
+/// - `base`: The attribute value at character creation (natural/starting value)
+/// - `actual`: The "current" value including semi-permanent modifications
+///   (cyberware, training, long-term injuries). This is what appears on the
+///   character sheet and persists between sessions.
+///
+/// For momentary effects (drugs, encumbrance, combat boosts), use
+/// `Character::effective_attribute()` which calculates the actual roll value.
 #[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct AttributeValue {
     pub base: usize,
@@ -181,6 +190,18 @@ Character {{ \n\
             8..=9 => 3,
             10 => 4,
             _ => 5,
+        }
+    }
+
+    /// Returns the effective attribute value for dice rolls, including all
+    /// temporary modifiers (encumbrance, drugs, combat effects, etc.).
+    pub fn effective_attribute(&self, attr: Attribute) -> usize {
+        let base_value = self.attributes[&attr].actual;
+
+        match attr {
+            Attribute::Reflexes => base_value.saturating_sub(self.encumberance()),
+            Attribute::Move => base_value.saturating_sub(self.encumberance()),
+            _ => base_value
         }
     }
 
@@ -673,6 +694,8 @@ mod tests {
         character.inventory.push(Box::new(kev_shirt()));
         assert_eq!(character.inventory.calculate_total_weight(), 50_900);
         assert_eq!(character.encumberance(), 1);
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), 9);
+        assert_eq!(character.effective_attribute(Attribute::Move), 9);
         for _i in 0..20 {
             character.inventory.push(Box::new(kev_shirt()));
         }
@@ -701,5 +724,7 @@ mod tests {
         }
         assert_eq!(character.inventory.calculate_total_weight(), 160_900);
         assert_eq!(character.encumberance(), 8);
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), 2);
+        assert_eq!(character.effective_attribute(Attribute::Move), 2);
     }
 }
