@@ -135,7 +135,7 @@ impl fmt::Display for Inventory {
         for item in &self.items {
             write!(f, "\n\t\t{}", item)?;
         }
-        write!(f, "\n\tTotal weight: {}", self.calc_total_weight())
+        write!(f, "\n\tTotal weight: {}", self.calculate_total_weight())
     }
 }
 
@@ -170,7 +170,7 @@ impl Inventory {
         None
     }
 
-    pub fn calc_total_weight(&self) -> usize {
+    pub fn calculate_total_weight(&self) -> usize {
         let mut total = 0;
         for item in &self.items {
             total += item.get_item().amount * item.get_item().weight_grams;
@@ -236,10 +236,7 @@ mod tests {
         assert_eq!(item, deserialized);
     }
 
-    #[test]
-    fn test_inventory_serialization() {
-        use crate::armor::tests::flak_vest;
-
+    fn create_simple_inventory() -> Inventory {
         let mut inv = Inventory::new();
         inv.push(Box::new(Item::new(
             None,
@@ -249,11 +246,34 @@ mod tests {
             0,
             "Test item".to_string(),
         )));
+
+        inv
+    }
+
+    fn create_simple_inventory_with_armor() -> Inventory {
+        use crate::armor::tests::flak_vest;
+        let mut inv = create_simple_inventory();
         inv.push(Box::new(flak_vest()));
+
+        inv
+    }
+
+    #[test]
+    fn test_inventory_serialization() {
+        let inv = create_simple_inventory();
 
         let serialized = toml::to_string(&inv).unwrap();
         println!("serialized: {}", serialized);
         let deserialized: Inventory = toml::from_str(&serialized).unwrap();
         assert_eq!(inv, deserialized);
     }
+
+    #[test]
+    fn test_calc_weight() {
+        let inv = create_simple_inventory_with_armor();
+
+        let total_weight = inv.calculate_total_weight();
+        assert_eq!(total_weight, 1500 + 1000 + 1000); // one broomstick and two flak vests
+    }
+
 }
