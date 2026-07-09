@@ -320,10 +320,16 @@ The workshop trade system IS in scope.)*
   validation, age points, data-driven lifepath with --classic/--desaster
   toggle (Q29; classic tables are a best-effort transcription, REVIEW), money,
   trait catalog as reviewable TOML (Q30), NSC skeleton generation.
-- **M7 — Frontend**: **ON HOLD (Q31)** — Ben hasn't decided hosting/auth yet.
-  Long-term goal remains a web service on Ben's server with auto-rolls and an
-  AI-agent-friendly API; keep the rules engine a pure library with a thin API
-  layer; the current CLI `main.rs` stays a dev playground until then.
+- **M7 — Frontend**: scoped as **EPIC #33** (2026-07-10), implementation
+  **ON HOLD (Q31: hosting/auth undecided)**. Sub-issues in priority order:
+  #34 character maintenance UI live + PDF (*first*), #35 news tracker with
+  propagation (merchants carry news; AI-agent collaboration; replaces Ben's
+  Gnumeric sheet), #37 random encounters (post-apoc adaptation of the Night
+  City list), #38 loot generation (refresh the ~150-item list), #39 session
+  log with tags (replaces the Fandom diary; unified with the character sheet),
+  #36 automated full-auto rolls (*lowest*). Ben has detailed requirements per
+  step, to be collected when each sub-issue starts. Ground rule: rules engine
+  stays a pure library, thin agent-friendly API on top.
 - **M8 — Campaign tools**: workshop equipment-token trade simulator (in scope);
   no XP tracking.
 
