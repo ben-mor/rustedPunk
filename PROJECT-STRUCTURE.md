@@ -233,6 +233,8 @@ authoritative source since it is not on the wiki)*
   age 16→1 … 24→9, 25→11, 26→13, 27→15, 28→17, 29→20, 30→23, 31→26, 32→29).
 - Skill costs at creation: level N costs N points cumulative-per-level
   (1,2,3 …). Caps: one skill at 8, one at 7, two at 6 — tradeable 1:2 downward.
+- In-play skill raises *(decided, Q32)*: **target level × 10 CP** (7→8 = 80 CP;
+  the wiki's old "40" was wrong and is fixed).
 - Reading/writing is a 5/10 CP advantage; higher education 15 CP and gates
   academic skills (2 levels allowed without it, given fitting background).
 - Starting equipment budget = (sum of levels of three profession-defining skills,
