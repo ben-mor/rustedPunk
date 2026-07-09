@@ -1,7 +1,7 @@
 use crate::armor::Armor;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use uuid::Uuid;
-use serde::{Deserialize, Serialize};
 
 /// IMPORTANT: When adding new types that implement InventoryItem, you MUST also:
 /// 1. Add a variant to SerializableInventoryItem
@@ -25,7 +25,7 @@ pub struct Inventory {
 impl fmt::Debug for Inventory {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Inventory")
-            .field("items", &self.items.len())  // Can't debug trait objects easily
+            .field("items", &self.items.len()) // Can't debug trait objects easily
             .finish()
     }
 }
@@ -44,8 +44,12 @@ enum SerializeableInventoryItem {
 
 impl PartialEq for Inventory {
     fn eq(&self, other: &Self) -> bool {
-        self.items.len() == other.items.len() &&
-        self.items.iter().zip(other.items.iter()).all(|(a, b)| a.equals(b.as_ref()))
+        self.items.len() == other.items.len()
+            && self
+                .items
+                .iter()
+                .zip(other.items.iter())
+                .all(|(a, b)| a.equals(b.as_ref()))
     }
 }
 
@@ -60,16 +64,18 @@ impl Serialize for Inventory {
 
         for item in &self.items {
             if let Some(armor) = item.as_any().downcast_ref::<Armor>() {
-                    serializable_items.push(SerializeableInventoryItem::ArmorItem(armor.clone()));
-                } else if let Some(basic) = item.as_any().downcast_ref::<Item>() {
-                    serializable_items.push(SerializeableInventoryItem::BasicItem(basic.clone()));
-                } else {
-                    // Unknown type - shouldn't happen, but handle it
-                    panic!("Unknown inventory item type!");
-                }
+                serializable_items.push(SerializeableInventoryItem::ArmorItem(armor.clone()));
+            } else if let Some(basic) = item.as_any().downcast_ref::<Item>() {
+                serializable_items.push(SerializeableInventoryItem::BasicItem(basic.clone()));
+            } else {
+                // Unknown type - shouldn't happen, but handle it
+                panic!("Unknown inventory item type!");
+            }
         }
 
-        let container = SerializeableInventory { items: serializable_items };
+        let container = SerializeableInventory {
+            items: serializable_items,
+        };
         container.serialize(serializer)
     }
 }
@@ -139,6 +145,12 @@ impl fmt::Display for Inventory {
     }
 }
 
+impl Default for Inventory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Inventory {
     pub fn new() -> Inventory {
         Inventory { items: Vec::new() }
@@ -152,22 +164,17 @@ impl Inventory {
     }
 
     pub fn get_item(&self, uuid: Uuid) -> Option<&dyn InventoryItem> {
-        let item = self.items.iter().find(|item| item.get_item().uuid == uuid);
-        if item.is_some() {
-            return Some(item.unwrap().as_ref());
-        }
-        None
+        self.items
+            .iter()
+            .find(|item| item.get_item().uuid == uuid)
+            .map(|item| item.as_ref())
     }
 
     pub fn get_item_mut(&mut self, uuid: Uuid) -> Option<&mut dyn InventoryItem> {
-        let item = self
-            .items
+        self.items
             .iter_mut()
-            .find(|item| item.get_item().uuid == uuid);
-        if item.is_some() {
-            return Some(item.unwrap().as_mut());
-        }
-        None
+            .find(|item| item.get_item().uuid == uuid)
+            .map(|item| &mut **item as &mut dyn InventoryItem)
     }
 
     pub fn calculate_total_weight(&self) -> usize {
@@ -276,5 +283,4 @@ mod tests {
         let total_weight = inv.calculate_total_weight();
         assert_eq!(total_weight, 1500 + 1000 + 1000); // one broomstick and two flak vests
     }
-
 }

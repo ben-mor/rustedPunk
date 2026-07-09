@@ -1,11 +1,11 @@
 use crate::inventory::InventoryItem;
 use crate::inventory::Item;
 use crate::weapons::DamageType;
+use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use std::collections::BTreeMap;
 use std::fmt;
 use std::str::FromStr;
-use serde::{Serialize, Deserialize};
-use serde_with::{serde_as, DisplayFromStr};
 
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -127,9 +127,9 @@ impl Armor {
         Armor {
             item: Item::new(None, name, amount, weight_grams, price_eb, comment),
             protection_max,
-            protection_current: protection_current,
-            is_hard: is_hard,
-            encumberance: encumberance,
+            protection_current,
+            is_hard,
+            encumberance,
         }
     }
 
@@ -159,21 +159,12 @@ impl Armor {
     pub fn hit(&mut self, damage: i32, zone: HitZone, damage_type: DamageType) -> DamageResult {
         if self.protection_current.contains_key(&zone) {
             let mut remaining_damage = damage;
-            let absorbed_damage;
-            match damage_type {
-                DamageType::ArmorPiercing => {
-                    absorbed_damage = self.hit_armor_piercing(zone, &mut remaining_damage);
-                }
-                DamageType::Blunt => {
-                    absorbed_damage = self.hit_blunt(zone, &mut remaining_damage);
-                }
-                DamageType::HollowPoint => {
-                    absorbed_damage = self.hit_hollow_point(zone, &mut remaining_damage);
-                }
-                DamageType::Slashing => {
-                    absorbed_damage = self.hit_slashing(zone, &mut remaining_damage);
-                }
-            }
+            let absorbed_damage = match damage_type {
+                DamageType::ArmorPiercing => self.hit_armor_piercing(zone, &mut remaining_damage),
+                DamageType::Blunt => self.hit_blunt(zone, &mut remaining_damage),
+                DamageType::HollowPoint => self.hit_hollow_point(zone, &mut remaining_damage),
+                DamageType::Slashing => self.hit_slashing(zone, &mut remaining_damage),
+            };
             DamageResult {
                 remaining_damage,
                 absorbed_damage,
