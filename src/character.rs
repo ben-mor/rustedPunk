@@ -152,7 +152,8 @@ pub struct HitOutcome {
     /// Real damage that came from the bruise scale filling up
     /// (already part of `real_damage`).
     pub converted_bruise_damage: i32,
-    /// The bruise scale converted to real damage: a KO check is required.
+    /// The hit caused real damage (directly or via a full bruise scale):
+    /// a KO check is required, see [`Character::ko_check`].
     pub ko_check_required: bool,
     /// The penetration cap kicked in: the shot exited through the back.
     pub through_and_through: bool,
@@ -352,6 +353,25 @@ Character {{ \n\
         }
     }
 
+    /// The KO check after taking damage: BODY against 10, modified by the
+    /// wound category's Stun malus (Light −0, Serious −1, Critical −2,
+    /// Mortal 0 −3, one more per Mortal step).
+    ///
+    /// Uses the sheet BODY (plus advantage modifiers) WITHOUT the wound
+    /// thirding — the category malus already covers the wound effect;
+    /// applying both would double-count.
+    ///
+    /// On a failure the character is out of the fight (KO, on the floor
+    /// screaming, …) and may repeat the roll every round; the first success
+    /// means recovery. On a critical failure the GM decides — usually out
+    /// for longer.
+    pub fn ko_check(&self, roller: &mut dyn DieRoller) -> CheckResult {
+        let body = self.attributes.get(&Attribute::Body).unwrap().actual
+            + self.modifier_for_attribute(Attribute::Body)
+            - self.wound_state().ko_malus();
+        skill_check(body, 0, 0, Difficulty::Custom(10), roller)
+    }
+
     /// The morning-after complication check: BODY against 10 + current damage.
     /// With a healer present (practically always) no check is needed and
     /// `None` is returned. A failed check means complications — interpreting
@@ -528,7 +548,9 @@ Character {{ \n\
         self.current_bruise += bruise;
         let converted_bruise_damage = self.current_bruise / capacity;
         self.current_bruise %= capacity;
-        let ko_check_required = converted_bruise_damage > 0;
+        // taking real damage requires a KO check (see Character::ko_check);
+        // pure Prellschaden doesn't — it gives the next-roll malus instead
+        let ko_check_required = real_damage > 0 || converted_bruise_damage > 0;
 
         if real_damage == 0 && converted_bruise_damage == 0 && bruise > 0 {
             self.pending_roll_malus += bruise;
@@ -1269,6 +1291,54 @@ mod tests {
         );
         assert_eq!(character.modifier_for_tag("hören"), 2);
         assert_eq!(character.modifier_for_tag("sehen"), 0);
+    }
+
+    #[test]
+    fn test_ko_check_maluses_follow_wound_track() {
+        let mut character = unencumbered_shooter(); // BODY 10
+
+        // uninjured: BODY 10 vs 10 -> auto-success, no roll needed
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let result = character.ko_check(&mut roller);
+        assert_eq!(result.outcome, crate::dice::Outcome::AutoSuccess);
+
+        // Serious (Stun -1): BODY 9 + die 2 = 11 vs 10 -> recovers
+        character.current_damage = 6;
+        let mut roller = crate::dice::SequenceRoller::new(vec![2]);
+        assert!(character.ko_check(&mut roller).outcome.is_success());
+
+        // Mortal 2 (Stun -5): BODY 5 + die 4 = 9 -> stays down this round...
+        character.current_damage = 22;
+        let mut roller = crate::dice::SequenceRoller::new(vec![4]);
+        assert!(!character.ko_check(&mut roller).outcome.is_success());
+        // ...but may repeat every round and recovers on the first success
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        assert!(character.ko_check(&mut roller).outcome.is_success());
+
+        // critical failure is reported for the GM to decide (out for longer)
+        let mut roller = crate::dice::SequenceRoller::new(vec![1, 1]);
+        assert_eq!(
+            character.ko_check(&mut roller).outcome,
+            crate::dice::Outcome::CriticalFailure
+        );
+    }
+
+    #[test]
+    fn test_real_damage_requires_ko_check() {
+        let mut character = unencumbered_shooter();
+        let outcome = character.take_damage(6, HitZone::Chest);
+        assert!(outcome.ko_check_required);
+
+        // pure Prellschaden: no KO check, next-roll malus instead
+        let mut character = unencumbered_shooter();
+        let vest = kev_shirt();
+        let vest_uuid = vest.item.uuid;
+        character.inventory.push(Box::new(vest));
+        character.wear_armor(vest_uuid, None);
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(3, HitZone::Chest, DamageType::Blunt, true, &mut roller);
+        assert!(!outcome.ko_check_required);
+        assert_eq!(character.pending_roll_malus, 3);
     }
 
     #[test]
