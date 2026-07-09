@@ -11,8 +11,8 @@ use serde_with::{serde_as, DisplayFromStr};
 pub struct Character {
     pub name: String,
     pub role: String,
-    pub age: usize,
-    pub current_damage: usize,
+    pub age: i32,
+    pub current_damage: i32,
     pub damage_notes: String,
     pub worn_armor: Vec<Uuid>,
     pub skills: Vec<Skill>,
@@ -106,12 +106,12 @@ impl fmt::Display for Attributes {
 /// `Character::effective_attribute()` which calculates the actual roll value.
 #[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct AttributeValue {
-    pub base: usize,
-    pub actual: usize,
+    pub base: i32,
+    pub actual: i32,
 }
 
 impl AttributeValue {
-    pub fn new(actual: usize, base: usize) -> Self {
+    pub fn new(actual: i32, base: i32) -> Self {
         AttributeValue { base, actual }
     }
 }
@@ -126,16 +126,16 @@ impl Character {
     pub fn new(
         name: String,
         role: String,
-        age: usize,
-        att: usize,
-        mov: usize,
-        coo: usize,
-        emp: usize,
-        luck: usize,
-        int: usize,
-        body: usize,
-        refl: usize,
-        tec: usize,
+        age: i32,
+        att: i32,
+        mov: i32,
+        coo: i32,
+        emp: i32,
+        luck: i32,
+        int: i32,
+        body: i32,
+        refl: i32,
+        tec: i32,
     ) -> Self {
         let mut character = Character {
             name,
@@ -182,9 +182,9 @@ Character {{ \n\
 
     /// Body Type Modifier
     /// How much damage gets reduced when being hit, based on the body stat.
-    pub fn btm(&self) -> usize {
+    pub fn btm(&self) -> i32 {
         match self.attributes.get(&Attribute::Body).unwrap().actual {
-            0..=2 => 0,
+            ..=2 => 0,
             3..=4 => 1,
             5..=7 => 2,
             8..=9 => 3,
@@ -195,19 +195,21 @@ Character {{ \n\
 
     /// Returns the effective attribute value for dice rolls, including all
     /// temporary modifiers (encumbrance, drugs, combat effects, etc.).
-    pub fn effective_attribute(&self, attr: Attribute) -> usize {
+    pub fn effective_attribute(&self, attr: Attribute) -> i32 {
         let base_value = self.attributes[&attr].actual;
 
         match attr {
-            Attribute::Reflexes => base_value.saturating_sub(self.encumberance()
-                + self.calculate_armor_encumberance()),
-            Attribute::Move => base_value.saturating_sub(self.encumberance()),
-            _ => base_value
+            Attribute::Reflexes => (base_value
+                - self.encumberance()
+                - self.calculate_armor_encumberance())
+            .max(0),
+            Attribute::Move => (base_value - self.encumberance()).max(0),
+            _ => base_value,
         }
     }
 
     /// Calculates the malus to movement and reflexes based on encumberance
-    pub fn encumberance(&self) -> usize {
+    pub fn encumberance(&self) -> i32 {
         let inventory_weight = self.inventory.calculate_total_weight();
         let capacity = self.carry_capacity();
         match (inventory_weight*10) / capacity {
@@ -223,7 +225,7 @@ Character {{ \n\
     /// Looks up the carry capacity of the character
     /// Returns grams.
     pub fn carry_capacity(&self) -> usize {
-        self.attributes.get(&Attribute::Body).unwrap().actual * 10000
+        self.attributes.get(&Attribute::Body).unwrap().actual.max(0) as usize * 10000
     }
 
     /// Looks up the deadlift capacity of the character
@@ -259,7 +261,7 @@ Character {{ \n\
     ///
     /// This will apply damage to the armor (outer to inner) and then to the character.
     ///
-    pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) {
+    pub fn hit(&mut self, damage: i32, zone: HitZone, damage_type: DamageType) {
         let mut remaining_damage = damage;
         let mut absorbed_damage = 0;
 
@@ -286,13 +288,10 @@ Character {{ \n\
 
     /// This ignores all armor and applies damage directly.
     /// It will subtract the BTM first.
-    pub fn take_damage(&mut self, damage: usize, zone: HitZone) {
+    pub fn take_damage(&mut self, damage: i32, zone: HitZone) {
         let mut remaining_damage = damage;
         if remaining_damage > 0 {
-            remaining_damage = remaining_damage.saturating_sub(self.btm());
-            if remaining_damage < 1 {
-                remaining_damage = 1;
-            }
+            remaining_damage = (remaining_damage - self.btm()).max(1);
 
             // TODO: Need to implement the House Rule that this doubling only takes effect after the check if it will kill you immediately.
             if zone == HitZone::Head {
@@ -316,7 +315,7 @@ Character {{ \n\
         }
     }
 
-    pub fn calculate_armor_encumberance(&self) -> usize {
+    pub fn calculate_armor_encumberance(&self) -> i32 {
         let mut encumberance = 0;
         let mut covered_zones = HashSet::new();
         for i in (0..self.worn_armor.len()).rev() {
@@ -367,8 +366,8 @@ Character {{ \n\
 pub struct Skill {
     pub name: String,
     pub base: Attribute,
-    pub level: usize,
-    pub level_up_modifier: usize,
+    pub level: i32,
+    pub level_up_modifier: i32,
 }
 
 impl Skill {
@@ -386,7 +385,7 @@ impl Skill {
         )
     }
 
-    pub fn new(name: String, base: Attribute, level: usize, level_up_modifierer: usize) -> Self {
+    pub fn new(name: String, base: Attribute, level: i32, level_up_modifierer: i32) -> Self {
         Skill {
             name,
             base,
@@ -579,9 +578,9 @@ mod tests {
         test_context: &str,
         armor_name: &str,
         hit_zone: HitZone,
-        expected_remaining_protection: usize,
+        expected_remaining_protection: i32,
         unhit_zone: HitZone,
-        expected_original_protection_in_unhit_zone: usize,
+        expected_original_protection_in_unhit_zone: i32,
     ) {
         let armor_list = character.inventory.get_all_armor();
         let armor = armor_list
@@ -608,7 +607,7 @@ mod tests {
         test_context: &str,
         armor_name: &str,
         hit_zone: HitZone,
-        expected_remaining_protection: usize,
+        expected_remaining_protection: i32,
         armor: &Armor,
     ) {
         let current_protection = armor.protection_current.get(&hit_zone);
@@ -782,7 +781,8 @@ mod tests {
         }
         assert_eq!(character.inventory.calculate_total_weight(), 160_900);
         assert_eq!(character.encumberance(), 8);
-        assert_eq!(character.effective_attribute(Attribute::Reflexes), basic_ref.saturating_sub(8));
+        // effective attributes never go below 0, even when the malus exceeds them
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), (basic_ref - 8).max(0));
         assert_eq!(character.effective_attribute(Attribute::Move), 2);
     }
 }

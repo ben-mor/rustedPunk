@@ -10,18 +10,18 @@ use serde_with::{serde_as, DisplayFromStr};
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct Armor {
-    pub protection_max: usize,
+    pub protection_max: i32,
     pub is_hard: bool,
-    pub encumberance: usize,
+    pub encumberance: i32,
     pub item: Item,
     #[serde_as(as = "BTreeMap<DisplayFromStr, _>")]
-    pub protection_current: BTreeMap<HitZone, usize>,
+    pub protection_current: BTreeMap<HitZone, i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct DamageResult {
-    pub remaining_damage: usize,
-    pub absorbed_damage: usize,
+    pub remaining_damage: i32,
+    pub absorbed_damage: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone, PartialOrd, Ord)]
@@ -115,10 +115,10 @@ impl Armor {
         weight_grams: usize,
         price_eb: usize,
         comment: String,
-        protection_max: usize,
+        protection_max: i32,
         protected_zones: Vec<HitZone>,
         is_hard: bool,
-        encumberance: usize,
+        encumberance: i32,
     ) -> Self {
         let mut protection_current = BTreeMap::new();
         for zone in protected_zones {
@@ -156,7 +156,7 @@ impl Armor {
     /// # Returns
     ///
     /// A `DamageResult` containing the remaining damage and the amount absorbed by the armor
-    pub fn hit(&mut self, damage: usize, zone: HitZone, damage_type: DamageType) -> DamageResult {
+    pub fn hit(&mut self, damage: i32, zone: HitZone, damage_type: DamageType) -> DamageResult {
         if self.protection_current.contains_key(&zone) {
             let mut remaining_damage = damage;
             let absorbed_damage;
@@ -189,7 +189,7 @@ impl Armor {
     /// Armor-piercing weapons halve the effective protection of the armor.
     /// Any remaining damage is halved at the end.
     /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
-    fn hit_armor_piercing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+    fn hit_armor_piercing(&mut self, zone: HitZone, remaining_damage: &mut i32) -> i32 {
         let protection = self.protection_current[&zone] / 2;
         let absorbed_damage;
 
@@ -209,7 +209,7 @@ impl Armor {
     /// Blunt weapons use the full protection value of the armor.
     /// No additional damage modifications are applied.
     /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
-    fn hit_blunt(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+    fn hit_blunt(&mut self, zone: HitZone, remaining_damage: &mut i32) -> i32 {
         let absorbed_damage;
 
         if self.protection_current[&zone] >= *remaining_damage {
@@ -227,7 +227,7 @@ impl Armor {
     /// Hollow-point weapons halve the incoming damage before armor calculation.
     /// The armor uses its full protection value against the reduced damage.
     /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
-    fn hit_hollow_point(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+    fn hit_hollow_point(&mut self, zone: HitZone, remaining_damage: &mut i32) -> i32 {
         let protection = self.protection_current[&zone];
         *remaining_damage = (*remaining_damage + 1) / 2;
         let absorbed_damage;
@@ -248,7 +248,7 @@ impl Armor {
     /// Against soft armor, the effective protection is halved.
     /// Other then armor piercing damage, the remaining damage is not halved.
     /// This function also reduces the armor's durability by 1, IF the armor has been penetrated.
-    fn hit_slashing(&mut self, zone: HitZone, remaining_damage: &mut usize) -> usize {
+    fn hit_slashing(&mut self, zone: HitZone, remaining_damage: &mut i32) -> i32 {
         let mut protection = self.protection_current[&zone];
         if !self.is_hard {
             protection = (protection + 1) / 2;
@@ -498,11 +498,11 @@ pub mod tests {
 
     fn test_armor_hit(
         armor: &mut Armor,
-        damage: usize,
+        damage: i32,
         damage_type: DamageType,
-        expected_remaining_damage: usize,
-        expected_absorbed_damage: usize,
-        expected_remaining_protection: usize,
+        expected_remaining_damage: i32,
+        expected_absorbed_damage: i32,
+        expected_remaining_protection: i32,
     ) {
         let context = format!("{} {:?} against {}", damage, damage_type, armor.item.name);
         let result = armor.hit(damage, HitZone::Chest, damage_type);
