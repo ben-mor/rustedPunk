@@ -259,10 +259,10 @@ The workshop trade system IS in scope.)*
 - **M1 — Dice engine (#11)**: pure, seedable RNG (inject `rand::Rng` or a trait for
   testability), skill checks, exploding/fumble/luck/auto-success. Everything later
   (combat, chargen, NSCs) consumes this.
-- **M2 — Damage details (#19) + injuries & healing (#13)**: replace the 20%
-  blunt-trauma approximation with the Prellschaden scale, BTM→Prellschaden
-  conversion, the remaining `Character::hit()` TODOs, health blocks, wound
-  penalties into `effective_attribute()`, healing over time.
+- **M2 — Damage details (#19) + injuries & healing (#13)**: *damage side done
+  2026-07-09* (Prellschaden scale, BTM conversion, penetration cap, head-hit
+  ordering, health blocks, wound penalties). Still open: hollow-point vs soft
+  targets (Q17), healing over time + KO check (Q18), crippling-chance rolls.
 - **M3 — Dis-/advantages (#10)**: storage first, then a generic `Modifier`
   mechanism (source, target attr/skill/roll-tag, value) that encumbrance and wound
   penalties can migrate onto.

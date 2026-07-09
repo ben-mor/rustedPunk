@@ -125,7 +125,14 @@ fn character_test() {
         0,
     )));
     cool_guy.print();
-    cool_guy.hit(15, HitZone::Chest, DamageType::ArmorPiercing);
+    let mut roller = RandomRoller;
+    cool_guy.hit(
+        15,
+        HitZone::Chest,
+        DamageType::ArmorPiercing,
+        true,
+        &mut roller,
+    );
     cool_guy.print();
 
     cool_guy.print_skills();
