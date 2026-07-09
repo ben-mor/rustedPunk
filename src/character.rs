@@ -15,7 +15,8 @@ pub struct Character {
     pub age: i32,
     pub current_damage: i32,
     /// Available luck points. A persistent pool: spending survives the session,
-    /// [`Character::start_session`] regenerates half the base LUCK (rounded up).
+    /// [`Character::start_session`] regenerates half the current base LUCK
+    /// (rounded up). See [`Character::start_session`] for the three luck levels.
     pub current_luck: i32,
     pub damage_notes: String,
     pub worn_armor: Vec<Uuid>,
@@ -422,14 +423,43 @@ Character {{ \n\
         Ok(())
     }
 
-    /// Starts a new game session: regenerates half the base LUCK (rounded up),
-    /// capped at the LUCK attribute's current value.
+    /// Starts a new game session: regenerates luck points.
     ///
-    /// Example: base LUCK 9, 8 already spent (1 left) → +5 → starts with 6.
+    /// Luck has three levels:
+    /// - starting base (`AttributeValue.base`): the chargen value, never changes
+    /// - current base (`AttributeValue.actual`): permanently reducible via
+    ///   [`Character::sacrifice_luck`]; regeneration rate and cap come from here
+    /// - current pool (`Character.current_luck`): fluctuates with every roll
+    ///
+    /// Regenerates half the current base (rounded up), capped at the current
+    /// base. Example: current base 9, 8 already spent (1 left) → +5 → 6.
     pub fn start_session(&mut self) {
         let luck = self.attributes.get(&Attribute::Luck).unwrap();
-        let regenerated = (luck.base + 1) / 2;
+        let regenerated = (luck.actual + 1) / 2;
         self.current_luck = (self.current_luck + regenerated).min(luck.actual);
+    }
+
+    /// Permanently sacrifices luck for an extreme "the world now turns in your
+    /// favor" event: lowers the current base LUCK (`actual`), which also lowers
+    /// the regeneration rate and cap. The starting base is untouched. The
+    /// current pool is clamped to the new base if it now exceeds it.
+    pub fn sacrifice_luck(&mut self, points: i32) -> Result<(), String> {
+        if points < 0 {
+            return Err(format!(
+                "Cannot sacrifice a negative amount of luck: {}",
+                points
+            ));
+        }
+        let luck = self.attributes.get_mut(&Attribute::Luck).unwrap();
+        if points > luck.actual {
+            return Err(format!(
+                "Character '{}' has only {} base luck, tried to sacrifice {}",
+                self.name, luck.actual, points
+            ));
+        }
+        luck.actual -= points;
+        self.current_luck = self.current_luck.min(luck.actual);
+        Ok(())
     }
 
     /// Rolls a check on one of the character's skills.
@@ -937,9 +967,9 @@ mod tests {
     }
 
     #[test]
-    fn test_start_session_regenerates_half_base_luck() {
+    fn test_start_session_regenerates_half_current_base_luck() {
         let mut character = unencumbered_shooter();
-        // change base LUCK to 9 to mirror the example from the table rules
+        // current base LUCK 9 to mirror the example from the table rules
         character
             .attributes
             .insert(Attribute::Luck, AttributeValue::new(9, 9));
@@ -948,10 +978,45 @@ mod tests {
         // 1 + ceil(9/2) = 6
         assert_eq!(character.current_luck, 6);
 
-        // regeneration is capped at the LUCK attribute
+        // regeneration is capped at the current base
         character.current_luck = 8;
         character.start_session();
         assert_eq!(character.current_luck, 9);
+    }
+
+    #[test]
+    fn test_sacrifice_luck_lowers_current_base_and_regen() {
+        let mut character = unencumbered_shooter();
+        // starting base 9, still at full current base and pool
+        character
+            .attributes
+            .insert(Attribute::Luck, AttributeValue::new(9, 9));
+        character.current_luck = 9;
+
+        character.sacrifice_luck(4).unwrap();
+        let luck = character.attributes.get(&Attribute::Luck).unwrap();
+        // starting base untouched, current base lowered, pool clamped
+        assert_eq!(luck.base, 9);
+        assert_eq!(luck.actual, 5);
+        assert_eq!(character.current_luck, 5);
+
+        // regen now runs off the current base: 0 -> ceil(5/2) = 3, capped at 5
+        character.current_luck = 0;
+        character.start_session();
+        assert_eq!(character.current_luck, 3);
+        character.start_session();
+        character.start_session();
+        assert_eq!(character.current_luck, 5);
+    }
+
+    #[test]
+    fn test_sacrifice_luck_rejects_more_than_current_base() {
+        let mut character = unencumbered_shooter();
+        let error = character.sacrifice_luck(6).unwrap_err();
+        assert_eq!(
+            error,
+            "Character 'Shooter' has only 5 base luck, tried to sacrifice 6"
+        );
     }
 
     #[test]
