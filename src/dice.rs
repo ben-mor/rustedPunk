@@ -1,19 +1,28 @@
-/// Source of raw d10 rolls.
+use serde::{Deserialize, Serialize};
+use std::fmt;
+use std::str::FromStr;
+
+/// Source of raw die rolls.
 ///
 /// The rules engine never calls the RNG directly; it always goes through this
 /// trait so tests can script exact die sequences and a future server can
 /// record and replay rolls.
 pub trait DieRoller {
+    /// Rolls a single die with `sides` faces, returning a value in 1..=sides.
+    fn die(&mut self, sides: i32) -> i32;
+
     /// Rolls a single d10, returning a value in 1..=10.
-    fn d10(&mut self) -> i32;
+    fn d10(&mut self) -> i32 {
+        self.die(10)
+    }
 }
 
-/// The real thing: uniformly random d10s.
+/// The real thing: uniformly random dice.
 pub struct RandomRoller;
 
 impl DieRoller for RandomRoller {
-    fn d10(&mut self) -> i32 {
-        rand::random_range(1..=10)
+    fn die(&mut self, sides: i32) -> i32 {
+        rand::random_range(1..=sides)
     }
 }
 
@@ -22,7 +31,7 @@ impl DieRoller for RandomRoller {
 /// # Panics
 ///
 /// Panics when more rolls are requested than values were provided, or when a
-/// value is outside 1..=10.
+/// value is outside the requested die's range.
 pub struct SequenceRoller {
     values: Vec<i32>,
     next: usize,
@@ -35,19 +44,102 @@ impl SequenceRoller {
 }
 
 impl DieRoller for SequenceRoller {
-    fn d10(&mut self) -> i32 {
+    fn die(&mut self, sides: i32) -> i32 {
         let value = *self
             .values
             .get(self.next)
             .expect("SequenceRoller ran out of scripted values");
         assert!(
-            (1..=10).contains(&value),
-            "SequenceRoller value out of d10 range: {}",
+            (1..=sides).contains(&value),
+            "SequenceRoller value out of d{} range: {}",
+            sides,
             value
         );
         self.next += 1;
         value
     }
+}
+
+/// A dice expression like `5d6` or `2d6+2`, used for weapon and
+/// martial-arts damage.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DiceExpr {
+    pub count: i32,
+    pub sides: i32,
+    pub bonus: i32,
+}
+
+impl DiceExpr {
+    pub fn new(count: i32, sides: i32, bonus: i32) -> Self {
+        DiceExpr {
+            count,
+            sides,
+            bonus,
+        }
+    }
+
+    pub fn roll(&self, roller: &mut dyn DieRoller) -> i32 {
+        (0..self.count).map(|_| roller.die(self.sides)).sum::<i32>() + self.bonus
+    }
+
+    /// The table's "average damage" as used by the shot-noise formula:
+    /// `count * (sides / 2) + bonus` with integer halving
+    /// (AK 5d6 → 15, Grach 2d6+2 → 8, matching the wiki examples).
+    pub fn average(&self) -> i32 {
+        self.count * (self.sides / 2) + self.bonus
+    }
+}
+
+impl fmt::Display for DiceExpr {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}d{}", self.count, self.sides)?;
+        if self.bonus > 0 {
+            write!(f, "+{}", self.bonus)?;
+        } else if self.bonus < 0 {
+            write!(f, "{}", self.bonus)?;
+        }
+        Ok(())
+    }
+}
+
+impl FromStr for DiceExpr {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let error = || format!("Invalid dice expression: '{}'", s);
+        let (count, rest) = s.split_once(['d', 'D']).ok_or_else(error)?;
+        let (sides, bonus) = if let Some((sides, bonus)) = rest.split_once('+') {
+            (sides, bonus.parse::<i32>().map_err(|_| error())?)
+        } else if let Some((sides, malus)) = rest.split_once('-') {
+            (sides, -malus.parse::<i32>().map_err(|_| error())?)
+        } else {
+            (rest, 0)
+        };
+        Ok(DiceExpr {
+            count: count.parse().map_err(|_| error())?,
+            sides: sides.parse().map_err(|_| error())?,
+            bonus,
+        })
+    }
+}
+
+impl Serialize for DiceExpr {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for DiceExpr {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        s.parse().map_err(serde::de::Error::custom)
+    }
+}
+
+/// Rolls a uniform number in 0..=999 from three d10s (each die read as a
+/// digit, 10 = 0). Used for per-mille chances like the crippling roll.
+pub fn roll_per_mille(roller: &mut dyn DieRoller) -> i32 {
+    (roller.d10() % 10) * 100 + (roller.d10() % 10) * 10 + (roller.d10() % 10)
 }
 
 /// Standard difficulties from the house rules: easy 10+, normal 15+, hard 20+.
@@ -354,5 +446,40 @@ mod tests {
         let mut roller = SequenceRoller::new(vec![5]);
         roller.d10();
         roller.d10();
+    }
+
+    #[test]
+    fn test_dice_expr_parse_display_roundtrip() {
+        for s in ["5d6", "2d6+2", "1d3", "4d10", "2d6-1"] {
+            let expr: DiceExpr = s.parse().unwrap();
+            assert_eq!(expr.to_string(), s);
+        }
+        assert!("d6".parse::<DiceExpr>().is_err());
+        assert!("2w6".parse::<DiceExpr>().is_err());
+    }
+
+    #[test]
+    fn test_dice_expr_average_matches_wiki_examples() {
+        // AK 5d6 -> 15, 9mm 2d6+2 -> 8 (noise formula examples)
+        assert_eq!("5d6".parse::<DiceExpr>().unwrap().average(), 15);
+        assert_eq!("2d6+2".parse::<DiceExpr>().unwrap().average(), 8);
+    }
+
+    #[test]
+    fn test_dice_expr_roll() {
+        let expr: DiceExpr = "2d6+3".parse().unwrap();
+        let mut roller = SequenceRoller::new(vec![4, 6]);
+        assert_eq!(expr.roll(&mut roller), 13);
+    }
+
+    #[test]
+    fn test_random_roller_die_range() {
+        let mut roller = RandomRoller;
+        for sides in [3, 6, 10] {
+            for _ in 0..200 {
+                let roll = roller.die(sides);
+                assert!((1..=sides).contains(&roll));
+            }
+        }
     }
 }

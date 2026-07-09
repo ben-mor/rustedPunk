@@ -191,6 +191,50 @@ Encumbrance affects:
 
 ---
 
+## Melee & Martial Arts (`melee.rs`) — #15
+
+- General melee skill "Nahkampf" (incl. Dodge) caps at 3 (`MELEE_GENERAL_CAP`);
+  specializations "Nahkampf Kurz/Mittel/Lang" CONTINUE the scale independently.
+  `Character::melee_level(class)` = specialization if present, else general
+  (capped). `check_melee(class, familiar, ...)`: unfamiliar weapon = target +3.
+  `check_dodge()` always uses general (Q24).
+- Martial arts: styles Prügeln (no key attacks), Boxen (+3 Punch/+3 Sweep/
+  +1 Block), Ringen (+2 Sweep/+4 Grapple/+3 Throw/+4 Hold/+2 Choke/+4 Escape).
+  `check_martial_arts(style, action, ...)` adds the key-attack bonus to the
+  roll; `martial_arts_damage()` = base dice (Punch 1d3, Kick/Throw/Choke 1d6)
+  + DAM (not for Choke) + skill level 1:1.
+- `Character::dam()` = hand-to-hand DAM from sheet BODY (RB5 table:
+  ..2 → −2, 3-4 → −1, 5-7 → 0, 8-9 → +1, 10 → +2, 11-12 → +4, 13-14 → +6,
+  15+ → +8). Distinct from `btm()` (damage reduction when hit)!
+- `dice::DiceExpr` ("5d6+2"): parse/display/roll/average (integer halving —
+  matches wiki noise examples); `DieRoller::die(sides)` for non-d10 dice;
+  `roll_per_mille()` for the crippling check.
+- `Character::crippling_check(medical_care, roller)`: rolled once per
+  critical+ injury directly after the fight; 5%/0.5%, Schnelle Heilung 1%/0.1%.
+
+## Weapons (`weapons.rs`) — #21
+
+- `Weapon` (InventoryItem, serde: `item` field LAST for TOML) with category,
+  WA, concealability, availability, damage `DiceExpr`, damage type, magazine,
+  ROF, reliability, range, silencer/scope flags. Availability/cost kept for
+  classic-CP2020 support (Q28).
+- `Weapon::catalog()`: one middle RAW representative per issue-#21 category
+  (Q27); comments carry the RB5 source line. Sling + Molotov = BEST GUESS
+  (no RB5 entry), marked in the comment.
+- `DamageType::Fire` (new): armor protects like Blunt, never cripples
+  (>8-rule ignored), used by the Molotov.
+- `Character::check_ranged_attack(weapon, skill, ...)` adds WA (+1 scope);
+  `Character::weapon_damage()` adds DAM for melee-class weapons.
+- Autofire: `autofire_attack_modifier(bullets, close)` = ±1 per 10 bullets,
+  `autofire_hits(total, target, bullets)` = margin capped at bullets.
+  Burst: `BURST_ATTACK_BONUS` (+3), `burst_hits()` = 1d2.
+- `shot_noise_bonus(weapon, bullets, distance, walls, soundproofed)`:
+  avg×3 (silencer halves), −2/wall, −6/soundproofed, −2/50m, +2/bullet.
+  NOTE: the wiki's 200m AK example says 38 but the formula gives 37 (wiki
+  arithmetic typo).
+- When adding InventoryItem types: extend SerializeableInventoryItem + both
+  Serialize/Deserialize impls in inventory.rs.
+
 ## Dis-/Advantages (`advantages.rs`) — #10
 
 - `Advantage { name, kind, cp (always positive), level, description, modifiers }`;
@@ -205,6 +249,30 @@ Encumbrance affects:
   healing rate; healing_progress counts quarter-days, 4 quarters = 1 damage).
 - Situational tags ("hören", …): caller queries `modifier_for_tag()` when a
   fitting roll comes up.
+
+## Character Creation (`chargen.rs`) — #9
+
+- Validations: `validate_attributes` (60 points, 2..=9 each, INT/REF ≥ 5, no
+  10 at creation), `validate_skill_caps` (one 8 / one 7 / two 6, tradeable
+  1:2 downward), `validate_skill_budget` (pool = INT + REF + 40 + age points;
+  skill level N costs N cumulative; advantages cost CP 1:1, disadvantages
+  grant), `validate_character` aggregates. `starting_money` = 3 profession
+  skills × 350 eb, Reich tag doubles the factor per level.
+- `age_points`: Alterspunkte table; >32 continues +3/year (aging rules #22
+  still unwritten).
+- **Lifepath** (Q29): data-driven d10 tables in `data/lifepath_classic.toml`
+  and `..._desaster.toml` (embedded via include_str!). Tables chain via
+  `goto`. `roll_background` (family/childhood/personality once) +
+  `roll_life_events` (one master roll per year over 15).
+  The classic file is a BEST-EFFORT transcription (core book is a text-less
+  scan) — marked for review; the desaster file starts as a copy to edit.
+- `generate_nsc(name, role, age, variant, roller)`: valid random attributes +
+  lifepath; skills/gear stay empty (GM flavor). CLI:
+  `cargo run -- chargen [--classic|--desaster] [name] [role] [age]`.
+- **Trait catalog** (Q30): `advantage_catalog()` loads all wiki traits from
+  `data/advantages.toml`; GUESS comments mark my modifier interpretations,
+  ENGINE-TODO marks rules needing engine hooks (half-Prellschaden, RUN factor,
+  Pech's always-fail-on-1, Bluter). Leveled traits encoded at smallest level.
 
 ## Quick Reference
 
