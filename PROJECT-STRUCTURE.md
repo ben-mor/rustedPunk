@@ -270,9 +270,11 @@ The workshop trade system IS in scope.)*
   health blocks, wound penalties, hollow-point flesh doubling, healing rates,
   complication check). Deferred: KO-check resolution mechanics and the 5%
   crippling roll (need the advantage system for the modifiers anyway, → M3).
-- **M3 — Dis-/advantages (#10)**: storage first, then a generic `Modifier`
-  mechanism (source, target attr/skill/roll-tag, value) that encumbrance and wound
-  penalties can migrate onto.
+- **M3 — Dis-/advantages (#10)**: *done 2026-07-09* — storage with CP budget
+  validation plus generic `Modifier` mechanism (attribute / skill-by-name /
+  free tag) wired into checks, initiative, bruise scale and healing rate.
+  Not done: a data file cataloguing all ~65 wiki traits (fits better with
+  chargen, M6); KO-check resolution still pending.
 - **M4 — Skills special functions (#15)**: melee split at level 3, martial-arts
   actions with scaled damage.
 - **M5 — Weapons (#21)**: Weapon as InventoryItem, categories from RAW stats,

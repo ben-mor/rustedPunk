@@ -1,3 +1,6 @@
+use crate::advantages::{
+    Advantage, ModifierTarget, TAG_BRUISE_SCALE, TAG_HEALING_RATE, TAG_INITIATIVE,
+};
 use crate::dice::{skill_check, CheckResult, DieRoller, Difficulty};
 use crate::health::WoundState;
 use crate::{armor::HitZone, Armor};
@@ -31,6 +34,7 @@ pub struct Character {
     pub damage_notes: String,
     pub worn_armor: Vec<Uuid>,
     pub skills: Vec<Skill>,
+    pub advantages: Vec<Advantage>,
     pub attributes: Attributes,
     pub inventory: Inventory,
 }
@@ -183,6 +187,7 @@ impl Character {
             current_luck: luck,
             damage_notes: "".to_string(),
             skills: Vec::new(),
+            advantages: Vec::new(),
         };
 
         character.attributes.insert(
@@ -284,15 +289,64 @@ Character {{ \n\
         WoundState::from_damage(self.current_damage)
     }
 
+    /// Sum of all advantage/disadvantage modifiers for an attribute.
+    pub fn modifier_for_attribute(&self, attr: Attribute) -> i32 {
+        self.modifier_sum(|target| matches!(target, ModifierTarget::Attribute(a) if *a == attr))
+    }
+
+    /// Sum of all advantage/disadvantage modifiers for a skill (by name).
+    pub fn modifier_for_skill(&self, skill_name: &str) -> i32 {
+        self.modifier_sum(|target| matches!(target, ModifierTarget::Skill(s) if s == skill_name))
+    }
+
+    /// Sum of all advantage/disadvantage modifiers for a free-form tag.
+    /// The engine applies the `TAG_*` tags itself; situational ones
+    /// ("hören", "musik", …) are looked up by the caller when they fit a roll.
+    pub fn modifier_for_tag(&self, tag: &str) -> i32 {
+        self.modifier_sum(|target| matches!(target, ModifierTarget::Tag(t) if t == tag))
+    }
+
+    fn modifier_sum(&self, matches: impl Fn(&ModifierTarget) -> bool) -> i32 {
+        self.advantages
+            .iter()
+            .flat_map(|advantage| &advantage.modifiers)
+            .filter(|modifier| matches(&modifier.target))
+            .map(|modifier| modifier.value)
+            .sum()
+    }
+
+    /// Size of the Prellschaden scale: 5, enlarged by advantages like
+    /// Erhöhte Ausdauer (modifier on the `prellschaden` tag).
+    pub fn bruise_capacity(&self) -> i32 {
+        5 + self.modifier_for_tag(TAG_BRUISE_SCALE)
+    }
+
+    /// Rolls initiative: 1d10 + effective REF, plus advantage modifiers on the
+    /// `initiative` tag (Kampfreflexe).
+    pub fn roll_initiative(&self, roller: &mut dyn DieRoller) -> i32 {
+        roller.d10()
+            + self.effective_attribute(Attribute::Reflexes)
+            + self.modifier_for_tag(TAG_INITIATIVE)
+    }
+
     /// A day of rest: heals 1 damage per day with a healer present,
     /// 1 per two days without (progress carries over between days).
+    /// Schnelle Heilung (healing-rate tag +1) doubles the rate,
+    /// Langsame Heilung (−1) halves it.
     pub fn rest_day(&mut self, healer_present: bool) {
         if self.current_damage == 0 || self.wound_state() == WoundState::Dead {
             return;
         }
-        self.healing_progress += if healer_present { 2 } else { 1 };
-        self.current_damage = (self.current_damage - self.healing_progress / 2).max(0);
-        self.healing_progress %= 2;
+        // progress is counted in quarter-days: 4 quarters heal 1 damage
+        let mut increment = if healer_present { 4 } else { 2 };
+        match self.modifier_for_tag(TAG_HEALING_RATE) {
+            rate if rate > 0 => increment *= 2,
+            rate if rate < 0 => increment /= 2,
+            _ => {}
+        }
+        self.healing_progress += increment;
+        self.current_damage = (self.current_damage - self.healing_progress / 4).max(0);
+        self.healing_progress %= 4;
         if self.current_damage == 0 {
             self.healing_progress = 0;
         }
@@ -321,14 +375,16 @@ Character {{ \n\
     }
 
     /// Returns the effective attribute value for dice rolls, including all
-    /// temporary modifiers (wound penalties, encumbrance, etc.).
+    /// temporary modifiers (advantages, wound penalties, encumbrance, etc.).
     ///
-    /// Order: wound penalties modify the attribute first, encumbrance maluses
-    /// are subtracted afterwards, the result never drops below 0 (see Q19).
+    /// Order: advantage modifiers adjust the sheet value, wound penalties
+    /// modify that, encumbrance maluses are subtracted afterwards, the result
+    /// never drops below 0 (see Q19).
     pub fn effective_attribute(&self, attr: Attribute) -> i32 {
-        let mut value = self
-            .wound_state()
-            .modify_attribute(attr, self.attributes[&attr].actual);
+        let mut value = self.wound_state().modify_attribute(
+            attr,
+            self.attributes[&attr].actual + self.modifier_for_attribute(attr),
+        );
 
         match attr {
             Attribute::Reflexes => {
@@ -468,9 +524,10 @@ Character {{ \n\
             bruise += converted_by_btm;
         }
 
+        let capacity = self.bruise_capacity();
         self.current_bruise += bruise;
-        let converted_bruise_damage = self.current_bruise / 5;
-        self.current_bruise %= 5;
+        let converted_bruise_damage = self.current_bruise / capacity;
+        self.current_bruise %= capacity;
         let ko_check_required = converted_bruise_damage > 0;
 
         if real_damage == 0 && converted_bruise_damage == 0 && bruise > 0 {
@@ -634,11 +691,12 @@ Character {{ \n\
                 )
             })?;
         let (attribute_value, skill_level) = (self.effective_attribute(skill.base), skill.level);
+        let advantage_bonus = self.modifier_for_skill(skill_name);
         self.spend_luck(luck)?;
         // pure bruise damage puts a malus on the NEXT roll — consume it
         let malus = std::mem::take(&mut self.pending_roll_malus);
         Ok(skill_check(
-            attribute_value - malus,
+            attribute_value + advantage_bonus - malus,
             skill_level,
             luck,
             difficulty,
@@ -1067,6 +1125,150 @@ mod tests {
         let result = character.complication_check(false, &mut roller).unwrap();
         // effective BODY 4 + die 5 = 9 vs 24: failed
         assert!(!result.outcome.is_success());
+    }
+
+    #[test]
+    fn test_advantage_modifiers_in_skill_checks() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget};
+        let mut character = unencumbered_shooter(); // REF 8, Pistole 4
+        character.advantages.push(
+            Advantage::new(
+                "Maschinenflüsterer".to_string(),
+                AdvantageKind::Advantage,
+                10,
+                "+3 auf Wartung und Reparatur".to_string(),
+            )
+            .with_modifier(ModifierTarget::Skill("Pistole".to_string()), 3),
+        );
+        // the bonus makes REF 8 + Pistole 4 + 3 = 15: auto-success vs Normal
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let result = character
+            .check_skill("Pistole", 0, Difficulty::Normal, &mut roller)
+            .unwrap();
+        assert_eq!(result.outcome, crate::dice::Outcome::AutoSuccess);
+
+        // vs Hard the die is rolled and the bonus still counts
+        let mut roller = crate::dice::SequenceRoller::new(vec![3]);
+        let result = character
+            .check_skill("Pistole", 0, Difficulty::Hard, &mut roller)
+            .unwrap();
+        // REF 8 + Pistole 4 + Bonus 3 + die 3 = 18
+        assert_eq!(result.total, 18);
+    }
+
+    #[test]
+    fn test_advantage_attribute_modifier() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget};
+        let mut character = unencumbered_shooter(); // ATT 5
+        character.advantages.push(
+            Advantage::new(
+                "Erweitertes Sichtfeld".to_string(),
+                AdvantageKind::Advantage,
+                1,
+                "210° Sicht, -2 ATTR".to_string(),
+            )
+            .with_modifier(ModifierTarget::Attribute(Attribute::Attractiveness), -2),
+        );
+        assert_eq!(character.effective_attribute(Attribute::Attractiveness), 3);
+    }
+
+    #[test]
+    fn test_erhoehte_ausdauer_enlarges_bruise_scale() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget, TAG_BRUISE_SCALE};
+        let mut character = unencumbered_shooter();
+        character.advantages.push(
+            Advantage::new(
+                "Erhöhte Ausdauer".to_string(),
+                AdvantageKind::Advantage,
+                4,
+                "2 CP / Punkt".to_string(),
+            )
+            .with_level(2)
+            .with_modifier(ModifierTarget::Tag(TAG_BRUISE_SCALE.to_string()), 2),
+        );
+        assert_eq!(character.bruise_capacity(), 7);
+        // 6 bruise points: would convert on a 5-scale, not on a 7-scale
+        character.take_damage(0, HitZone::Chest);
+        character.current_bruise = 6;
+        let outcome = character.take_damage(0, HitZone::Chest);
+        assert_eq!(outcome.converted_bruise_damage, 0);
+        assert_eq!(character.current_bruise, 6);
+    }
+
+    #[test]
+    fn test_healing_rate_advantages() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget, TAG_HEALING_RATE};
+        // Schnelle Heilung: double rate -> 2 per day with a healer
+        let mut character = unencumbered_shooter();
+        character.advantages.push(
+            Advantage::new(
+                "Schnelle Heilung".to_string(),
+                AdvantageKind::Advantage,
+                5,
+                "doppelte Heilrate".to_string(),
+            )
+            .with_modifier(ModifierTarget::Tag(TAG_HEALING_RATE.to_string()), 1),
+        );
+        character.current_damage = 6;
+        character.rest_day(true);
+        assert_eq!(character.current_damage, 4);
+
+        // Langsame Heilung: half rate -> 1 per four days without a healer
+        let mut character = unencumbered_shooter();
+        character.advantages.push(
+            Advantage::new(
+                "Langsame Heilung".to_string(),
+                AdvantageKind::Disadvantage,
+                5,
+                "halbe Heilrate".to_string(),
+            )
+            .with_modifier(ModifierTarget::Tag(TAG_HEALING_RATE.to_string()), -1),
+        );
+        character.current_damage = 6;
+        for _ in 0..3 {
+            character.rest_day(false);
+        }
+        assert_eq!(character.current_damage, 6);
+        character.rest_day(false);
+        assert_eq!(character.current_damage, 5);
+    }
+
+    #[test]
+    fn test_initiative_with_kampfreflexe() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget, TAG_INITIATIVE};
+        let mut character = unencumbered_shooter(); // REF 8
+        let mut roller = crate::dice::SequenceRoller::new(vec![6]);
+        assert_eq!(character.roll_initiative(&mut roller), 14);
+
+        character.advantages.push(
+            Advantage::new(
+                "Kampfreflexe".to_string(),
+                AdvantageKind::Advantage,
+                5,
+                "+3 Initiative und Wahrnehmung in Konflikten".to_string(),
+            )
+            .with_modifier(ModifierTarget::Tag(TAG_INITIATIVE.to_string()), 3),
+        );
+        let mut roller = crate::dice::SequenceRoller::new(vec![6]);
+        assert_eq!(character.roll_initiative(&mut roller), 17);
+    }
+
+    #[test]
+    fn test_situational_tag_lookup() {
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget};
+        let mut character = unencumbered_shooter();
+        character.advantages.push(
+            Advantage::new(
+                "Gute Ohren".to_string(),
+                AdvantageKind::Advantage,
+                1,
+                "Lausch-Bonus".to_string(),
+            )
+            .with_level(2)
+            .with_modifier(ModifierTarget::Tag("hören".to_string()), 2),
+        );
+        assert_eq!(character.modifier_for_tag("hören"), 2);
+        assert_eq!(character.modifier_for_tag("sehen"), 0);
     }
 
     #[test]
