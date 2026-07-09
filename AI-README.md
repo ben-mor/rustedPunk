@@ -182,6 +182,21 @@ Encumbrance affects:
 
 ---
 
+## Dis-/Advantages (`advantages.rs`) — #10
+
+- `Advantage { name, kind, cp (always positive), level, description, modifiers }`;
+  narrative-only traits simply have no modifiers.
+- `validate_budget()`: ≤30 CP total, or exactly ONE trait >30 plus ≤5 CP others.
+- `Modifier { value, target }` with `ModifierTarget::{Attribute, Skill(name), Tag(string)}`
+  (serde: adjacently tagged as `{ type = "...", of = "..." }` for TOML).
+- Auto-applied: attribute modifiers in `effective_attribute()` (before wound
+  penalties), skill modifiers in `check_skill()`.
+- Engine-known tags: `initiative` (roll_initiative = 1d10 + eff. REF + tag),
+  `prellschaden` (bruise_capacity = 5 + tag), `heilrate` (+1 double / −1 half
+  healing rate; healing_progress counts quarter-days, 4 quarters = 1 damage).
+- Situational tags ("hören", …): caller queries `modifier_for_tag()` when a
+  fitting roll comes up.
+
 ## Quick Reference
 
 | What | Where |
