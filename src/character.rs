@@ -261,7 +261,7 @@ Character {{ \n\
         let inventory_weight = self.inventory.calculate_total_weight();
         let capacity = self.carry_capacity();
         match (inventory_weight * 10) / capacity {
-            0..=4 => 0,
+            ..=4 => 0,
             5..=6 => 1,
             7..=9 => 2,
             10..=12 => 4,
@@ -272,13 +272,13 @@ Character {{ \n\
 
     /// Looks up the carry capacity of the character
     /// Returns grams.
-    pub fn carry_capacity(&self) -> usize {
-        self.attributes.get(&Attribute::Body).unwrap().actual.max(0) as usize * 10000
+    pub fn carry_capacity(&self) -> i32 {
+        self.attributes.get(&Attribute::Body).unwrap().actual.max(0) * 10000
     }
 
     /// Looks up the deadlift capacity of the character
     /// Returns grams.
-    pub fn deadlift(&self) -> usize {
+    pub fn deadlift(&self) -> i32 {
         self.carry_capacity() * 4
     }
 

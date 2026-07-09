@@ -30,8 +30,16 @@ Mention situations where I mistype or misspell words / grammar.
 ## Non-Obvious Design Patterns
 
 ### Armor Damage Tracking (`armor.rs`)
-- `protection_max: usize` - Maximum stopping power (SP)
-- `protection_current: HashMap<HitZone, usize>` - Tracks per-zone degradation (WIP)
+- `protection_max: i32` - Maximum stopping power (SP)
+- `protection_current: BTreeMap<HitZone, i32>` - Tracks per-zone degradation (WIP)
+
+### Number Types (#18)
+- All game values are `i32` (attributes, damage, protection, encumbrance,
+  skill levels, amounts, weights, prices) — allows direct subtraction.
+- Non-negativity of `Item` quantities (`amount`, `weight_grams`, `price_eb`) is
+  enforced by explicit validation: `Item::new` panics with a meaningful message,
+  deserialization fails via `#[serde(try_from = "UncheckedItem")]`.
+- `effective_attribute()` clamps at 0; `take_damage` keeps the min-1-after-BTM rule.
 
 ### List Struct (`character.rs`)
 - `List(pub Vec<Skill>)` - Newtype wrapper for skill collections
@@ -87,8 +95,8 @@ Each damage type has a private helper method. Full mechanics documented on publi
 
 ### `Character.take_damage(damage, zone)` - IMPLEMENTED
 - Bypasses armor, applies damage directly to character
-- Applies Body Type Modifier (BTM) with minimum 1 damage rule (CP2020 RAW)
-- Uses `saturating_sub()` to prevent underflow when BTM > damage
+- Applies Body Type Modifier (BTM) with minimum 1 damage rule (CP2020 RAW),
+  implemented as `(damage - btm).max(1)`
 - **Head damage doubles** after BTM calculation
 - **Crippling damage** (8+ points after BTM):
   - **Critical zones (Head/Chest/Vitals)**: Instant death, sets `current_damage = 100`
