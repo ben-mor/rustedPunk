@@ -111,9 +111,9 @@ impl fmt::Display for Armor {
 impl Armor {
     pub fn new(
         name: String,
-        amount: usize,
-        weight_grams: usize,
-        price_eb: usize,
+        amount: i32,
+        weight_grams: i32,
+        price_eb: i32,
         comment: String,
         protection_max: i32,
         protected_zones: Vec<HitZone>,

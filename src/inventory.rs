@@ -1,5 +1,6 @@
 use crate::armor::Armor;
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::fmt;
 use uuid::Uuid;
 
@@ -101,13 +102,54 @@ impl<'de> Deserialize<'de> for Inventory {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+#[serde(try_from = "UncheckedItem")]
 pub struct Item {
     pub uuid: Uuid,
     pub name: String,
-    pub amount: usize,
-    pub weight_grams: usize,
-    pub price_eb: usize,
+    pub amount: i32,
+    pub weight_grams: i32,
+    pub price_eb: i32,
     pub comment: String,
+}
+
+/// Mirror of `Item` without validation, used as the deserialization input.
+/// `Item` itself can only be produced through `TryFrom`, which rejects
+/// negative quantities with a meaningful error message.
+#[derive(Deserialize)]
+struct UncheckedItem {
+    uuid: Uuid,
+    name: String,
+    amount: i32,
+    weight_grams: i32,
+    price_eb: i32,
+    comment: String,
+}
+
+impl TryFrom<UncheckedItem> for Item {
+    type Error = String;
+
+    fn try_from(raw: UncheckedItem) -> Result<Self, Self::Error> {
+        for (field, value) in [
+            ("amount", raw.amount),
+            ("weight_grams", raw.weight_grams),
+            ("price_eb", raw.price_eb),
+        ] {
+            if value < 0 {
+                return Err(format!(
+                    "Item '{}': {} must not be negative, got {}",
+                    raw.name, field, value
+                ));
+            }
+        }
+        Ok(Item {
+            uuid: raw.uuid,
+            name: raw.name,
+            amount: raw.amount,
+            weight_grams: raw.weight_grams,
+            price_eb: raw.price_eb,
+            comment: raw.comment,
+        })
+    }
 }
 
 impl InventoryItem for Item {
@@ -177,7 +219,7 @@ impl Inventory {
             .map(|item| &mut **item as &mut dyn InventoryItem)
     }
 
-    pub fn calculate_total_weight(&self) -> usize {
+    pub fn calculate_total_weight(&self) -> i32 {
         let mut total = 0;
         for item in &self.items {
             total += item.get_item().amount * item.get_item().weight_grams;
@@ -191,14 +233,32 @@ impl Inventory {
 }
 
 impl Item {
+    /// Creates a new item.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `amount`, `weight_grams` or `price_eb` is negative.
     pub fn new(
         uuid: Option<Uuid>,
         name: String,
-        amount: usize,
-        weight_grams: usize,
-        price_eb: usize,
+        amount: i32,
+        weight_grams: i32,
+        price_eb: i32,
         comment: String,
     ) -> Self {
+        for (field, value) in [
+            ("amount", amount),
+            ("weight_grams", weight_grams),
+            ("price_eb", price_eb),
+        ] {
+            assert!(
+                value >= 0,
+                "Item '{}': {} must not be negative, got {}",
+                name,
+                field,
+                value
+            );
+        }
         Item {
             uuid: uuid.unwrap_or(Uuid::new_v4()),
             name,
@@ -241,6 +301,34 @@ mod tests {
         let serialized = toml::to_string(&item).unwrap();
         let deserialized: Item = toml::from_str(&serialized).unwrap();
         assert_eq!(item, deserialized);
+    }
+
+    #[test]
+    #[should_panic(expected = "Item 'Broomstick': weight_grams must not be negative, got -1500")]
+    fn test_item_new_rejects_negative_weight() {
+        Item::new(
+            None,
+            "Broomstick".to_string(),
+            1,
+            -1500,
+            0,
+            "Test item".to_string(),
+        );
+    }
+
+    #[test]
+    fn test_item_deserialization_rejects_negative_amount() {
+        let toml_str = format!(
+            "uuid = \"{}\"\nname = \"Ammo 9mm\"\namount = -30\nweight_grams = 10\nprice_eb = 1\ncomment = \"\"\n",
+            Uuid::new_v4()
+        );
+        let result: Result<Item, _> = toml::from_str(&toml_str);
+        let error = result.unwrap_err().to_string();
+        assert!(
+            error.contains("Item 'Ammo 9mm': amount must not be negative, got -30"),
+            "unexpected error message: {}",
+            error
+        );
     }
 
     fn create_simple_inventory() -> Inventory {
