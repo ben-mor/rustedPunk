@@ -18,7 +18,7 @@ Dann vergibt man seine Punkte auf die Fertigkeiten, dabei kostet jeder Level ein
 
 Es ist erlaubt: eine Fertigkeit mit Wert 8, eine mit Wert 7, zwei mit Wert 6, darunter frei. Dabei kann man 1:2 nach unten tauschen (also drei mit 7, zwei mit 6 ist auch okay, dafür dann eben keinen mit 8).
 
-: Für den Min-Maxer: Während des Spiels ist es etwas schwieriger hohe Skills zu erwerben. Von 7 -> 8 kostet bei der Erschaffung einen Punkt, im Spiel kostet es 40 CP (bei ~5 / Abend). Man möge das im Kopf behalten.
+: Für den Min-Maxer: Während des Spiels ist es etwas schwieriger hohe Skills zu erwerben. Von 7 -> 8 kostet bei der Erschaffung einen Punkt, im Spiel kostet eine Steigerung Ziellevel × 10 CP (7 -> 8 also 80 CP, bei ~5 / Abend). Man möge das im Kopf behalten.
 
 Zuletzt kauft man sich sein Equipment. Dabei wird der Fertigkeitslevel von drei berufsdefinierenden Fertigkeiten genommen, und mit 350 multipliziert. Für einen Tech wäre das  "Basic Tech", "Elektrotechnik" und "Schweißen" oder was auch immer, für einen Nomaden wahrscheinlich "Fahren: LKW", "Fahren: Auto" und "Schießen: Gewehr". Welche drei Skills das sind kann sich der Spieler aussuchen, ich habe ein Veto-Recht.
 
