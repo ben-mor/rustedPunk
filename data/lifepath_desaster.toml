@@ -1,0 +1,172 @@
+# Desaster-Variante des Lifepath (Q29): startet als Kopie der klassischen
+# Tabellen — Ben interpretiert die Ergebnisse in die post-apokalyptische Welt
+# oder passt diese Datei direkt an (z.B. "Konzern" -> "Dom", "Polizei" ->
+# "Miliz der Werkstatt"). Struktur identisch mit lifepath_classic.toml.
+
+background = ["family_ranking", "parents", "childhood", "siblings", "personality"]
+yearly = "life_event"
+
+[tables.family_ranking]
+title = "Familienhintergrund"
+entries = [
+    { min = 1, max = 1, text = "Konzern-Führungskraft" },
+    { min = 2, max = 2, text = "Konzern-Manager" },
+    { min = 3, max = 3, text = "Konzern-Techniker" },
+    { min = 4, max = 4, text = "Nomaden-Pack" },
+    { min = 5, max = 5, text = "Piraten-/Gang-Familie" },
+    { min = 6, max = 6, text = "Familie eines Verbrecherbosses" },
+    { min = 7, max = 7, text = "Arbeiterfamilie in der Combat Zone" },
+    { min = 8, max = 8, text = "Städtische Mittelschicht" },
+    { min = 9, max = 9, text = "Arm, aber ehrlich (Arbeiter)" },
+    { min = 10, max = 10, text = "Obdachlos / Street Trash" },
+]
+
+[tables.parents]
+title = "Eltern"
+entries = [
+    { min = 1, max = 6, text = "Beide Eltern leben" },
+    { min = 7, max = 10, text = "Etwas ist mit den Eltern passiert …", goto = "parents_fate" },
+]
+
+# verbatim from RB5 ("SOMETHING HAPPENED TO PARENTS")
+[tables.parents_fate]
+title = "Schicksal der Eltern"
+entries = [
+    { min = 1, max = 1, text = "Eltern wurden ermordet" },
+    { min = 2, max = 2, text = "Eltern starben im Krieg" },
+    { min = 3, max = 3, text = "Eltern starben bei einem Unfall" },
+    { min = 4, max = 4, text = "Eltern begingen Selbstmord" },
+    { min = 5, max = 5, text = "Du hast deine Eltern nie gekannt" },
+    { min = 6, max = 6, text = "Eltern verstecken sich, um dich zu schützen" },
+    { min = 7, max = 7, text = "Du wurdest bei Verwandten gelassen" },
+    { min = 8, max = 8, text = "Eltern gaben dich zur Adoption frei" },
+    { min = 9, max = 9, text = "Eltern wurden Fanatiker/Radikale" },
+    { min = 10, max = 10, text = "Eltern haben dich für Geld verkauft" },
+]
+
+# verbatim from RB5 ("CHILDHOOD ENVIRONMENT")
+[tables.childhood]
+title = "Kindheit"
+entries = [
+    { min = 1, max = 1, text = "Im Wohnheim einer Schule" },
+    { min = 2, max = 2, text = "Sicherer Konzern-Vorort/Arkologie" },
+    { min = 3, max = 3, text = "Konzern-Farm/Forschungseinrichtung" },
+    { min = 4, max = 4, text = "Normales Stadtleben" },
+    { min = 5, max = 5, text = "Auf der Straße, ohne Aufsicht" },
+    { min = 6, max = 6, text = "Kleines Dorf oder Kleinstadt" },
+    { min = 7, max = 7, text = "Kampfkunst-/religiöse Ausbildung" },
+    { min = 8, max = 8, text = "Gang/Piraten/Schmuggler" },
+    { min = 9, max = 10, text = "Ab 8 in Fabrik oder Laden gearbeitet" },
+]
+
+[tables.siblings]
+title = "Geschwister"
+entries = [
+    { min = 1, max = 2, text = "Ein Geschwister", goto = "sibling_feeling" },
+    { min = 3, max = 4, text = "Zwei Geschwister", goto = "sibling_feeling" },
+    { min = 5, max = 6, text = "Drei Geschwister", goto = "sibling_feeling" },
+    { min = 7, max = 7, text = "Vier Geschwister", goto = "sibling_feeling" },
+    { min = 8, max = 10, text = "Einzelkind" },
+]
+
+[tables.sibling_feeling]
+title = "Verhältnis zu den Geschwistern"
+entries = [
+    { min = 1, max = 2, text = "Sie bewundern dich" },
+    { min = 3, max = 4, text = "Ihr respektiert euch" },
+    { min = 5, max = 6, text = "Neutral bis distanziert" },
+    { min = 7, max = 8, text = "Sie verachten dich" },
+    { min = 9, max = 10, text = "Sie hassen dich (oder du sie)" },
+]
+
+[tables.personality]
+title = "Persönlichkeit"
+entries = [
+    { min = 1, max = 1, text = "Schüchtern und verschlossen" },
+    { min = 2, max = 2, text = "Rebellisch, asozial, gewalttätig" },
+    { min = 3, max = 3, text = "Arrogant, stolz, distanziert" },
+    { min = 4, max = 4, text = "Launisch, impulsiv, eigensinnig" },
+    { min = 5, max = 5, text = "Pingelig, nervös, penibel" },
+    { min = 6, max = 6, text = "Stabil, ernsthaft, verantwortungsvoll" },
+    { min = 7, max = 7, text = "Albern, verspielt, flatterhaft" },
+    { min = 8, max = 8, text = "Verschlagen und hinterhältig" },
+    { min = 9, max = 9, text = "Intellektuell und reserviert" },
+    { min = 10, max = 10, text = "Freundlich und offen" },
+]
+
+[tables.life_event]
+title = "Lebensereignis"
+entries = [
+    { min = 1, max = 4, text = "Großes Problem oder großer Gewinn", goto = "problem_or_win" },
+    { min = 5, max = 6, text = "Freund oder Feind", goto = "friend_enemy" },
+    { min = 7, max = 8, text = "Romanze", goto = "romance" },
+    { min = 9, max = 10, text = "Nichts Besonderes passiert" },
+]
+
+[tables.problem_or_win]
+title = "Problem oder Gewinn?"
+entries = [
+    { min = 1, max = 5, text = "Das Unglück schlägt zu …", goto = "disaster" },
+    { min = 6, max = 10, text = "Glück gehabt!", goto = "lucky" },
+]
+
+[tables.disaster]
+title = "Unglück"
+entries = [
+    { min = 1, max = 1, text = "Finanzieller Verlust oder Schulden (1W10 × 100 eb)" },
+    { min = 2, max = 2, text = "Gefängnis oder Gefangenschaft (1W10 Monate)" },
+    { min = 3, max = 3, text = "Krankheit oder Sucht" },
+    { min = 4, max = 4, text = "Verrat: erpresst, ein Geheimnis verraten oder hintergangen" },
+    { min = 5, max = 5, text = "Unfall (Narben, Krankenhaus, Gedächtnislücken …)" },
+    { min = 6, max = 6, text = "Partner oder Freund getötet" },
+    { min = 7, max = 7, text = "Falsche Anschuldigung" },
+    { min = 8, max = 8, text = "Vom Gesetz gejagt" },
+    { min = 9, max = 9, text = "Von Konzern oder Gang gejagt" },
+    { min = 10, max = 10, text = "Schwere Verletzung oder psychisches Trauma" },
+]
+
+[tables.lucky]
+title = "Glücksfall"
+entries = [
+    { min = 1, max = 1, text = "Mächtige Verbindung (Polizei, Konzern, Unterwelt)" },
+    { min = 2, max = 2, text = "Geldsegen (1W10 × 100 eb)" },
+    { min = 3, max = 3, text = "Großer Coup gelungen (2W10 × 100 eb)" },
+    { min = 4, max = 4, text = "Sensei gefunden (Kampfkunst +2 oder bestehende +1)" },
+    { min = 5, max = 5, text = "Lehrer gefunden (INT-Fertigkeit +1)" },
+    { min = 6, max = 6, text = "Einflussreiche Person schuldet dir einen Gefallen" },
+    { min = 7, max = 7, text = "Nomaden-/Flüchtlingsgruppe als Verbündete" },
+    { min = 8, max = 8, text = "Freund bei der Polizei/Miliz" },
+    { min = 9, max = 9, text = "Lokale Gang mag dich (Gefallen)" },
+    { min = 10, max = 10, text = "Kampflehrer gefunden (Kampffertigkeit +1)" },
+]
+
+[tables.friend_enemy]
+title = "Freund oder Feind"
+entries = [
+    { min = 1, max = 4, text = "Du gewinnst einen Freund" },
+    { min = 5, max = 10, text = "Du machst dir einen Feind …", goto = "enemy_who" },
+]
+
+[tables.enemy_who]
+title = "Der Feind ist …"
+entries = [
+    { min = 1, max = 1, text = "Ex-Freund" },
+    { min = 2, max = 2, text = "Ex-Geliebte(r)" },
+    { min = 3, max = 3, text = "Verwandte(r)" },
+    { min = 4, max = 4, text = "Feind aus der Kindheit" },
+    { min = 5, max = 5, text = "Jemand, der für dich arbeitet(e)" },
+    { min = 6, max = 6, text = "Jemand, für den du arbeitest(e)" },
+    { min = 7, max = 7, text = "Partner oder Kollege" },
+    { min = 8, max = 8, text = "Eine Gang" },
+    { min = 9, max = 9, text = "Ein Konzernmensch" },
+    { min = 10, max = 10, text = "Ein Beamter/Offizieller" },
+]
+
+[tables.romance]
+title = "Romanze"
+entries = [
+    { min = 1, max = 4, text = "Glückliche Liebesbeziehung" },
+    { min = 5, max = 5, text = "Tragische Liebe (Tod, Verschwinden, Verrat …)" },
+    { min = 6, max = 7, text = "Beziehung mit Hindernissen (verfeindete Familien, Rivale …)" },
+    { min = 8, max = 10, text = "Kurze Affären und heiße Dates" },
+]

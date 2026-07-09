@@ -1,13 +1,48 @@
 use rusted_punk::{
-    Armor, Attribute, Character, DamageType, Difficulty, HitZone, Item, List, RandomRoller, Skill,
+    generate_nsc, Armor, Attribute, Character, DamageType, Difficulty, HitZone, Item,
+    LifepathVariant, List, RandomRoller, Skill,
 };
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 && args[1] == "chargen" {
+        chargen_command(&args[2..]);
+        return;
+    }
     armor_test();
     character_test();
     skill_test();
     list_test();
     dice_test();
+}
+
+/// `cargo run -- chargen [--classic|--desaster] [name] [role] [age]`
+/// Rolls an NSC skeleton: valid random attributes plus lifepath (Q29).
+fn chargen_command(args: &[String]) {
+    let variant = if args.iter().any(|arg| arg == "--desaster") {
+        LifepathVariant::Desaster
+    } else {
+        LifepathVariant::Classic
+    };
+    let positional: Vec<&String> = args.iter().filter(|arg| !arg.starts_with("--")).collect();
+    let name = positional.first().map_or("NSC", |s| s.as_str()).to_string();
+    let role = positional
+        .get(1)
+        .map_or("Ganger", |s| s.as_str())
+        .to_string();
+    let age = positional.get(2).and_then(|s| s.parse().ok()).unwrap_or(22);
+
+    let mut roller = RandomRoller;
+    let (character, events) = generate_nsc(name, role, age, variant, &mut roller);
+    character.print();
+    println!("Lifepath ({:?}):", variant);
+    for event in events {
+        if event.age > 0 {
+            println!("  [{}] {}: {}", event.age, event.table, event.text);
+        } else {
+            println!("  {}: {}", event.table, event.text);
+        }
+    }
 }
 
 fn dice_test() {

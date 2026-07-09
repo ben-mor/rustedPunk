@@ -1,0 +1,654 @@
+# Vor- und Nachteile-Katalog (Q30) aus docs/rules/VorUndNachteile.wiki.
+#
+# Jede mechanische Wirkung ist ein GUESS-Kommentar + Modifier; rein narrative
+# Einträge haben keine Modifier (der SL spielt sie aus). Bei gestuften Traits
+# ist die KLEINSTE Stufe kodiert (cp/level); höhere Stufen klont man mit
+# with_level und skaliert die Modifier. "ENGINE-TODO" = die Regel bräuchte
+# einen Motor-Haken, den es noch nicht gibt.
+# BITTE die GUESS-Zeilen reviewen.
+
+# ============================= VORTEILE =============================
+
+# GUESS: Verdopplung von INT/TECH-Skillpunkten ist Chargen-Mechanik, kein
+# Roll-Modifier; Erinnerungswurf (INT gegen 10) macht der SL situativ.
+[[advantages]]
+name = "Absolutes Gedächtnis"
+kind = "Advantage"
+cp = 60
+level = 1
+description = "INT/TECH-Skillpunkte zählen doppelt; INT-Wurf gegen 10 für akkurate Erinnerung."
+modifiers = []
+
+# GUESS: kein Abzug für die schwache Hand — der Motor kennt (noch) keinen
+# Beidhändigkeits-Malus, daher narrativ.
+[[advantages]]
+name = "Beidhändig"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "Kein Abzug für die schwächere Hand."
+modifiers = []
+
+[[advantages]]
+name = "Bekanntes Gesicht"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "Sieht aus wie eine bekannte Persönlichkeit (10 CP: klingt auch so, imitierbar)."
+modifiers = []
+
+# GUESS: Tag 'prellschaden' vergrößert die Skala 1:1 pro Level (2 CP/Punkt).
+[[advantages]]
+name = "Erhöhte Ausdauer"
+kind = "Advantage"
+cp = 2
+level = 1
+description = "Mehr Kleintreffer aushalten, bevor es auf die Gesundheit geht (2 CP/Punkt)."
+modifiers = [{ value = 1, target = { type = "Tag", of = "prellschaden" } }]
+
+# GUESS: −2 ATTR fest; +1 auf kurze 3D-Sicht als Tag 'dreidimensional'.
+[[advantages]]
+name = "Erweitertes Sichtfeld"
+kind = "Advantage"
+cp = 1
+level = 1
+description = "210° Sichtfeld; weit auseinanderstehende Augen (−2 ATTR), +1 bei 3D-Nahsicht."
+modifiers = [
+    { value = -2, target = { type = "Attribute", of = "Attractiveness" } },
+    { value = 1, target = { type = "Tag", of = "dreidimensional" } },
+]
+
+[[advantages]]
+name = "Fortschrittlich"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "Aufgewachsen in höherem TL (5 CP/TL über 6); schaltet dortige Fertigkeiten frei."
+modifiers = []
+
+# GUESS: Tag 'angst' +2 (1 CP für 2 Level; 4 CP für 4 Level analog).
+[[advantages]]
+name = "Furchtlos"
+kind = "Advantage"
+cp = 1
+level = 2
+description = "Bonus auf alle Proben gegen Erschrecken/Einschüchtern/Angst."
+modifiers = [{ value = 2, target = { type = "Tag", of = "angst" } }]
+
+# GUESS: Tag 'gelenkigkeit' +3 (Ritzen, Schlingen, Klettern je nach Situation).
+[[advantages]]
+name = "Gelenkigkeit"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 wo Beweglichkeit zählt (enge Ritzen, Fesseln, Klettern)."
+modifiers = [{ value = 3, target = { type = "Tag", of = "gelenkigkeit" } }]
+
+[[advantages]]
+name = "Gute Ohren"
+kind = "Advantage"
+cp = 1
+level = 2
+description = "Bonus auf Lausch-Wahrnehmung (1 CP für 2 Level, 4 CP für 4)."
+modifiers = [{ value = 2, target = { type = "Tag", of = "hören" } }]
+
+[[advantages]]
+name = "Gute Augen"
+kind = "Advantage"
+cp = 1
+level = 2
+description = "Bonus auf Seh-Wahrnehmung (1 CP für 2 Level, 4 CP für 4)."
+modifiers = [{ value = 2, target = { type = "Tag", of = "sehen" } }]
+
+[[advantages]]
+name = "Gute Nase"
+kind = "Advantage"
+cp = 1
+level = 2
+description = "Bonus auf Riechen/Schmecken (1 CP für 2 Level, 4 CP für 4)."
+modifiers = [{ value = 2, target = { type = "Tag", of = "riechen" } }]
+
+# GUESS: Tag 'tiere' +3; Ehrenkodex 'Tiere nicht quälen' ist narrativ dabei.
+[[advantages]]
+name = "Tierempathie"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 auf alles mit Tieren; Kodex: Tiere nicht quälen."
+modifiers = [{ value = 3, target = { type = "Tag", of = "tiere" } }]
+
+[[advantages]]
+name = "Höhere Bildung"
+kind = "Advantage"
+cp = 15
+level = 1
+description = "Universitätszugang gehabt; schaltet akademische Fertigkeiten frei (setzt Lesen 10 CP voraus)."
+modifiers = []
+
+# GUESS: 10-CP-Version kodiert (+5 auf Langzeit-Würfe); 20 CP = würfelt nie
+# gegen Krankheiten (narrativ, Minimum BODY 6).
+[[advantages]]
+name = "Immun gegen Krankheiten"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "Zäh gegen Krankheiten: +5 auf Langzeiteffekt-Würfe (20 CP: nie krank)."
+modifiers = [{ value = 5, target = { type = "Tag", of = "krankheit" } }]
+
+# GUESS: leichte Version kodiert (+3); große Version = level 2 mit +6.
+# Wahrnehmung in Konflikten als eigener Tag.
+[[advantages]]
+name = "Kampfreflexe"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "+3 Initiative und Konflikt-Wahrnehmung (10 CP: +6)."
+modifiers = [
+    { value = 3, target = { type = "Tag", of = "initiative" } },
+    { value = 3, target = { type = "Tag", of = "konflikt-wahrnehmung" } },
+]
+
+[[advantages]]
+name = "Konzentriert"
+kind = "Advantage"
+cp = 2
+level = 2
+description = "Bonus gegen Ablenkung (2 CP für 2 Level, 8 CP für 4); addiert zu Furchtlos."
+modifiers = [{ value = 2, target = { type = "Tag", of = "ablenkung" } }]
+
+[[advantages]]
+name = "Lesen und Schreiben"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "Mühsam lesen (5 CP) oder flüssig (10 CP); Voraussetzung für Bildung."
+modifiers = []
+
+[[advantages]]
+name = "Maschinenflüsterer"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 auf Wartung/Reparatur/Pflege von Maschinen und Fehlersuche (min. 15 CP in Maschinen-Skills)."
+modifiers = [{ value = 3, target = { type = "Tag", of = "maschinen" } }]
+
+[[advantages]]
+name = "Mathematische Begabung"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 auf Kopfrechnen (auch Physik, höhere Mathematik, Chemie)."
+modifiers = [{ value = 3, target = { type = "Tag", of = "kopfrechnen" } }]
+
+[[advantages]]
+name = "Musikalische Begabung"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 auf alles Musikalische."
+modifiers = [{ value = 3, target = { type = "Tag", of = "musik" } }]
+
+# GUESS: narrativ — 'keine Abzüge bei schlechtem Licht nach 5 Minuten' ist ein
+# Erlass von Situationsmali, kein fester Bonus.
+[[advantages]]
+name = "Nachtsicht"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "Keine Abzüge bei schlechtem Licht (nach 5 Min. Gewöhnung); völlige Finsternis bleibt."
+modifiers = []
+
+# GUESS: Tag 'reich' = Level; chargen::starting_money verdoppelt den Faktor
+# pro Punkt (0: 350, 1: 700, 2: 1400 …).
+[[advantages]]
+name = "Reich"
+kind = "Advantage"
+cp = 2
+level = 1
+description = "Verdoppelt den Startgeld-Faktor pro Level (SL-Veto je nach Hintergrund)."
+modifiers = [{ value = 1, target = { type = "Tag", of = "reich" } }]
+
+[[advantages]]
+name = "Richtungssinn"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "Wege der letzten ~4 Wochen auswendig; +3 wo Richtung zählt."
+modifiers = [{ value = 3, target = { type = "Tag", of = "richtung" } }]
+
+# GUESS: +3 Aushalten/Folter als Tag; halber Prellschaden und halbe
+# Verletzungsabzüge sind ENGINE-TODO (kein Haken vorhanden).
+[[advantages]]
+name = "Schmerzunempfindlich"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 Aushalten/Folter; Prellschaden und Verletzungsabzüge zählen halb (ENGINE-TODO)."
+modifiers = [{ value = 3, target = { type = "Tag", of = "aushalten" } }]
+
+[[advantages]]
+name = "Schnelle Heilung"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "Heilt Verletzungen doppelt so schnell; Verkrüppelung nur 1% / 0,1%."
+modifiers = [{ value = 1, target = { type = "Tag", of = "heilrate" } }]
+
+# GUESS: Scheintot-Mechanik ist narrativ/SL-Sache; pro Stufe ein 'Tödlich'-
+# Bereich markiert.
+[[advantages]]
+name = "Schwer zu töten"
+kind = "Advantage"
+cp = 5
+level = 1
+description = "Pro Stufe: ein Tödlich-Bereich wird bei misslungenem Tot-Check zu Scheintod."
+modifiers = []
+
+# GUESS: Chargen-Mechanik (Sprachpunkte verdoppelt/verdreifacht), narrativ.
+[[advantages]]
+name = "Sprachbegabung"
+kind = "Advantage"
+cp = 2
+level = 1
+description = "Alle Punkte in Sprachen verdoppelt (6 CP: verdreifacht)."
+modifiers = []
+
+[[advantages]]
+name = "Stimme"
+kind = "Advantage"
+cp = 10
+level = 1
+description = "+3 wo Stimme und Sprechen wichtig sind."
+modifiers = [{ value = 3, target = { type = "Tag", of = "stimme" } }]
+
+# GUESS: cp variabel — 0 als Platzhalter, der SL setzt den Preis.
+[[advantages]]
+name = "Ungewöhnlicher Hintergrund"
+kind = "Advantage"
+cp = 0
+level = 1
+description = "Zugriff auf normalerweise unverfügbare Fertigkeiten/Besitztümer; Kosten variabel (SL)."
+modifiers = []
+
+# ============================= NACHTEILE =============================
+
+[[advantages]]
+name = "Abergläubisch"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Richtet sein Leben nach Omen (5/10/15 CP nach Schwere); muss ausgespielt werden."
+modifiers = []
+
+# GUESS: die wichtigsten Mali als Tags; Sonnen-Schaden ist narrativ/SL.
+[[advantages]]
+name = "Albinismus"
+kind = "Disadvantage"
+cp = 15
+level = 1
+description = "Sonnenschaden, auffällig (−6 in Menge verstecken), −6 helles Licht, −5 räumlich, −4 sonstiges Sehen."
+modifiers = [
+    { value = -6, target = { type = "Tag", of = "sehen-hell" } },
+    { value = -4, target = { type = "Tag", of = "sehen" } },
+]
+
+[[advantages]]
+name = "Altruismus"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Stellt Forschungs-/Berufsergebnisse uneigennützig zur Verfügung (braucht Forschungs-Skill +4)."
+modifiers = []
+
+[[advantages]]
+name = "Ängste"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Phobien u.ä., Kosten nach Häufigkeit und Einschränkung; COOL-Wurf zum Überwinden."
+modifiers = []
+
+[[advantages]]
+name = "Arm"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Startet fast besitzlos (10 CP: dauerhaft Pech beim Güter-Ansammeln)."
+modifiers = []
+
+# GUESS: Heilungs-Stopp ist ENGINE-TODO (rest_day kennt kein 'heilt nie').
+[[advantages]]
+name = "Bluter"
+kind = "Disadvantage"
+cp = 50
+level = 1
+description = "Wunden heilen nicht von selbst und verschlimmern sich; innere Verletzungen tödlich (ENGINE-TODO)."
+modifiers = []
+
+[[advantages]]
+name = "Blutgier"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Will Gegner TOT sehen; COOL gegen 15 (gute Gründe: 10) um es zu lassen."
+modifiers = []
+
+[[advantages]]
+name = "Ehrenkodex"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Folgt festen Regeln der sozialen Gruppe (5–10 CP nach Einschränkung)."
+modifiers = []
+
+[[advantages]]
+name = "Ehrlich"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Kann nicht lügen; COOL 10 um zu schweigen, COOL 15 um doch zu lügen."
+modifiers = []
+
+# GUESS: −1 Tiefenschärfe, −2 im Kampf/hektisch, −2 ATTR fest.
+[[advantages]]
+name = "Einäugig"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Nur ein Auge: −1 Tiefenschärfe, −2 wenn es schnell gehen muss, meist −2 ATTR."
+modifiers = [
+    { value = -1, target = { type = "Tag", of = "dreidimensional" } },
+    { value = -2, target = { type = "Attribute", of = "Attractiveness" } },
+]
+
+[[advantages]]
+name = "Einarmig"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Zweiarmige Aktionen nur mit −6 oder gar nicht."
+modifiers = [{ value = -6, target = { type = "Tag", of = "zweihändig" } }]
+
+[[advantages]]
+name = "Einhändig"
+kind = "Disadvantage"
+cp = 3
+level = 1
+description = "Eine Hand fehlt (Haken/Messer-Prothese möglich); −2 auf zweihändige Aktionen."
+modifiers = [{ value = -2, target = { type = "Tag", of = "zweihändig" } }]
+
+# GUESS: −4 Handeln außerhalb des Expertenwissens und −4 Foltern als Tags;
+# 'durchschaut nie Lügen' ist narrativ.
+[[advantages]]
+name = "Empathielos"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Liest keine Gefühle: durchschaut nie Lügen, −4 Handeln (ohne Expertise), −4 Foltern."
+modifiers = [{ value = -4, target = { type = "Tag", of = "handeln" } }]
+
+[[advantages]]
+name = "Feige"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Weicht Verletzungsgefahr aus; COOL 10/15 um zu handeln (15 CP wenn Mut erwartet wird)."
+modifiers = []
+
+[[advantages]]
+name = "Farbenblind"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "−4 wo Farben nötig sind (Karten, Elektrotechnik), −2 wo nützlich (Spuren, Handeln)."
+modifiers = [{ value = -4, target = { type = "Tag", of = "farben" } }]
+
+# GUESS: doppelte Erschöpfung wäre ENGINE-TODO (Prellschaden durch Anstrengung
+# ist nicht automatisiert); +2 auf Festhalten/liegen bleiben als Tag.
+[[advantages]]
+name = "Fett"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "BMI > 31: schneller außer Atem (ENGINE-TODO), keine normale Kleidung, +2 auf Festpinnen."
+modifiers = [{ value = 2, target = { type = "Tag", of = "festhalten" } }]
+
+[[advantages]]
+name = "Gefürchtetes Gesicht"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Sieht aus wie ein Gesuchter; Leute halten Abstand (10 CP: wird verwechselt/gejagt)."
+modifiers = []
+
+[[advantages]]
+name = "Geheimnis"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Muss etwas Gravierendes verheimlichen (10 CP: tödlich, wenn es rauskommt)."
+modifiers = []
+
+[[advantages]]
+name = "Großmaul"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Schmückt Geschichten über sich selbst aus; kein Lügner, nur größer als er ist."
+modifiers = []
+
+[[advantages]]
+name = "Hedonist"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Sucht Genuss, meidet Entbehrung, gibt Geld aus solange es hält."
+modifiers = []
+
+[[advantages]]
+name = "Humorlos"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Versteht keinen Humor, meint alles ernst."
+modifiers = []
+
+[[advantages]]
+name = "Impulsiv"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Less talking, more action: nimmt den ersten nicht offensichtlich dummen Plan."
+modifiers = []
+
+[[advantages]]
+name = "Intolerant"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Abneigung gegen Andersartige; COOL 10 (10 CP: 13) für distanzierte Höflichkeit."
+modifiers = []
+
+[[advantages]]
+name = "Kampfstarre"
+kind = "Disadvantage"
+cp = 15
+level = 1
+description = "Bei drohendem Schaden COOL gegen 13, sonst handlungsunfähig; +1 je weitere Runde."
+modifiers = []
+
+[[advantages]]
+name = "Kein Geruchs- und Geschmackssinn"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Nur Grundgeschmäcker, kein Geruch: erkennt weder Gift am Geschmack noch Rauch."
+modifiers = []
+
+# GUESS: RUN-Faktor 2 statt 3 ist ENGINE-TODO (Bewegungsweiten sind nicht
+# implementiert); Rest narrativ.
+[[advantages]]
+name = "Klein"
+kind = "Disadvantage"
+cp = 15
+level = 1
+description = "≤120 cm: fällt immer auf, RUN-Faktor 2 statt 3 (ENGINE-TODO)."
+modifiers = []
+
+[[advantages]]
+name = "Langsame Heilung"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Heilt Verletzungen nur mit halber Rate; Heildrogen wirken normal."
+modifiers = [{ value = -1, target = { type = "Tag", of = "heilrate" } }]
+
+[[advantages]]
+name = "Lebensmüde"
+kind = "Disadvantage"
+cp = 15
+level = 1
+description = "Keine Wertschätzung fürs eigene Wohlergehen; INT gegen 15 um sich zu schützen."
+modifiers = []
+
+[[advantages]]
+name = "Leichtgläubig"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Glaubt alles; lügt selbst nur mit −2 und merkt nicht, ob man ihm glaubt."
+modifiers = [{ value = -2, target = { type = "Tag", of = "lügen" } }]
+
+# GUESS: cp variabel — 5 als Platzhalter.
+[[advantages]]
+name = "Markenzeichen"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Hinterlässt immer 'seine' Spur; CP nach Risiko und Zeitaufwand."
+modifiers = []
+
+[[advantages]]
+name = "Muss fertig werden"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Kann Angefangenes nicht liegen lassen; COOL 15/20 (+5 wenn das Leben dranhängt)."
+modifiers = []
+
+[[advantages]]
+name = "Neugierde"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Will alles sofort erkunden; COOL 10 (steigend) um es zu lassen."
+modifiers = []
+
+[[advantages]]
+name = "Pazifist"
+kind = "Disadvantage"
+cp = 15
+level = 1
+description = "Lehnt Gewalt ab, schießt nie zuerst, kämpft nicht gegen Aufgebende."
+modifiers = []
+
+# GUESS: 'eine gewürfelte 1 misslingt IMMER (auch bei Auto-Erfolg)' wäre ein
+# ENGINE-TODO im Würfelmotor; narrativ kodiert.
+[[advantages]]
+name = "Pech"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Jede gewürfelte 1 misslingt, Auto-Erfolge müssen trotzdem würfeln (ENGINE-TODO)."
+modifiers = []
+
+[[advantages]]
+name = "Rechtschaffenheit"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Hält sich ans (aus seiner Sicht) herrschende Recht, auf Biegen und Brechen."
+modifiers = []
+
+[[advantages]]
+name = "Schüchtern"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Gehemmt unter Fremden; −2 auf Reden vor Publikum u.ä."
+modifiers = [{ value = -2, target = { type = "Tag", of = "publikum" } }]
+
+[[advantages]]
+name = "Primitiv"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Aufgewachsen unter TL 6 (5 CP/TL darunter); kann die dortigen Fertigkeiten."
+modifiers = []
+
+# GUESS: −2 Entfesseln und −3 normale Sitze als Tags, Rest narrativ.
+[[advantages]]
+name = "Riesig"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "≥210 cm: fällt immer auf, keine normale Kleidung, −2 Entfesseln, Sitze nur mit −3."
+modifiers = [{ value = -2, target = { type = "Tag", of = "entfesseln" } }]
+
+[[advantages]]
+name = "Schlechte Ohren"
+kind = "Disadvantage"
+cp = 1
+level = 2
+description = "Malus auf Lausch-Wahrnehmung (1 CP für 2 Level, 4 für 4); Hörgerät gleicht aus."
+modifiers = [{ value = -2, target = { type = "Tag", of = "hören" } }]
+
+[[advantages]]
+name = "Schlechte Augen"
+kind = "Disadvantage"
+cp = 1
+level = 2
+description = "Malus auf Seh-Wahrnehmung; Brille gleicht aus (gefundene: 10%/5% Chance)."
+modifiers = [{ value = -2, target = { type = "Tag", of = "sehen" } }]
+
+[[advantages]]
+name = "Schlechte Nase"
+kind = "Disadvantage"
+cp = 1
+level = 2
+description = "Malus auf Riechen/Schmecken (1 CP für 2 Level, 4 für 4)."
+modifiers = [{ value = -2, target = { type = "Tag", of = "riechen" } }]
+
+# GUESS: BODY-Obergrenze 5 ist eine Chargen-Prüfung, kein Modifier.
+[[advantages]]
+name = "Schmächtig"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "BMI < 19; BODY darf nicht 6+ sein (Chargen-Regel), Kleidung sitzt nie."
+modifiers = []
+
+[[advantages]]
+name = "Tiefer Schlaf"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "Extrem schwer zu wecken (BODY/COOL gegen 15); danach −6, wird alle 10 Min. um 1 besser."
+modifiers = []
+
+# GUESS: Schmerz-Verdopplung wäre ENGINE-TODO; COOL-Wimmern-Wurf narrativ.
+[[advantages]]
+name = "Wehleidig"
+kind = "Disadvantage"
+cp = 10
+level = 1
+description = "Prellschaden zählt doppelt (ENGINE-TODO); COOL gegen 10+Schaden oder Jammern."
+modifiers = []
+
+[[advantages]]
+name = "Mangelnde Hörfilter"
+kind = "Disadvantage"
+cp = 5
+level = 1
+description = "−4 auf gesprochene Sprache verstehen unter erschwerten Umständen."
+modifiers = [{ value = -4, target = { type = "Tag", of = "sprache-verstehen" } }]

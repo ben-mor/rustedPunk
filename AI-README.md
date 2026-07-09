@@ -250,6 +250,30 @@ Encumbrance affects:
 - Situational tags ("hören", …): caller queries `modifier_for_tag()` when a
   fitting roll comes up.
 
+## Character Creation (`chargen.rs`) — #9
+
+- Validations: `validate_attributes` (60 points, 2..=9 each, INT/REF ≥ 5, no
+  10 at creation), `validate_skill_caps` (one 8 / one 7 / two 6, tradeable
+  1:2 downward), `validate_skill_budget` (pool = INT + REF + 40 + age points;
+  skill level N costs N cumulative; advantages cost CP 1:1, disadvantages
+  grant), `validate_character` aggregates. `starting_money` = 3 profession
+  skills × 350 eb, Reich tag doubles the factor per level.
+- `age_points`: Alterspunkte table; >32 continues +3/year (aging rules #22
+  still unwritten).
+- **Lifepath** (Q29): data-driven d10 tables in `data/lifepath_classic.toml`
+  and `..._desaster.toml` (embedded via include_str!). Tables chain via
+  `goto`. `roll_background` (family/childhood/personality once) +
+  `roll_life_events` (one master roll per year over 15).
+  The classic file is a BEST-EFFORT transcription (core book is a text-less
+  scan) — marked for review; the desaster file starts as a copy to edit.
+- `generate_nsc(name, role, age, variant, roller)`: valid random attributes +
+  lifepath; skills/gear stay empty (GM flavor). CLI:
+  `cargo run -- chargen [--classic|--desaster] [name] [role] [age]`.
+- **Trait catalog** (Q30): `advantage_catalog()` loads all wiki traits from
+  `data/advantages.toml`; GUESS comments mark my modifier interpretations,
+  ENGINE-TODO marks rules needing engine hooks (half-Prellschaden, RUN factor,
+  Pech's always-fail-on-1, Bluter). Leveled traits encoded at smallest level.
+
 ## Quick Reference
 
 | What | Where |

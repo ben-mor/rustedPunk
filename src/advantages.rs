@@ -102,6 +102,21 @@ impl fmt::Display for Advantage {
     }
 }
 
+#[derive(Deserialize)]
+struct AdvantageCatalog {
+    advantages: Vec<Advantage>,
+}
+
+/// The trait catalog from the wiki (docs/rules/VorUndNachteile.wiki),
+/// loaded from data/advantages.toml. Mechanical effects are best guesses
+/// marked with GUESS comments in the data file (Q30) — leveled traits are
+/// encoded at their smallest level; clone with `with_level` and scale.
+pub fn advantage_catalog() -> Vec<Advantage> {
+    let catalog: AdvantageCatalog = toml::from_str(include_str!("../data/advantages.toml"))
+        .expect("embedded advantage catalog must parse");
+    catalog.advantages
+}
+
 /// Validates the chargen budget rule: up to 30 CP of traits in total, or
 /// exactly ONE trait bigger than 30 plus at most 5 CP of others.
 pub fn validate_budget(advantages: &[Advantage]) -> Result<(), String> {
@@ -187,6 +202,33 @@ mod tests {
     #[should_panic(expected = "cp must not be negative")]
     fn test_negative_cp_panics() {
         plain("Broken", -10);
+    }
+
+    #[test]
+    fn test_catalog_parses_and_covers_the_wiki_list() {
+        let catalog = advantage_catalog();
+        assert!(
+            catalog.len() >= 60,
+            "expected the full wiki list, got {}",
+            catalog.len()
+        );
+        // spot checks: one mechanical advantage, one disadvantage, one narrative
+        let fast_healing = catalog
+            .iter()
+            .find(|advantage| advantage.name == "Schnelle Heilung")
+            .unwrap();
+        assert_eq!(fast_healing.modifiers.len(), 1);
+        let slow_healing = catalog
+            .iter()
+            .find(|advantage| advantage.name == "Langsame Heilung")
+            .unwrap();
+        assert_eq!(slow_healing.kind, AdvantageKind::Disadvantage);
+        assert_eq!(slow_healing.modifiers[0].value, -1);
+        let honest = catalog
+            .iter()
+            .find(|advantage| advantage.name == "Ehrlich")
+            .unwrap();
+        assert!(honest.modifiers.is_empty());
     }
 
     #[test]
