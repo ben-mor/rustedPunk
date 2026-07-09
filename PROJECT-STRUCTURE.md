@@ -152,8 +152,14 @@ Design rules already established (keep them):
   (TODO `character.rs:282`: cap at 4 + 1d10).
 - **Crippling injuries**: critical-or-worse wounds have 5% crippling chance without
   proper medical care (0.5% with care).
-- Ammo types: AP (armor halved, damage vs soft targets halved), dum-dum/HP (half
-  vs hard armor, double vs soft targets — TODO `character.rs:281`).
+- Ammo types: AP (armor halved, damage vs soft targets halved); dum-dum/HP
+  *(decided, Q17)*: mushrooms — vs hard armor the damage counts half; soft
+  armor faces the full damage (generating Prellschaden as usual); damage that
+  reaches flesh is DOUBLED and the projectile never exits (no penetration cap).
+- **Healing** *(decided, Q18)*: the morning after a wound, BODY roll vs
+  10 + taken damage or complications arise — skipped entirely when a healer is
+  present (practically always). Healing rate: 1 damage per two days, with a
+  healer 1 per day.
 - Fire damage ignores the ">8 damage" rule.
 
 ### Encumbrance (`character.rs`, `inventory.rs`) — implemented, #12 ✓
@@ -259,10 +265,11 @@ The workshop trade system IS in scope.)*
 - **M1 — Dice engine (#11)**: pure, seedable RNG (inject `rand::Rng` or a trait for
   testability), skill checks, exploding/fumble/luck/auto-success. Everything later
   (combat, chargen, NSCs) consumes this.
-- **M2 — Damage details (#19) + injuries & healing (#13)**: *damage side done
-  2026-07-09* (Prellschaden scale, BTM conversion, penetration cap, head-hit
-  ordering, health blocks, wound penalties). Still open: hollow-point vs soft
-  targets (Q17), healing over time + KO check (Q18), crippling-chance rolls.
+- **M2 — Damage details (#19) + injuries & healing (#13)**: *done 2026-07-09*
+  (Prellschaden scale, BTM conversion, penetration cap, head-hit ordering,
+  health blocks, wound penalties, hollow-point flesh doubling, healing rates,
+  complication check). Deferred: KO-check resolution mechanics and the 5%
+  crippling roll (need the advantage system for the modifiers anyway, → M3).
 - **M3 — Dis-/advantages (#10)**: storage first, then a generic `Modifier`
   mechanism (source, target attr/skill/roll-tag, value) that encumbrance and wound
   penalties can migrate onto.

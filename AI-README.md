@@ -95,7 +95,15 @@ Each damage type has a private helper method. Full mechanics documented on publi
   the shot does at most `4 + 1d10` — the rest exits through the back
   (`through_and_through` in the outcome)
 - Then delegates to `resolve_damage` (same core as `take_damage`)
-- TODO(Q17): hollow-point double damage vs soft targets pending ruling
+- **HollowPoint** (Q17): mushrooms — halved vs hard armor (in `Armor.hit`),
+  full damage vs soft armor; damage reaching flesh DOUBLES and the projectile
+  never exits (no penetration cap)
+
+### Healing (Q18)
+- `Character::rest_day(healer_present)`: heals 1/day with healer, 1 per two
+  days without (`healing_progress` carries the half-day)
+- `Character::complication_check(healer_present, roller)`: morning-after BODY
+  roll vs 10 + current damage; `None` with a healer (no check needed)
 
 ### `Character.take_damage(damage, zone)` → `HitOutcome`
 - Bypasses armor. BTM is SUBTRACTED and CONVERTED to Prellschaden (min 1 real

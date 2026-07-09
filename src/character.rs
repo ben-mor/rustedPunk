@@ -21,6 +21,9 @@ pub struct Character {
     /// Malus from pure bruise damage, applied to (and consumed by) the
     /// character's next check.
     pub pending_roll_malus: i32,
+    /// Healing progress in half-points: a healer day counts 2, a day without
+    /// counts 1; every 2 half-points heal 1 damage (see [`Character::rest_day`]).
+    pub healing_progress: i32,
     /// Available luck points. A persistent pool: spending survives the session,
     /// [`Character::start_session`] regenerates half the current base LUCK
     /// (rounded up). See [`Character::start_session`] for the three luck levels.
@@ -176,6 +179,7 @@ impl Character {
             current_damage: 0,
             current_bruise: 0,
             pending_roll_malus: 0,
+            healing_progress: 0,
             current_luck: luck,
             damage_notes: "".to_string(),
             skills: Vec::new(),
@@ -280,6 +284,42 @@ Character {{ \n\
         WoundState::from_damage(self.current_damage)
     }
 
+    /// A day of rest: heals 1 damage per day with a healer present,
+    /// 1 per two days without (progress carries over between days).
+    pub fn rest_day(&mut self, healer_present: bool) {
+        if self.current_damage == 0 || self.wound_state() == WoundState::Dead {
+            return;
+        }
+        self.healing_progress += if healer_present { 2 } else { 1 };
+        self.current_damage = (self.current_damage - self.healing_progress / 2).max(0);
+        self.healing_progress %= 2;
+        if self.current_damage == 0 {
+            self.healing_progress = 0;
+        }
+    }
+
+    /// The morning-after complication check: BODY against 10 + current damage.
+    /// With a healer present (practically always) no check is needed and
+    /// `None` is returned. A failed check means complications — interpreting
+    /// them is up to the GM.
+    pub fn complication_check(
+        &mut self,
+        healer_present: bool,
+        roller: &mut dyn DieRoller,
+    ) -> Option<CheckResult> {
+        if healer_present {
+            return None;
+        }
+        let difficulty = Difficulty::Custom(10 + self.current_damage);
+        Some(skill_check(
+            self.effective_attribute(Attribute::Body),
+            0,
+            0,
+            difficulty,
+            roller,
+        ))
+    }
+
     /// Returns the effective attribute value for dice rolls, including all
     /// temporary modifiers (wound penalties, encumbrance, etc.).
     ///
@@ -381,10 +421,14 @@ Character {{ \n\
             }
         }
 
-        // House rule: a gunshot doing more than 4 damage rolls 1d10 — that is
-        // the maximum extra damage before the shot exits through the back.
         let mut through_and_through = false;
-        if is_gunshot && remaining_damage > 4 {
+        if damage_type == DamageType::HollowPoint {
+            // Q17: the mushroomed projectile doubles its damage as soon as it
+            // enters flesh — and doesn't exit the body, so no penetration cap.
+            remaining_damage *= 2;
+        } else if is_gunshot && remaining_damage > 4 {
+            // House rule: a gunshot doing more than 4 damage rolls 1d10 — that
+            // is the maximum extra damage before the shot exits through the back.
             let cap = 4 + roller.d10();
             if remaining_damage > cap {
                 remaining_damage = cap;
@@ -392,8 +436,6 @@ Character {{ \n\
             }
         }
 
-        // TODO(Q17): HollowPoint/dum-dum double damage against soft targets —
-        // pending ruling on what exactly counts as a soft target.
         let mut outcome = self.resolve_damage(remaining_damage, soft_absorbed, zone);
         outcome.through_and_through = through_and_through;
         outcome
@@ -954,6 +996,77 @@ mod tests {
             character.wound_state(),
             crate::health::WoundState::Mortal(0)
         );
+    }
+
+    #[test]
+    fn test_hollow_point_doubles_in_flesh_and_never_exits() {
+        // Ben's Q17 example: 8 damage against 4-SP soft armor. The armor
+        // consumes 4 (-> Prellschaden); the remaining 4 double in the flesh,
+        // so 8 (minus BTM) reach the character. No through-and-through.
+        let mut character = unencumbered_shooter(); // BODY 10, BTM 4
+        let cloak = long_leather_cloak(); // soft, 4 SP, covers Chest
+        let cloak_uuid = cloak.item.uuid;
+        character.inventory.push(Box::new(cloak));
+        character.wear_armor(cloak_uuid, None);
+
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(
+            8,
+            HitZone::Chest,
+            DamageType::HollowPoint,
+            true,
+            &mut roller,
+        );
+
+        assert!(!outcome.through_and_through, "hollow point never exits");
+        // doubled to 8, BTM converts 4 -> 4 real; bruise = 4 (armor) + 4 (BTM)
+        // = 8 -> 1 converted damage, scale at 3
+        assert_eq!(character.current_damage, 4 + 1);
+        assert_eq!(character.current_bruise, 3);
+        assert!(outcome.ko_check_required);
+    }
+
+    #[test]
+    fn test_rest_day_healing_rates() {
+        let mut character = unencumbered_shooter();
+        character.current_damage = 6;
+
+        // without a healer: 1 point per two days
+        character.rest_day(false);
+        assert_eq!(character.current_damage, 6);
+        character.rest_day(false);
+        assert_eq!(character.current_damage, 5);
+
+        // with a healer: 1 point per day (carried half-progress stays intact)
+        character.rest_day(true);
+        assert_eq!(character.current_damage, 4);
+
+        // healing stops at 0 and never goes negative
+        character.current_damage = 1;
+        character.rest_day(true);
+        character.rest_day(true);
+        assert_eq!(character.current_damage, 0);
+    }
+
+    #[test]
+    fn test_complication_check_only_without_healer() {
+        let mut character = unencumbered_shooter(); // BODY 10
+        character.current_damage = 4;
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        assert!(character.complication_check(true, &mut roller).is_none());
+
+        // without healer: BODY vs 10 + damage = 14. BODY 10 + die 5 = 15: passed.
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character.complication_check(false, &mut roller).unwrap();
+        assert_eq!(result.target, 14);
+        assert!(result.outcome.is_success());
+
+        // heavily wounded: wound penalties make BODY worse (Mortal thirds it)
+        character.current_damage = 14;
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character.complication_check(false, &mut roller).unwrap();
+        // effective BODY 4 + die 5 = 9 vs 24: failed
+        assert!(!result.outcome.is_success());
     }
 
     #[test]
