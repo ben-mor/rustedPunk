@@ -24,4 +24,7 @@ pub use self::melee::{
     dam_for_body, MartialArtsAction, MartialArtsStyle, MeleeClass, MELEE_GENERAL_CAP,
     SKILL_MELEE_GENERAL,
 };
-pub use self::weapons::DamageType;
+pub use self::weapons::{
+    autofire_attack_modifier, autofire_hits, burst_hits, shot_noise_bonus, Availability,
+    Concealability, DamageType, Reliability, Weapon, WeaponCategory, BURST_ATTACK_BONUS,
+};

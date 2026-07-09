@@ -478,6 +478,56 @@ Character {{ \n\
         Some((base.roll(roller) + dam + level).max(0))
     }
 
+    /// Rolls a ranged attack with a weapon: like [`Character::check_skill`]
+    /// plus the weapon accuracy (WA) and +1 if the weapon has a scope.
+    /// Autofire/burst modifiers are the caller's business
+    /// (see `weapons::autofire_attack_modifier` / `BURST_ATTACK_BONUS`).
+    pub fn check_ranged_attack(
+        &mut self,
+        weapon: &crate::weapons::Weapon,
+        skill_name: &str,
+        luck: i32,
+        difficulty: Difficulty,
+        roller: &mut dyn DieRoller,
+    ) -> Result<CheckResult, String> {
+        let skill = self
+            .skills
+            .iter()
+            .find(|skill| skill.name == skill_name)
+            .ok_or_else(|| {
+                format!(
+                    "Character '{}' has no skill named '{}'",
+                    self.name, skill_name
+                )
+            })?;
+        let (attribute_value, skill_level) = (self.effective_attribute(skill.base), skill.level);
+        let advantage_bonus = self.modifier_for_skill(skill_name);
+        let weapon_bonus = weapon.weapon_accuracy + if weapon.scope { 1 } else { 0 };
+        self.spend_luck(luck)?;
+        let malus = std::mem::take(&mut self.pending_roll_malus);
+        Ok(skill_check(
+            attribute_value + advantage_bonus + weapon_bonus - malus,
+            skill_level,
+            luck,
+            difficulty,
+            roller,
+        ))
+    }
+
+    /// Rolls a weapon's damage. Melee weapons add the wielder's DAM.
+    pub fn weapon_damage(
+        &self,
+        weapon: &crate::weapons::Weapon,
+        roller: &mut dyn DieRoller,
+    ) -> i32 {
+        let dam = if weapon.category.melee_class().is_some() {
+            self.dam()
+        } else {
+            0
+        };
+        (weapon.damage.roll(roller) + dam).max(0)
+    }
+
     /// The KO check after taking damage: BODY against 10, modified by the
     /// wound category's Stun malus (Light −0, Serious −1, Critical −2,
     /// Mortal 0 −3, one more per Mortal step).
@@ -653,7 +703,9 @@ Character {{ \n\
             }
         }
 
-        let mut outcome = self.resolve_damage(remaining_damage, soft_absorbed, zone);
+        // fire damage ignores the ">8 damage" crippling rule
+        let can_cripple = damage_type != DamageType::Fire;
+        let mut outcome = self.resolve_damage(remaining_damage, soft_absorbed, zone, can_cripple);
         outcome.through_and_through = through_and_through;
         outcome
     }
@@ -661,7 +713,7 @@ Character {{ \n\
     /// This ignores all armor and applies damage directly.
     /// It will subtract the BTM first.
     pub fn take_damage(&mut self, damage: i32, zone: HitZone) -> HitOutcome {
-        self.resolve_damage(damage, 0, zone)
+        self.resolve_damage(damage, 0, zone, true)
     }
 
     /// Core damage resolution after armor: BTM conversion, bruise scale,
@@ -675,7 +727,13 @@ Character {{ \n\
     ///   that amount on the character's next roll.
     /// - The crippling check (8+ zone damage after BTM) uses the UNDOUBLED
     ///   value; head doubling is applied afterwards.
-    fn resolve_damage(&mut self, incoming: i32, armor_bruise: i32, zone: HitZone) -> HitOutcome {
+    fn resolve_damage(
+        &mut self,
+        incoming: i32,
+        armor_bruise: i32,
+        zone: HitZone,
+        can_cripple: bool,
+    ) -> HitOutcome {
         let mut real_damage = incoming.max(0);
         let mut bruise = armor_bruise;
 
@@ -698,7 +756,8 @@ Character {{ \n\
         }
 
         // Crippling check against the unmodified zone damage, doubling after.
-        let crippled = real_damage >= 8;
+        // Fire never cripples (can_cripple = false, Q: Hausregeln Niederbrennen).
+        let crippled = can_cripple && real_damage >= 8;
         let mut applied_damage = real_damage;
         if zone == HitZone::Head {
             applied_damage *= 2;
@@ -1653,6 +1712,66 @@ mod tests {
         assert!(character.crippling_check(true, &mut roller)); // 000 < 1
         let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 1]);
         assert!(!character.crippling_check(true, &mut roller));
+    }
+
+    #[test]
+    fn test_ranged_attack_applies_weapon_accuracy_and_scope() {
+        use crate::weapons::{Weapon, WeaponCategory};
+        let mut character = unencumbered_shooter(); // REF 8, Pistole 4
+        let catalog = Weapon::catalog();
+        let mut smg = catalog
+            .iter()
+            .find(|weapon| weapon.category == WeaponCategory::Smg)
+            .unwrap()
+            .clone();
+        // Uzi WA +1: REF 8 + Pistole 4 + WA 1 + die 4 = 17
+        let mut roller = crate::dice::SequenceRoller::new(vec![4]);
+        let result = character
+            .check_ranged_attack(&smg, "Pistole", 0, Difficulty::Hard, &mut roller)
+            .unwrap();
+        assert_eq!(result.total, 17);
+
+        // scope adds +1
+        smg.scope = true;
+        let mut roller = crate::dice::SequenceRoller::new(vec![4]);
+        let result = character
+            .check_ranged_attack(&smg, "Pistole", 0, Difficulty::Hard, &mut roller)
+            .unwrap();
+        assert_eq!(result.total, 18);
+    }
+
+    #[test]
+    fn test_melee_weapon_damage_adds_dam() {
+        use crate::weapons::{Weapon, WeaponCategory};
+        let character = unencumbered_shooter(); // BODY 10 -> DAM +2
+        let catalog = Weapon::catalog();
+        let knife = catalog
+            .iter()
+            .find(|weapon| weapon.category == WeaponCategory::Knife)
+            .unwrap();
+        // Combat Knife 1d6+3: die 4 + 3 + DAM 2 = 9
+        let mut roller = crate::dice::SequenceRoller::new(vec![4]);
+        assert_eq!(character.weapon_damage(knife, &mut roller), 9);
+
+        // ranged weapons don't add DAM
+        let ak = catalog
+            .iter()
+            .find(|weapon| weapon.category == WeaponCategory::Rifle)
+            .unwrap();
+        let mut roller = crate::dice::SequenceRoller::new(vec![3, 3, 3, 3, 3]);
+        assert_eq!(character.weapon_damage(ak, &mut roller), 15);
+    }
+
+    #[test]
+    fn test_fire_damage_never_cripples() {
+        let mut character = unencumbered_shooter(); // BTM 4
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        // 20 fire damage, no armor: 20 - 4 BTM = 16 zone damage -> would
+        // cripple/kill for any other type, but fire ignores the 8+ rule
+        let outcome = character.hit(20, HitZone::Chest, DamageType::Fire, false, &mut roller);
+        assert_eq!(character.damage_notes, "");
+        assert!(outcome.real_damage >= 16);
+        assert_ne!(character.current_damage, 100);
     }
 
     #[test]

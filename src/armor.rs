@@ -166,6 +166,9 @@ impl Armor {
                 DamageType::Blunt => self.hit_blunt(zone, &mut remaining_damage),
                 DamageType::HollowPoint => self.hit_hollow_point(zone, &mut remaining_damage),
                 DamageType::Slashing => self.hit_slashing(zone, &mut remaining_damage),
+                // fire licks around armor no better than a blunt impact:
+                // full protection value, no modifications
+                DamageType::Fire => self.hit_blunt(zone, &mut remaining_damage),
             };
             DamageResult {
                 remaining_damage,

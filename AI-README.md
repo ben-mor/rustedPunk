@@ -212,6 +212,29 @@ Encumbrance affects:
 - `Character::crippling_check(medical_care, roller)`: rolled once per
   critical+ injury directly after the fight; 5%/0.5%, Schnelle Heilung 1%/0.1%.
 
+## Weapons (`weapons.rs`) — #21
+
+- `Weapon` (InventoryItem, serde: `item` field LAST for TOML) with category,
+  WA, concealability, availability, damage `DiceExpr`, damage type, magazine,
+  ROF, reliability, range, silencer/scope flags. Availability/cost kept for
+  classic-CP2020 support (Q28).
+- `Weapon::catalog()`: one middle RAW representative per issue-#21 category
+  (Q27); comments carry the RB5 source line. Sling + Molotov = BEST GUESS
+  (no RB5 entry), marked in the comment.
+- `DamageType::Fire` (new): armor protects like Blunt, never cripples
+  (>8-rule ignored), used by the Molotov.
+- `Character::check_ranged_attack(weapon, skill, ...)` adds WA (+1 scope);
+  `Character::weapon_damage()` adds DAM for melee-class weapons.
+- Autofire: `autofire_attack_modifier(bullets, close)` = ±1 per 10 bullets,
+  `autofire_hits(total, target, bullets)` = margin capped at bullets.
+  Burst: `BURST_ATTACK_BONUS` (+3), `burst_hits()` = 1d2.
+- `shot_noise_bonus(weapon, bullets, distance, walls, soundproofed)`:
+  avg×3 (silencer halves), −2/wall, −6/soundproofed, −2/50m, +2/bullet.
+  NOTE: the wiki's 200m AK example says 38 but the formula gives 37 (wiki
+  arithmetic typo).
+- When adding InventoryItem types: extend SerializeableInventoryItem + both
+  Serialize/Deserialize impls in inventory.rs.
+
 ## Dis-/Advantages (`advantages.rs`) — #10
 
 - `Advantage { name, kind, cp (always positive), level, description, modifiers }`;

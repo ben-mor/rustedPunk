@@ -1,4 +1,5 @@
 use crate::armor::Armor;
+use crate::weapons::Weapon;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt;
@@ -36,11 +37,15 @@ struct SerializeableInventory {
     items: Vec<SerializeableInventoryItem>,
 }
 
+// the variant names are the `type = "..."` tags in saved character files —
+// the Item postfix is intentional there
+#[allow(clippy::enum_variant_names)]
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", content = "data")]
 enum SerializeableInventoryItem {
     BasicItem(Item),
     ArmorItem(Armor),
+    WeaponItem(Weapon),
 }
 
 impl PartialEq for Inventory {
@@ -66,6 +71,8 @@ impl Serialize for Inventory {
         for item in &self.items {
             if let Some(armor) = item.as_any().downcast_ref::<Armor>() {
                 serializable_items.push(SerializeableInventoryItem::ArmorItem(armor.clone()));
+            } else if let Some(weapon) = item.as_any().downcast_ref::<Weapon>() {
+                serializable_items.push(SerializeableInventoryItem::WeaponItem(weapon.clone()));
             } else if let Some(basic) = item.as_any().downcast_ref::<Item>() {
                 serializable_items.push(SerializeableInventoryItem::BasicItem(basic.clone()));
             } else {
@@ -94,6 +101,7 @@ impl<'de> Deserialize<'de> for Inventory {
             match item {
                 SerializeableInventoryItem::BasicItem(basic) => items.push(Box::new(basic)),
                 SerializeableInventoryItem::ArmorItem(armor) => items.push(Box::new(armor)),
+                SerializeableInventoryItem::WeaponItem(weapon) => items.push(Box::new(weapon)),
             }
         }
 
