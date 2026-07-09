@@ -306,17 +306,20 @@ The workshop trade system IS in scope.)*
   validation plus generic `Modifier` mechanism (attribute / skill-by-name /
   free tag) wired into checks, initiative, bruise scale and healing rate.
   KO check landed separately (PR #30). Crippling roll (Q22) → M4 or M6.
-- **M4 — Skills special functions (#15)**: melee split at level 3 with
-  independently-continued specializations (Q23), Dodge capped on general (Q24),
-  unfamiliar-weapon +3 difficulty (Q25), martial-arts styles Prügeln/Boxen/
-  Ringen with key attacks and 1:1 skill-level damage (Q26), DAM table.
-- **M5 — Weapons (#21)**: Weapon as InventoryItem, one middle-of-the-road RAW
-  representative per category (Q27), availability/rarity/cost kept for classic
-  CP2020 support (Q28), fire modes, attachments, noise formula.
-- **M6 — Character generation (#9)**: point-buy validation, age points, RAW
-  lifepath with variant toggle --classic/--desaster (Q29), equipment budget,
-  trait catalog as reviewable TOML with best-guess modifiers (Q30); then
-  randomized NSC generation on top.
+- **M4 — Skills special functions (#15)**: *done 2026-07-10* — melee split at
+  level 3 with independently-continued specializations (Q23), Dodge capped on
+  general (Q24), unfamiliar-weapon +3 difficulty (Q25), martial-arts styles
+  Prügeln/Boxen/Ringen with key attacks and 1:1 skill-level damage (Q26),
+  DAM table, crippling roll (Q22).
+- **M5 — Weapons (#21)**: *done 2026-07-10* — Weapon as InventoryItem, one
+  middle RAW representative per category (Q27; Sling/Molotov = best guesses),
+  availability/cost kept for classic CP2020 support (Q28), DamageType::Fire,
+  autofire/burst helpers, noise formula (wiki example has an off-by-one typo:
+  AK at 200 m gives 37, not 38).
+- **M6 — Character generation (#9)**: *done 2026-07-10* — point-buy/caps/budget
+  validation, age points, data-driven lifepath with --classic/--desaster
+  toggle (Q29; classic tables are a best-effort transcription, REVIEW), money,
+  trait catalog as reviewable TOML (Q30), NSC skeleton generation.
 - **M7 — Frontend**: **ON HOLD (Q31)** — Ben hasn't decided hosting/auth yet.
   Long-term goal remains a web service on Ben's server with auto-rolls and an
   AI-agent-friendly API; keep the rules engine a pure library with a thin API
