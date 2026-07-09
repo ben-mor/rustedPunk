@@ -3,6 +3,10 @@ use crate::advantages::{
 };
 use crate::dice::{skill_check, CheckResult, DieRoller, Difficulty};
 use crate::health::WoundState;
+use crate::melee::{
+    dam_for_body, MartialArtsAction, MartialArtsStyle, MeleeClass, MELEE_GENERAL_CAP,
+    SKILL_MELEE_GENERAL,
+};
 use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
 use serde::{Deserialize, Serialize};
@@ -353,6 +357,127 @@ Character {{ \n\
         }
     }
 
+    /// The hand-to-hand damage modifier (DAM, "DAMAGE MOD" on the sheet),
+    /// based on the sheet BODY plus advantage modifiers.
+    pub fn dam(&self) -> i32 {
+        dam_for_body(
+            self.attributes.get(&Attribute::Body).unwrap().actual
+                + self.modifier_for_attribute(Attribute::Body),
+        )
+    }
+
+    fn skill_level(&self, name: &str) -> Option<i32> {
+        self.skills
+            .iter()
+            .find(|skill| skill.name == name)
+            .map(|skill| skill.level)
+    }
+
+    /// The melee level used with a weapon class: the specialization if the
+    /// character has it, otherwise the shared general skill (capped at 3).
+    pub fn melee_level(&self, class: MeleeClass) -> i32 {
+        self.skill_level(class.skill_name()).unwrap_or_else(|| {
+            self.skill_level(SKILL_MELEE_GENERAL)
+                .unwrap_or(0)
+                .min(MELEE_GENERAL_CAP)
+        })
+    }
+
+    /// Rolls a melee attack with a weapon class. Unfamiliar weapons within
+    /// the class raise the difficulty by 3 (Q25).
+    pub fn check_melee(
+        &mut self,
+        class: MeleeClass,
+        familiar: bool,
+        luck: i32,
+        difficulty: Difficulty,
+        roller: &mut dyn DieRoller,
+    ) -> Result<CheckResult, String> {
+        let target = difficulty.target() + if familiar { 0 } else { 3 };
+        let (attribute_value, level) = (
+            self.effective_attribute(Attribute::Reflexes),
+            self.melee_level(class),
+        );
+        self.spend_luck(luck)?;
+        let malus = std::mem::take(&mut self.pending_roll_malus);
+        Ok(skill_check(
+            attribute_value - malus,
+            level,
+            luck,
+            Difficulty::Custom(target),
+            roller,
+        ))
+    }
+
+    /// Rolls a dodge: always uses the general melee level (capped at 3),
+    /// specializations don't help here (Q24).
+    pub fn check_dodge(
+        &mut self,
+        luck: i32,
+        difficulty: Difficulty,
+        roller: &mut dyn DieRoller,
+    ) -> Result<CheckResult, String> {
+        let (attribute_value, level) = (
+            self.effective_attribute(Attribute::Reflexes),
+            self.skill_level(SKILL_MELEE_GENERAL)
+                .unwrap_or(0)
+                .min(MELEE_GENERAL_CAP),
+        );
+        self.spend_luck(luck)?;
+        let malus = std::mem::take(&mut self.pending_roll_malus);
+        Ok(skill_check(
+            attribute_value - malus,
+            level,
+            luck,
+            difficulty,
+            roller,
+        ))
+    }
+
+    /// Rolls a martial arts action: REF + style skill + the style's
+    /// key-attack bonus. Errors if the character doesn't know the style.
+    pub fn check_martial_arts(
+        &mut self,
+        style: MartialArtsStyle,
+        action: MartialArtsAction,
+        luck: i32,
+        difficulty: Difficulty,
+        roller: &mut dyn DieRoller,
+    ) -> Result<CheckResult, String> {
+        let level = self.skill_level(style.skill_name()).ok_or_else(|| {
+            format!(
+                "Character '{}' has no skill named '{}'",
+                self.name,
+                style.skill_name()
+            )
+        })?;
+        let attribute_value = self.effective_attribute(Attribute::Reflexes);
+        self.spend_luck(luck)?;
+        let malus = std::mem::take(&mut self.pending_roll_malus);
+        Ok(skill_check(
+            attribute_value + style.key_attack_bonus(action) - malus,
+            level,
+            luck,
+            difficulty,
+            roller,
+        ))
+    }
+
+    /// Rolls the damage of a martial arts action: base dice + DAM (where the
+    /// body's mass matters) + style skill level 1:1 (Q26).
+    /// `None` for actions that don't deal damage. Minimum 0.
+    pub fn martial_arts_damage(
+        &self,
+        style: MartialArtsStyle,
+        action: MartialArtsAction,
+        roller: &mut dyn DieRoller,
+    ) -> Option<i32> {
+        let base = action.base_damage()?;
+        let level = self.skill_level(style.skill_name()).unwrap_or(0);
+        let dam = if action.applies_dam() { self.dam() } else { 0 };
+        Some((base.roll(roller) + dam + level).max(0))
+    }
+
     /// The KO check after taking damage: BODY against 10, modified by the
     /// wound category's Stun malus (Light −0, Serious −1, Critical −2,
     /// Mortal 0 −3, one more per Mortal step).
@@ -370,6 +495,22 @@ Character {{ \n\
             + self.modifier_for_attribute(Attribute::Body)
             - self.wound_state().ko_malus();
         skill_check(body, 0, 0, Difficulty::Custom(10), roller)
+    }
+
+    /// The crippling check for one critical-or-worse injury, rolled directly
+    /// after the fight (Q22): 5% chance without proper medical care, 0.5%
+    /// with; Schnelle Heilung (healing-rate tag > 0) lowers that to 1% /
+    /// 0.1%. Returns true when the body part is crippled — what that means
+    /// concretely is the GM's call, the tool only reports it.
+    pub fn crippling_check(&self, medical_care: bool, roller: &mut dyn DieRoller) -> bool {
+        let fast_healer = self.modifier_for_tag(TAG_HEALING_RATE) > 0;
+        let per_mille = match (medical_care, fast_healer) {
+            (false, false) => 50,
+            (true, false) => 5,
+            (false, true) => 10,
+            (true, true) => 1,
+        };
+        crate::dice::roll_per_mille(roller) < per_mille
     }
 
     /// The morning-after complication check: BODY against 10 + current damage.
@@ -1339,6 +1480,179 @@ mod tests {
         let outcome = character.hit(3, HitZone::Chest, DamageType::Blunt, true, &mut roller);
         assert!(!outcome.ko_check_required);
         assert_eq!(character.pending_roll_malus, 3);
+    }
+
+    #[test]
+    fn test_melee_specialization_continues_the_scale() {
+        use crate::melee::{MeleeClass, SKILL_MELEE_GENERAL};
+        let mut character = unencumbered_shooter(); // REF 8
+        character.skills.push(Skill::new(
+            SKILL_MELEE_GENERAL.to_string(),
+            Attribute::Reflexes,
+            3,
+            1,
+        ));
+        character.skills.push(Skill::new(
+            MeleeClass::Short.skill_name().to_string(),
+            Attribute::Reflexes,
+            4,
+            1,
+        ));
+        // Ben's Q23 example: 1d10+4 with short weapons, 1d10+3 with medium
+        assert_eq!(character.melee_level(MeleeClass::Short), 4);
+        assert_eq!(character.melee_level(MeleeClass::Medium), 3);
+        assert_eq!(character.melee_level(MeleeClass::Long), 3);
+
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character
+            .check_melee(MeleeClass::Short, true, 0, Difficulty::Hard, &mut roller)
+            .unwrap();
+        // REF 8 + Kurz 4 + die 5 = 17
+        assert_eq!(result.total, 17);
+    }
+
+    #[test]
+    fn test_melee_general_is_capped_at_three() {
+        use crate::melee::{MeleeClass, SKILL_MELEE_GENERAL};
+        let mut character = unencumbered_shooter();
+        // an (invalid) general level above the cap doesn't leak into rolls
+        character.skills.push(Skill::new(
+            SKILL_MELEE_GENERAL.to_string(),
+            Attribute::Reflexes,
+            5,
+            1,
+        ));
+        assert_eq!(character.melee_level(MeleeClass::Medium), 3);
+    }
+
+    #[test]
+    fn test_unfamiliar_weapon_raises_difficulty() {
+        use crate::melee::MeleeClass;
+        let mut character = unencumbered_shooter();
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character
+            .check_melee(MeleeClass::Short, false, 0, Difficulty::Normal, &mut roller)
+            .unwrap();
+        assert_eq!(result.target, 18);
+    }
+
+    #[test]
+    fn test_dodge_ignores_specialization() {
+        use crate::melee::{MeleeClass, SKILL_MELEE_GENERAL};
+        let mut character = unencumbered_shooter();
+        character.skills.push(Skill::new(
+            SKILL_MELEE_GENERAL.to_string(),
+            Attribute::Reflexes,
+            3,
+            1,
+        ));
+        character.skills.push(Skill::new(
+            MeleeClass::Short.skill_name().to_string(),
+            Attribute::Reflexes,
+            6,
+            1,
+        ));
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character
+            .check_dodge(0, Difficulty::Hard, &mut roller)
+            .unwrap();
+        // REF 8 + general 3 (NOT Kurz 6) + die 5 = 16
+        assert_eq!(result.total, 16);
+    }
+
+    #[test]
+    fn test_martial_arts_check_and_damage() {
+        use crate::melee::{MartialArtsAction, MartialArtsStyle};
+        let mut character = unencumbered_shooter(); // REF 8, BODY 10 -> DAM +2
+        character.skills.push(Skill::new(
+            MartialArtsStyle::Boxen.skill_name().to_string(),
+            Attribute::Reflexes,
+            4,
+            1,
+        ));
+
+        // Boxen Punch: REF 8 + skill 4 + key attack +3 + die 4 = 19
+        let mut roller = crate::dice::SequenceRoller::new(vec![4]);
+        let result = character
+            .check_martial_arts(
+                MartialArtsStyle::Boxen,
+                MartialArtsAction::Punch,
+                0,
+                Difficulty::Hard,
+                &mut roller,
+            )
+            .unwrap();
+        assert_eq!(result.total, 19);
+
+        // Punch damage: 1d3 (2) + DAM 2 + skill 4 = 8
+        let mut roller = crate::dice::SequenceRoller::new(vec![2]);
+        let damage = character
+            .martial_arts_damage(
+                MartialArtsStyle::Boxen,
+                MartialArtsAction::Punch,
+                &mut roller,
+            )
+            .unwrap();
+        assert_eq!(damage, 8);
+
+        // Sweep deals no direct damage
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        assert!(character
+            .martial_arts_damage(
+                MartialArtsStyle::Boxen,
+                MartialArtsAction::Sweep,
+                &mut roller
+            )
+            .is_none());
+
+        // unknown style errors
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let error = character
+            .check_martial_arts(
+                MartialArtsStyle::Ringen,
+                MartialArtsAction::Grapple,
+                0,
+                Difficulty::Normal,
+                &mut roller,
+            )
+            .unwrap_err();
+        assert!(error.contains("Kampfkunst Ringen"), "{}", error);
+    }
+
+    #[test]
+    fn test_crippling_check_percentages() {
+        let character = unencumbered_shooter();
+        // no care: 5% -> 049 cripples, 050 doesn't
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 4, 9]);
+        assert!(character.crippling_check(false, &mut roller));
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 5, 10]);
+        assert!(!character.crippling_check(false, &mut roller));
+        // with care: 0.5% -> 004 cripples, 005 doesn't
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 4]);
+        assert!(character.crippling_check(true, &mut roller));
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 5]);
+        assert!(!character.crippling_check(true, &mut roller));
+
+        // Schnelle Heilung: 1% / 0.1%
+        use crate::advantages::{Advantage, AdvantageKind, ModifierTarget, TAG_HEALING_RATE};
+        let mut character = unencumbered_shooter();
+        character.advantages.push(
+            Advantage::new(
+                "Schnelle Heilung".to_string(),
+                AdvantageKind::Advantage,
+                5,
+                String::new(),
+            )
+            .with_modifier(ModifierTarget::Tag(TAG_HEALING_RATE.to_string()), 1),
+        );
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 9]);
+        assert!(character.crippling_check(false, &mut roller));
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 1, 10]);
+        assert!(!character.crippling_check(false, &mut roller));
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 10]);
+        assert!(character.crippling_check(true, &mut roller)); // 000 < 1
+        let mut roller = crate::dice::SequenceRoller::new(vec![10, 10, 1]);
+        assert!(!character.crippling_check(true, &mut roller));
     }
 
     #[test]

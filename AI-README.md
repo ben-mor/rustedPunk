@@ -191,6 +191,27 @@ Encumbrance affects:
 
 ---
 
+## Melee & Martial Arts (`melee.rs`) — #15
+
+- General melee skill "Nahkampf" (incl. Dodge) caps at 3 (`MELEE_GENERAL_CAP`);
+  specializations "Nahkampf Kurz/Mittel/Lang" CONTINUE the scale independently.
+  `Character::melee_level(class)` = specialization if present, else general
+  (capped). `check_melee(class, familiar, ...)`: unfamiliar weapon = target +3.
+  `check_dodge()` always uses general (Q24).
+- Martial arts: styles Prügeln (no key attacks), Boxen (+3 Punch/+3 Sweep/
+  +1 Block), Ringen (+2 Sweep/+4 Grapple/+3 Throw/+4 Hold/+2 Choke/+4 Escape).
+  `check_martial_arts(style, action, ...)` adds the key-attack bonus to the
+  roll; `martial_arts_damage()` = base dice (Punch 1d3, Kick/Throw/Choke 1d6)
+  + DAM (not for Choke) + skill level 1:1.
+- `Character::dam()` = hand-to-hand DAM from sheet BODY (RB5 table:
+  ..2 → −2, 3-4 → −1, 5-7 → 0, 8-9 → +1, 10 → +2, 11-12 → +4, 13-14 → +6,
+  15+ → +8). Distinct from `btm()` (damage reduction when hit)!
+- `dice::DiceExpr` ("5d6+2"): parse/display/roll/average (integer halving —
+  matches wiki noise examples); `DieRoller::die(sides)` for non-d10 dice;
+  `roll_per_mille()` for the crippling check.
+- `Character::crippling_check(medical_care, roller)`: rolled once per
+  critical+ injury directly after the fight; 5%/0.5%, Schnelle Heilung 1%/0.1%.
+
 ## Dis-/Advantages (`advantages.rs`) — #10
 
 - `Advantage { name, kind, cp (always positive), level, description, modifiers }`;
