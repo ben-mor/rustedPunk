@@ -1,0 +1,29 @@
+(Wichtig: Alle Rollen in den Büchern und auch sonst sind nur Ideengeber und Stereotype, alle entsprechenden Einschränkungen gelten nicht.)
+
+Eure Charaktere starten mit 60 Punkten die auf die 9 Attribute zu verteilen sind. (INT, REF, COOL, TECH, BODY, MOVE, EMPATHY, LUCK, ATTR) INT und REF dürfen dabei nicht kleiner als 5 sein. Werte von 10 sind nicht erlaubt.
+
+(Falls der Char älter ist als 28 kommen die Altersregeln hier zum tragen)
+
+Jetzt geht man durch den Lebenslauf, d.H. für jedes Lebensjahr über 15 würfelt man einmal ob was spannendes passiert ist. Man kanns auch lassen und sich eine eigene Historie schreiben, dann gibt es zwar keine überraschenden Bonusse aber eben auch keine Malusse.
+
+Die Alterspunkte sind zusätzliche Fertigkeitspunkte die man durch die Erfahrung gesammelt hat. Ich verwende dazu die entsprechende Liste von [[Alterspunkte|dieser Seite]].
+
+INT + REF + 40 + Alterspunkte = Fertigkeitspunkte.
+
+An dieser Stelle im System setze ich die GURPS Vor- und Nachteile ein. Dabei ist ein Fertigkeitspunkt = einem CP. Ich habe die Liste der Vor- und Nachteile aus dem Grundregelwerk durchgesehen und eine [[VorUndNachteile|Liste der erlaubten]] zusammengestellt. Wer andere haben möchte, möge sich melden. Es gibt im Netz noch viele weitere Ressourcen für GURPS Vor- und Nachteile die man heranziehen kann, wenn man das möchte.
+
+: In eurer Welt ist Lesen können nicht selbstverständlich (aber auch nicht so selten) und stellt einen 5 Punkte Vorteil dar. Höhere Bildung ist etwas sehr seltenes und Gelegenheit gehabt zu haben sie zu erwerben ist ein 15 Punkte Vorteil. Hat man die entsprechenden Vorteile nicht kann man natürlich auch die dazugehörigen Fertigkeiten nicht lernen.
+
+Dann vergibt man seine Punkte auf die Fertigkeiten, dabei kostet jeder Level einen weiteren Punkt. d.H. Level 1: 1 Level 2: 2, Level 3: 3 etc. Man kann Vor- und Nachteile und Fertigkeiten erwerben jederzeit abwechseln.
+
+Es ist erlaubt: eine Fertigkeit mit Wert 8, eine mit Wert 7, zwei mit Wert 6, darunter frei. Dabei kann man 1:2 nach unten tauschen (also drei mit 7, zwei mit 6 ist auch okay, dafür dann eben keinen mit 8).
+
+: Für den Min-Maxer: Während des Spiels ist es etwas schwieriger hohe Skills zu erwerben. Von 7 -> 8 kostet bei der Erschaffung einen Punkt, im Spiel kostet es 40 CP (bei ~5 / Abend). Man möge das im Kopf behalten.
+
+Zuletzt kauft man sich sein Equipment. Dabei wird der Fertigkeitslevel von drei berufsdefinierenden Fertigkeiten genommen, und mit 350 multipliziert. Für einen Tech wäre das  "Basic Tech", "Elektrotechnik" und "Schweißen" oder was auch immer, für einen Nomaden wahrscheinlich "Fahren: LKW", "Fahren: Auto" und "Schießen: Gewehr". Welche drei Skills das sind kann sich der Spieler aussuchen, ich habe ein Veto-Recht.
+
+Sollte jemand Dinge haben wollen die außerhalb seines Budges liegen kann er mich fragen.
+
+WICHTIG: Es ist okay Dinge gehabt zu haben die nicht mehr in das Budget passen. Also ein Nomade kann einen LKW gehabt haben. Nur dann ist er eben kurz vor Beginn des Abenteuers von der Straße abgekommen und das Teil ist nur noch Schrott (den man bergen kann, u.U.). Die Story wie es dazu gekommen ist das der Kram weg gekommen ist kann man vorschlagen oder mit mir zusammen ausarbeiten.
+
+Da es in der Welt kein Geld gibt das irgendeinen Wert hat sollte man seine EuroBucks in Ware umtauschen. Die letzten 100 eb können in Zigaretten oder Munition umgetauscht werden, die in der Welt zur Bezahlung von Kleinkram verwendet werden.
