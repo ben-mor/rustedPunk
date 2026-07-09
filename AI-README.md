@@ -149,7 +149,11 @@ Encumbrance affects:
 - `Character::check_skill(name, ...)` -> `Result` (error on unknown skill),
   uses `effective_attribute` so encumbrance maluses apply automatically.
   `Character::check_attribute(...)` for untrained rolls.
-- Per-evening luck budget is NOT enforced yet (session state, later milestone).
+- **Luck pool**: `Character.current_luck` is persistent (survives sessions).
+  Committed luck is deducted by check_skill/check_attribute (also on
+  auto-success); overspending errors without rolling.
+  `Character::start_session()` regenerates ceil(base LUCK / 2), capped at the
+  LUCK attribute.
 - `Difficulty::{Easy=10, Normal=15, Hard=20, Custom(n)}`.
 
 ---

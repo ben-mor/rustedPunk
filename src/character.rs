@@ -14,6 +14,9 @@ pub struct Character {
     pub role: String,
     pub age: i32,
     pub current_damage: i32,
+    /// Available luck points. A persistent pool: spending survives the session,
+    /// [`Character::start_session`] regenerates half the base LUCK (rounded up).
+    pub current_luck: i32,
     pub damage_notes: String,
     pub worn_armor: Vec<Uuid>,
     pub skills: Vec<Skill>,
@@ -145,6 +148,7 @@ impl Character {
             inventory: Inventory::new(),
             worn_armor: Vec::new(),
             current_damage: 0,
+            current_luck: luck,
             damage_notes: "".to_string(),
             skills: Vec::new(),
         };
@@ -397,18 +401,50 @@ Character {{ \n\
         armor
     }
 
+    /// Spends luck points from the character's pool.
+    ///
+    /// Returns an error when the pool doesn't cover it (or `points` is negative);
+    /// the pool is unchanged in that case.
+    pub fn spend_luck(&mut self, points: i32) -> Result<(), String> {
+        if points < 0 {
+            return Err(format!(
+                "Cannot spend a negative amount of luck: {}",
+                points
+            ));
+        }
+        if points > self.current_luck {
+            return Err(format!(
+                "Character '{}' has only {} luck points, tried to spend {}",
+                self.name, self.current_luck, points
+            ));
+        }
+        self.current_luck -= points;
+        Ok(())
+    }
+
+    /// Starts a new game session: regenerates half the base LUCK (rounded up),
+    /// capped at the LUCK attribute's current value.
+    ///
+    /// Example: base LUCK 9, 8 already spent (1 left) → +5 → starts with 6.
+    pub fn start_session(&mut self) {
+        let luck = self.attributes.get(&Attribute::Luck).unwrap();
+        let regenerated = (luck.base + 1) / 2;
+        self.current_luck = (self.current_luck + regenerated).min(luck.actual);
+    }
+
     /// Rolls a check on one of the character's skills.
     ///
     /// Uses the effective base attribute (encumbrance and other temporary
     /// maluses included) plus the skill level. `luck` is the number of luck
-    /// points the player commits before the roll; enforcing the per-evening
-    /// luck budget is not handled here yet.
+    /// points the player commits before the roll; they are deducted from
+    /// [`Character::current_luck`] (also on an auto-success — committed is
+    /// committed) and the check fails with an error if the pool is too small.
     ///
     /// Returns an error naming the skill if the character doesn't have it —
     /// rolling untrained is a deliberate decision, not a fallback:
     /// use [`Character::check_attribute`] for that.
     pub fn check_skill(
-        &self,
+        &mut self,
         skill_name: &str,
         luck: i32,
         difficulty: Difficulty,
@@ -424,10 +460,11 @@ Character {{ \n\
                     self.name, skill_name
                 )
             })?;
-        let attribute = self.effective_attribute(skill.base);
+        let (attribute_value, skill_level) = (self.effective_attribute(skill.base), skill.level);
+        self.spend_luck(luck)?;
         Ok(skill_check(
-            attribute,
-            skill.level,
+            attribute_value,
+            skill_level,
             luck,
             difficulty,
             roller,
@@ -435,20 +472,17 @@ Character {{ \n\
     }
 
     /// Rolls a check on a bare attribute (untrained, skill level 0).
+    /// Committed luck is deducted like in [`Character::check_skill`].
     pub fn check_attribute(
-        &self,
+        &mut self,
         attribute: Attribute,
         luck: i32,
         difficulty: Difficulty,
         roller: &mut dyn DieRoller,
-    ) -> CheckResult {
-        skill_check(
-            self.effective_attribute(attribute),
-            0,
-            luck,
-            difficulty,
-            roller,
-        )
+    ) -> Result<CheckResult, String> {
+        let attribute_value = self.effective_attribute(attribute);
+        self.spend_luck(luck)?;
+        Ok(skill_check(attribute_value, 0, luck, difficulty, roller))
     }
 
     pub fn print_skills(&self) {
@@ -849,7 +883,7 @@ mod tests {
 
     #[test]
     fn test_check_skill_uses_attribute_and_level() {
-        let character = unencumbered_shooter();
+        let mut character = unencumbered_shooter();
         let mut roller = crate::dice::SequenceRoller::new(vec![3]);
         let result = character
             .check_skill("Pistole", 0, Difficulty::Normal, &mut roller)
@@ -861,7 +895,7 @@ mod tests {
 
     #[test]
     fn test_check_skill_unknown_skill_errors() {
-        let character = unencumbered_shooter();
+        let mut character = unencumbered_shooter();
         let mut roller = crate::dice::SequenceRoller::new(vec![]);
         let error = character
             .check_skill(
@@ -875,6 +909,49 @@ mod tests {
             error,
             "Character 'Shooter' has no skill named 'Unterwasserkorbflechten'"
         );
+    }
+
+    #[test]
+    fn test_check_skill_spends_committed_luck() {
+        let mut character = unencumbered_shooter();
+        assert_eq!(character.current_luck, 5);
+        let mut roller = crate::dice::SequenceRoller::new(vec![3]);
+        character
+            .check_skill("Pistole", 2, Difficulty::Hard, &mut roller)
+            .unwrap();
+        assert_eq!(character.current_luck, 3);
+    }
+
+    #[test]
+    fn test_check_skill_rejects_overspent_luck() {
+        let mut character = unencumbered_shooter();
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let error = character
+            .check_skill("Pistole", 6, Difficulty::Normal, &mut roller)
+            .unwrap_err();
+        assert_eq!(
+            error,
+            "Character 'Shooter' has only 5 luck points, tried to spend 6"
+        );
+        assert_eq!(character.current_luck, 5);
+    }
+
+    #[test]
+    fn test_start_session_regenerates_half_base_luck() {
+        let mut character = unencumbered_shooter();
+        // change base LUCK to 9 to mirror the example from the table rules
+        character
+            .attributes
+            .insert(Attribute::Luck, AttributeValue::new(9, 9));
+        character.current_luck = 1;
+        character.start_session();
+        // 1 + ceil(9/2) = 6
+        assert_eq!(character.current_luck, 6);
+
+        // regeneration is capped at the LUCK attribute
+        character.current_luck = 8;
+        character.start_session();
+        assert_eq!(character.current_luck, 9);
     }
 
     #[test]
@@ -900,10 +977,11 @@ mod tests {
 
     #[test]
     fn test_check_attribute_auto_success() {
-        let character = unencumbered_shooter();
+        let mut character = unencumbered_shooter();
         let mut roller = crate::dice::SequenceRoller::new(vec![]);
-        let result =
-            character.check_attribute(Attribute::Body, 0, Difficulty::Custom(10), &mut roller);
+        let result = character
+            .check_attribute(Attribute::Body, 0, Difficulty::Custom(10), &mut roller)
+            .unwrap();
         assert_eq!(result.outcome, crate::dice::Outcome::AutoSuccess);
     }
 
