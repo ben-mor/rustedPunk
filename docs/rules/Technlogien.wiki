@@ -61,7 +61,7 @@ Die Waffen werden irgendwo westlich an der Transsib hergestellt und kommen über
 === AK-47 ===
 Eine zuverlässige stabile Waffe die es wohl schon immer gab. Sie verwendet Munition im 7,62 x 39 mm. Werte:
 * Gewehr
-* 6D6+2 Schaden, Panzerbrechend. ( Schutzwert wird halbiert, Schaden auch, ab 8 Schadenspunkten wird von einem Durchschlag ausgegangen)
+* 5D6 Schaden, Panzerbrechend (Schutzwert wird halbiert, Schaden gegen weiche Ziele auch). Die 6D6+2-Variante ist die Czar AK-47 aus CP2020 Reference Book 5.
 * Reichweite 300 Meter
 * Sehr zuverlässig
 * Nicht versteckbar

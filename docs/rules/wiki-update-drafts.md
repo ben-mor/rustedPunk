@@ -1,5 +1,12 @@
 # Wiki-Update-Entwürfe
 
+> **Status: ANGEWENDET am 2026-07-09** (Bot-Account „Morast“ via
+> `tools/fandom.py`). Punkte 1–5 wie unten; Punkt 6 bewusst konservativer:
+> nur der Schadens-Bullet wurde geändert (5D6 + Czar-Hinweis), Reichweite
+> 300 m und 1/15 Schuss blieben unangetastet, weil sie von Ben stammen
+> könnten. Die Snapshots in diesem Ordner sind auf dem neuen Stand.
+> Datei bleibt als Vorlage für künftige Regel-Synchronisierungen.
+
 Fertige Wikitext-Schnipsel für desaster.fandom.com, damit das Wiki wieder mit
 den entschiedenen Regeln (PROJECT-STRUCTURE.md §3, Stand 2026-07-09)
 übereinstimmt. Pro Abschnitt: Seite, was ersetzt wird, neuer Text.

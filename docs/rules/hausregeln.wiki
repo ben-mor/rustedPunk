@@ -33,18 +33,52 @@ Vor- und Nachteile aus Gurps, siehe [[VorUndNachteile]].
 
 Ausdauer und Prellschaden. Jeder hat 5 Prellpunkte. Anstrengende Arbeiten, Treffer die von weicher Rüstung gefangen werden und ähnliches gehen auf diese Skala. Ist die Skala bei 0 gibt es einen Schaden und sie beginnt wieder bei 5 zu zählen. Wenn man Schaden nimmt der nur Prellschaden ist, erhält man diese Menge Abzug auf seinen nächsten Wurf (muss aber keinen KO Check machen). Wird der Prellschaden zu echtem Schaden bekommt man keinen Abzug, muss aber einen KO Check machen.
 
+Prellschaden entsteht nur durch Treffer, die von WEICHER Rüstung gefangen werden (und durch anstrengende Arbeiten etc.). Von harter Rüstung absorbierter Schaden erzeugt keinen Prellschaden.
+
+Der Body Type Modifier (BTM) wird vom ankommenden Schaden abgezogen und in Prellschaden umgewandelt (Minimum 1 echter Schaden bleibt). Nahkampfwaffen und Kampfkunst benutzen beim Austeilen den davon verschiedenen Schadensmodifikator „DAM“.
+
 Wenn eine Schusswaffe mehr als 4 Punkte Schaden macht wird mit 1d10 gewürfelt. Soviel extra Schaden kann dieser Schuss noch anrichten bevor es ein Durchschuss wird.
 
 Eine Verletzung vom Typ "Kritisch" oder darüber hat eine 5% Chance auf Verkrüppelung des entsprechenden Körperteils wenn nicht besondere Medizinische Hilfe geleistet wird. (5/1000 wenn diese geleistet wird).
 
 Kopftrefferschaden wird verdoppelt, aber die Frage ob man daran stirbt ist verändert. Siehe [[Regeln]].
 
+== Traglast ==
+Tragekapazität = BODY × 10 kg. Deadlift = das Vierfache davon.
+
+Abzug auf Reflexe und Move nach dem Verhältnis Inventargewicht / Kapazität:
+{| class="wikitable"
+! Verhältnis !! Abzug
+|-
+| unter 0,5 || 0
+|-
+| 0,5 bis unter 0,7 || −1
+|-
+| 0,7 bis unter 1,0 || −2
+|-
+| 1,0 bis unter 1,3 || −4
+|-
+| 1,3 bis unter 1,6 || −6
+|-
+| ab 1,6 || −8
+|}
+Reflexe werden zusätzlich um die Behinderung der getragenen Rüstung reduziert, Move nur um die Inventar-Behinderung.
+
 == Würfel ==
 Ist der Minimalwert (also Attribut + Fertigkeit + eingesetztes Glück) größer als die Zielvorgabe wird nicht gewürfelt, automatischer Erfolg, immer (auch im Kampf).
 
 Ein Wurf von 1 ist ein Fehlschlag, danach wird nochmal gewürfelt; 1: Kritischer Fehler, Schaden am eigenen Team / sich selbst. 2-5: Fehlschlag und sieht peinlich aus. 6-0: Normaler Fehlschlag
 
-Ein Wurf von 10 ist eine besondere Leistung in dieser Fertigkeit. Ein CP für diese Fertigkeit und nochmal würfeln und dazu zählen (kaskadiert).
+Ein Wurf von 10 ist eine besondere Leistung: nochmal würfeln und dazu zählen (kaskadiert).
+=== Glück ===
+Glückspunkte werden VOR dem Wurf eingesetzt und verändern den Würfel direkt: eine gewürfelte 9 mit einem Glückspunkt zählt als natürliche 10 (und kaskadiert), eine gewürfelte 1 mit einem Glückspunkt zählt als 2 und ist kein Patzer.
+
+Glück hat drei Ebenen:
+# '''Start-Basis''': der Wert aus der Charaktererschaffung, ändert sich nie.
+# '''Aktuelle Basis''': kann für extreme „Die Welt dreht sich jetzt zu deinen Gunsten“-Ereignisse dauerhaft gesenkt werden. Regeneration und Obergrenze richten sich nach diesem Wert.
+# '''Aktueller Pool''': schwankt mit jedem Einsatz und bleibt über Sitzungen erhalten.
+
+Zu Beginn jeder Sitzung regeneriert der Pool die Hälfte der aktuellen Basis (aufgerundet), maximal bis zur aktuellen Basis. Beispiel: Basis 9, davon 8 ausgegeben (1 übrig) → nächste Sitzung +5 → Start mit 6.
 ==Schalldämpfer und Lärm eines Schuss==
 Schusswaffen sind laut. Sehr Laut. Das liegt an zwei Elementen: Eine fette Explosion und ein Projektil, das die Schallmauer durchbricht. Wenn ich also einen Schalldämpfer benutze, muss ich mir aus taktischer Sicht bewusst sein, dass er die Waffe nicht leise macht.
 
