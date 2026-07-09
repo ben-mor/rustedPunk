@@ -67,6 +67,11 @@ Im dritten Block (kritische Wunden): REF, INT, COOL halbiert (aufrunden)
 
 Ab dem vierten Block (tödlich): Alle Stats außer LUCK, EMP dritteln (aufrunden)
 
+=== Heilung ===
+Am Morgen nach einer Verwundung: BODY-Wurf gegen 10 + erlittenen Schaden, sonst gibt es Komplikationen. Ist ein Heiler anwesend (praktisch immer), entfällt der Wurf.
+
+Geheilt wird ein Punkt alle zwei Tage; mit Heiler ein Punkt pro Tag.
+
 ===Spezial===
 
 ==== Durchschlag bei Schusswaffen ====
@@ -99,7 +104,7 @@ Der Schaden ein Schusswaffe ist abhängig von ihrem Kaliber und beim Waffentyp m
 Panzerbrechende Munition ist besonders hart und spitz. Rüstung zielt nur halb gegen diese Munition, jedoch wird der Schaden gegen weiche Ziele halbiert, da die Kugel einfach durchschlägt.
 
 ====Dum Dum====
-Der Kontrast zu Panzerbrechender Munition, wirkt nur halb gegen harte Rüstung, dafür doppelt gegen weiche Ziele.
+Dum-Dum-Geschosse pilzen auf. Gegen harte Rüstung zählt der Schaden nur halb (das aufgepilzte Geschoss verliert Durchschlagskraft). Weiche Rüstung fängt den vollen Schaden (und erzeugt entsprechend Prellschaden). Schaden der ins Fleisch durchdringt wird verdoppelt — und das Geschoss verlässt den Körper nicht (kein Durchschuss).
 
 ====Autofeuer====
 Wenn man einigermaßen nah an einem Gegner dran ist kann man die Waffe auf automatisch stellen und das Magazin in die Richtung seines Gegners beschleunigen.

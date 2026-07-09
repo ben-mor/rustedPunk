@@ -1,4 +1,5 @@
 use crate::dice::{skill_check, CheckResult, DieRoller, Difficulty};
+use crate::health::WoundState;
 use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
 use serde::{Deserialize, Serialize};
@@ -14,6 +15,15 @@ pub struct Character {
     pub role: String,
     pub age: i32,
     pub current_damage: i32,
+    /// Prellschaden scale: accumulated bruise points (0–4). Every 5 points
+    /// convert into 1 real damage and the scale resets.
+    pub current_bruise: i32,
+    /// Malus from pure bruise damage, applied to (and consumed by) the
+    /// character's next check.
+    pub pending_roll_malus: i32,
+    /// Healing progress in half-points: a healer day counts 2, a day without
+    /// counts 1; every 2 half-points heal 1 damage (see [`Character::rest_day`]).
+    pub healing_progress: i32,
     /// Available luck points. A persistent pool: spending survives the session,
     /// [`Character::start_session`] regenerates half the current base LUCK
     /// (rounded up). See [`Character::start_session`] for the three luck levels.
@@ -126,6 +136,24 @@ impl fmt::Display for AttributeValue {
     }
 }
 
+/// Report of what a hit (or direct damage) did to the character.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct HitOutcome {
+    /// Real damage added to `current_damage` (head doubling and converted
+    /// bruise damage included).
+    pub real_damage: i32,
+    /// Prellschaden points this hit put on the bruise scale
+    /// (soft-armor absorption + BTM conversion).
+    pub bruise_added: i32,
+    /// Real damage that came from the bruise scale filling up
+    /// (already part of `real_damage`).
+    pub converted_bruise_damage: i32,
+    /// The bruise scale converted to real damage: a KO check is required.
+    pub ko_check_required: bool,
+    /// The penetration cap kicked in: the shot exited through the back.
+    pub through_and_through: bool,
+}
+
 impl Character {
     pub fn new(
         name: String,
@@ -149,6 +177,9 @@ impl Character {
             inventory: Inventory::new(),
             worn_armor: Vec::new(),
             current_damage: 0,
+            current_bruise: 0,
+            pending_roll_malus: 0,
+            healing_progress: 0,
             current_luck: luck,
             damage_notes: "".to_string(),
             skills: Vec::new(),
@@ -248,18 +279,65 @@ Character {{ \n\
         }
     }
 
+    /// The character's wound state, derived from the current damage.
+    pub fn wound_state(&self) -> WoundState {
+        WoundState::from_damage(self.current_damage)
+    }
+
+    /// A day of rest: heals 1 damage per day with a healer present,
+    /// 1 per two days without (progress carries over between days).
+    pub fn rest_day(&mut self, healer_present: bool) {
+        if self.current_damage == 0 || self.wound_state() == WoundState::Dead {
+            return;
+        }
+        self.healing_progress += if healer_present { 2 } else { 1 };
+        self.current_damage = (self.current_damage - self.healing_progress / 2).max(0);
+        self.healing_progress %= 2;
+        if self.current_damage == 0 {
+            self.healing_progress = 0;
+        }
+    }
+
+    /// The morning-after complication check: BODY against 10 + current damage.
+    /// With a healer present (practically always) no check is needed and
+    /// `None` is returned. A failed check means complications — interpreting
+    /// them is up to the GM.
+    pub fn complication_check(
+        &mut self,
+        healer_present: bool,
+        roller: &mut dyn DieRoller,
+    ) -> Option<CheckResult> {
+        if healer_present {
+            return None;
+        }
+        let difficulty = Difficulty::Custom(10 + self.current_damage);
+        Some(skill_check(
+            self.effective_attribute(Attribute::Body),
+            0,
+            0,
+            difficulty,
+            roller,
+        ))
+    }
+
     /// Returns the effective attribute value for dice rolls, including all
-    /// temporary modifiers (encumbrance, drugs, combat effects, etc.).
+    /// temporary modifiers (wound penalties, encumbrance, etc.).
+    ///
+    /// Order: wound penalties modify the attribute first, encumbrance maluses
+    /// are subtracted afterwards, the result never drops below 0 (see Q19).
     pub fn effective_attribute(&self, attr: Attribute) -> i32 {
-        let base_value = self.attributes[&attr].actual;
+        let mut value = self
+            .wound_state()
+            .modify_attribute(attr, self.attributes[&attr].actual);
 
         match attr {
             Attribute::Reflexes => {
-                (base_value - self.encumberance() - self.calculate_armor_encumberance()).max(0)
+                value -= self.encumberance() + self.calculate_armor_encumberance()
             }
-            Attribute::Move => (base_value - self.encumberance()).max(0),
-            _ => base_value,
+            Attribute::Move => value -= self.encumberance(),
+            _ => {}
         }
+        value.max(0)
     }
 
     /// Calculates the malus to movement and reflexes based on encumberance
@@ -315,9 +393,16 @@ Character {{ \n\
     ///
     /// This will apply damage to the armor (outer to inner) and then to the character.
     ///
-    pub fn hit(&mut self, damage: i32, zone: HitZone, damage_type: DamageType) {
+    pub fn hit(
+        &mut self,
+        damage: i32,
+        zone: HitZone,
+        damage_type: DamageType,
+        is_gunshot: bool,
+        roller: &mut dyn DieRoller,
+    ) -> HitOutcome {
         let mut remaining_damage = damage;
-        let mut absorbed_damage = 0;
+        let mut soft_absorbed = 0;
 
         for i in (0..self.worn_armor.len()).rev() {
             let armor_uuid = self.worn_armor[i];
@@ -326,44 +411,102 @@ Character {{ \n\
                 .as_any_mut().downcast_mut::<Armor>();
             let armor = armor_opt.unwrap_or_else(|| panic!("There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
                 armor_uuid));
+            let is_hard = armor.is_hard;
             let damage_result = armor.hit(remaining_damage, zone, damage_type);
             remaining_damage = damage_result.remaining_damage;
-            absorbed_damage += damage_result.absorbed_damage;
+            // House rule: only hits caught by SOFT armor go onto the bruise
+            // scale; hard armor absorbs without consequence.
+            if !is_hard {
+                soft_absorbed += damage_result.absorbed_damage;
+            }
         }
-        // House rule: 20% of absorbed damage becomes real damage through blunt trauma.
-        // TODO: implement variable for this so it rotates through subsequent hits as well.
-        // TODO: implement different handlings of DamageType (HollowPoint double damage)
-        // TODO: implement full penetration (can't do more then 4+1d10 damage, everything else goes out on the back)
-        remaining_damage += absorbed_damage / 5;
-        self.take_damage(remaining_damage, zone);
+
+        let mut through_and_through = false;
+        if damage_type == DamageType::HollowPoint {
+            // Q17: the mushroomed projectile doubles its damage as soon as it
+            // enters flesh — and doesn't exit the body, so no penetration cap.
+            remaining_damage *= 2;
+        } else if is_gunshot && remaining_damage > 4 {
+            // House rule: a gunshot doing more than 4 damage rolls 1d10 — that
+            // is the maximum extra damage before the shot exits through the back.
+            let cap = 4 + roller.d10();
+            if remaining_damage > cap {
+                remaining_damage = cap;
+                through_and_through = true;
+            }
+        }
+
+        let mut outcome = self.resolve_damage(remaining_damage, soft_absorbed, zone);
+        outcome.through_and_through = through_and_through;
+        outcome
     }
 
     /// This ignores all armor and applies damage directly.
     /// It will subtract the BTM first.
-    pub fn take_damage(&mut self, damage: i32, zone: HitZone) {
-        let mut remaining_damage = damage;
-        if remaining_damage > 0 {
-            remaining_damage = (remaining_damage - self.btm()).max(1);
+    pub fn take_damage(&mut self, damage: i32, zone: HitZone) -> HitOutcome {
+        self.resolve_damage(damage, 0, zone)
+    }
 
-            // TODO: Need to implement the House Rule that this doubling only takes effect after the check if it will kill you immediately.
-            if zone == HitZone::Head {
-                remaining_damage *= 2;
-            }
-            self.current_damage += remaining_damage;
-            if remaining_damage >= 8 {
-                if matches!(zone, HitZone::Head | HitZone::Chest | HitZone::Vitals) {
-                    self.current_damage = 100;
-                    self.damage_notes = format!("YOU ARE DEAD!\n{}", self.damage_notes);
-                } else {
-                    self.damage_notes = format!(
-                        "HitZone {} destroyed. You are now at least Mortal 0 and about to die.\n{}",
-                        zone, self.damage_notes
-                    );
-                    if self.current_damage <= 12 {
-                        self.current_damage = 13;
-                    }
+    /// Core damage resolution after armor: BTM conversion, bruise scale,
+    /// crippling check and head doubling.
+    ///
+    /// House rules applied here:
+    /// - BTM is subtracted from the incoming damage (at least 1 real damage
+    ///   remains) and the subtracted amount becomes Prellschaden.
+    /// - Every 5 Prellschaden points convert into 1 real damage and require a
+    ///   KO check. A hit that causes ONLY Prellschaden instead puts a malus of
+    ///   that amount on the character's next roll.
+    /// - The crippling check (8+ zone damage after BTM) uses the UNDOUBLED
+    ///   value; head doubling is applied afterwards.
+    fn resolve_damage(&mut self, incoming: i32, armor_bruise: i32, zone: HitZone) -> HitOutcome {
+        let mut real_damage = incoming.max(0);
+        let mut bruise = armor_bruise;
+
+        if real_damage > 0 {
+            let converted_by_btm = self.btm().min(real_damage - 1).max(0);
+            real_damage -= converted_by_btm;
+            bruise += converted_by_btm;
+        }
+
+        self.current_bruise += bruise;
+        let converted_bruise_damage = self.current_bruise / 5;
+        self.current_bruise %= 5;
+        let ko_check_required = converted_bruise_damage > 0;
+
+        if real_damage == 0 && converted_bruise_damage == 0 && bruise > 0 {
+            self.pending_roll_malus += bruise;
+        }
+
+        // Crippling check against the unmodified zone damage, doubling after.
+        let crippled = real_damage >= 8;
+        let mut applied_damage = real_damage;
+        if zone == HitZone::Head {
+            applied_damage *= 2;
+        }
+        applied_damage += converted_bruise_damage;
+        self.current_damage += applied_damage;
+
+        if crippled {
+            if matches!(zone, HitZone::Head | HitZone::Chest | HitZone::Vitals) {
+                self.current_damage = 100;
+                self.damage_notes = format!("YOU ARE DEAD!\n{}", self.damage_notes);
+            } else {
+                self.damage_notes = format!(
+                    "HitZone {} destroyed. You are now at least Mortal 0 and about to die.\n{}",
+                    zone, self.damage_notes
+                );
+                if self.current_damage <= 12 {
+                    self.current_damage = 13;
                 }
             }
+        }
+
+        HitOutcome {
+            real_damage: applied_damage,
+            bruise_added: bruise,
+            converted_bruise_damage,
+            ko_check_required,
+            through_and_through: false,
         }
     }
 
@@ -492,8 +635,10 @@ Character {{ \n\
             })?;
         let (attribute_value, skill_level) = (self.effective_attribute(skill.base), skill.level);
         self.spend_luck(luck)?;
+        // pure bruise damage puts a malus on the NEXT roll — consume it
+        let malus = std::mem::take(&mut self.pending_roll_malus);
         Ok(skill_check(
-            attribute_value,
+            attribute_value - malus,
             skill_level,
             luck,
             difficulty,
@@ -512,7 +657,14 @@ Character {{ \n\
     ) -> Result<CheckResult, String> {
         let attribute_value = self.effective_attribute(attribute);
         self.spend_luck(luck)?;
-        Ok(skill_check(attribute_value, 0, luck, difficulty, roller))
+        let malus = std::mem::take(&mut self.pending_roll_malus);
+        Ok(skill_check(
+            attribute_value - malus,
+            0,
+            luck,
+            difficulty,
+            roller,
+        ))
     }
 
     pub fn print_skills(&self) {
@@ -653,7 +805,8 @@ mod tests {
         let mut character = populated_character();
         let zone = HitZone::RightArm;
         let damage = 45;
-        character.hit(damage, zone, DamageType::Blunt);
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(damage, zone, DamageType::Blunt, false, &mut roller);
         let test_context = "multi-layer-arm";
         assert_armor_protection(&character,test_context,"Kevlar Shirt",       zone,  0, HitZone::Chest,   10,);
         assert_armor_protection(&character,test_context,"Flak Vest",          zone, 19, HitZone::Chest,   20,);
@@ -663,12 +816,17 @@ mod tests {
         assert_armor_protection(&character,test_context,"Braces",             zone,  9, HitZone::LeftArm, 10,);
         assert_armor_protection(&character,test_context,"Helmet",             zone,  0, HitZone::Head,    15,);
 
-        let expected_armor_on_arm = 20 + 10 + 4;
-        let expected_blunt_trauma = expected_armor_on_arm / 5;
-        let body_type_modifier = 4;
-
-        let expected_damage = (damage - expected_armor_on_arm) + expected_blunt_trauma - body_type_modifier;
+        // soft armor on arm (braces 10 + cloak 4) = 14 -> Prellschaden
+        // hard armor on arm (flak vest) absorbs 20 without consequence
+        // remaining zone damage: 45 - 34 = 11; BTM 4 converts to Prellschaden -> 7 real
+        // 7 < 8: NOT crippling. Prellschaden 14 + 4 = 18 -> 3 real damage, scale at 3
+        let expected_damage = 7 + 3;
         assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+        assert_eq!(character.current_bruise, 3);
+        assert!(outcome.ko_check_required);
+        assert!(!outcome.through_and_through);
+        assert_eq!(character.pending_roll_malus, 0);
+        assert_eq!(character.damage_notes, "", "7 zone damage after BTM must not cripple");
     }
 
     #[test]
@@ -677,7 +835,8 @@ mod tests {
         let mut character = populated_character();
         let zone = HitZone::Head;
         let damage = 16;
-        character.hit(damage, zone, DamageType::Blunt);
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        character.hit(damage, zone, DamageType::Blunt, false, &mut roller);
         let test_context = "multi-layer-head";
         assert_armor_protection(&character,test_context,"Kevlar Shirt",       zone,  0, HitZone::Chest,   10,);
         assert_armor_protection(&character,test_context,"Flak Vest",          zone,  0, HitZone::Chest,   20,);
@@ -687,10 +846,8 @@ mod tests {
         assert_armor_protection(&character,test_context,"Braces",             zone,  0, HitZone::LeftArm, 10,);
         assert_armor_protection(&character,test_context,"Helmet",             zone, 14, HitZone::Vitals,   0,);
 
-        // armor on head: 15
-        // blunt trauma: 3
-        // body type modifier: 4 (but can't reduce lower than 0)
-        // damage on head is doubled
+        // hard helmet absorbs 15 without Prellschaden; 1 remains.
+        // BTM can't reduce below 1 real damage. Head damage is doubled.
 
         let expected_damage = 2;
         assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
@@ -736,11 +893,10 @@ mod tests {
     fn test_take_crippling_head_damage() {
         let mut character = populated_character();
         let zone = HitZone::Head;
-        let damage = 8;
+        // 12 incoming - 4 BTM = 8 after BTM: crippling on the head means death.
+        let damage = 12;
         character.take_damage(damage, zone);
         let test_context = "crippling-head";
-
-        // damage of 8 or more is crippling on the head you just die, also damage is doubled.
 
         let expected_damage = 100;
         assert_eq!(
@@ -748,6 +904,182 @@ mod tests {
             "{}: Expected {} damage but was {}",
             test_context, expected_damage, character.current_damage
         );
+    }
+
+    #[test]
+    fn test_gunshot_penetration_cap() {
+        let mut character = unencumbered_shooter(); // BODY 10, BTM 4, no armor
+                                                    // 20 incoming, gunshot: cap roll d10 = 3 -> max 4 + 3 = 7 before through-and-through
+        let mut roller = crate::dice::SequenceRoller::new(vec![3]);
+        let outcome = character.hit(20, HitZone::Stomach, DamageType::Blunt, true, &mut roller);
+        assert!(outcome.through_and_through);
+        // capped at 7, BTM converts 4 -> 3 real damage + 4 bruise
+        assert_eq!(character.current_damage, 3);
+        assert_eq!(character.current_bruise, 4);
+    }
+
+    #[test]
+    fn test_melee_hit_is_not_capped() {
+        let mut character = unencumbered_shooter();
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(20, HitZone::Stomach, DamageType::Blunt, false, &mut roller);
+        assert!(!outcome.through_and_through);
+        // 20 - BTM 4 = 16 real: 8+ -> stomach crippled, at least Mortal 0
+        assert!(outcome.real_damage >= 16);
+    }
+
+    #[test]
+    fn test_pure_bruise_hit_gives_next_roll_malus() {
+        let mut character = unencumbered_shooter();
+        // soft armor that swallows the whole hit
+        let vest = kev_shirt();
+        let vest_uuid = vest.item.uuid;
+        character.inventory.push(Box::new(vest));
+        character.wear_armor(vest_uuid, None);
+
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(3, HitZone::Chest, DamageType::Blunt, true, &mut roller);
+        assert_eq!(outcome.real_damage, 0);
+        assert_eq!(outcome.bruise_added, 3);
+        assert!(!outcome.ko_check_required);
+        assert_eq!(character.pending_roll_malus, 3);
+
+        // the malus applies to exactly one (the next) roll and is then consumed
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character
+            .check_skill("Pistole", 0, Difficulty::Normal, &mut roller)
+            .unwrap();
+        // REF 8 + Pistole 4 - malus 3 + die 5 = 14
+        assert_eq!(result.total, 14);
+        assert_eq!(character.pending_roll_malus, 0);
+    }
+
+    #[test]
+    fn test_bruise_scale_converts_every_five_points() {
+        let mut character = unencumbered_shooter();
+        let outcome = character.take_damage(0, HitZone::Chest);
+        assert_eq!(outcome.real_damage, 0);
+
+        // three hits of 3 damage each: BTM 4 can only convert damage-1 = 2
+        // -> each hit: 1 real damage + 2 bruise
+        for _ in 0..2 {
+            character.take_damage(3, HitZone::Chest);
+        }
+        assert_eq!(character.current_damage, 2);
+        assert_eq!(character.current_bruise, 4);
+
+        let outcome = character.take_damage(3, HitZone::Chest);
+        // third hit: bruise reaches 6 -> 1 converted damage, scale at 1
+        assert_eq!(outcome.converted_bruise_damage, 1);
+        assert!(outcome.ko_check_required);
+        assert_eq!(character.current_damage, 4);
+        assert_eq!(character.current_bruise, 1);
+    }
+
+    #[test]
+    fn test_wound_penalties_in_effective_attributes() {
+        let mut character = unencumbered_shooter(); // REF 8, INT 5, BODY 10
+        character.current_damage = 6; // Serious: -2 REF
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), 6);
+        assert_eq!(character.effective_attribute(Attribute::Intelligence), 5);
+
+        character.current_damage = 10; // Critical: REF/INT/COOL halved, round up
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), 4);
+        assert_eq!(character.effective_attribute(Attribute::Intelligence), 3);
+        assert_eq!(character.effective_attribute(Attribute::Body), 10);
+
+        character.current_damage = 14; // Mortal 0: thirds, except LUCK/EMP
+        assert_eq!(character.effective_attribute(Attribute::Reflexes), 3);
+        assert_eq!(character.effective_attribute(Attribute::Body), 4);
+        assert_eq!(character.effective_attribute(Attribute::Luck), 5);
+        assert_eq!(
+            character.wound_state(),
+            crate::health::WoundState::Mortal(0)
+        );
+    }
+
+    #[test]
+    fn test_hollow_point_doubles_in_flesh_and_never_exits() {
+        // Ben's Q17 example: 8 damage against 4-SP soft armor. The armor
+        // consumes 4 (-> Prellschaden); the remaining 4 double in the flesh,
+        // so 8 (minus BTM) reach the character. No through-and-through.
+        let mut character = unencumbered_shooter(); // BODY 10, BTM 4
+        let cloak = long_leather_cloak(); // soft, 4 SP, covers Chest
+        let cloak_uuid = cloak.item.uuid;
+        character.inventory.push(Box::new(cloak));
+        character.wear_armor(cloak_uuid, None);
+
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        let outcome = character.hit(
+            8,
+            HitZone::Chest,
+            DamageType::HollowPoint,
+            true,
+            &mut roller,
+        );
+
+        assert!(!outcome.through_and_through, "hollow point never exits");
+        // doubled to 8, BTM converts 4 -> 4 real; bruise = 4 (armor) + 4 (BTM)
+        // = 8 -> 1 converted damage, scale at 3
+        assert_eq!(character.current_damage, 4 + 1);
+        assert_eq!(character.current_bruise, 3);
+        assert!(outcome.ko_check_required);
+    }
+
+    #[test]
+    fn test_rest_day_healing_rates() {
+        let mut character = unencumbered_shooter();
+        character.current_damage = 6;
+
+        // without a healer: 1 point per two days
+        character.rest_day(false);
+        assert_eq!(character.current_damage, 6);
+        character.rest_day(false);
+        assert_eq!(character.current_damage, 5);
+
+        // with a healer: 1 point per day (carried half-progress stays intact)
+        character.rest_day(true);
+        assert_eq!(character.current_damage, 4);
+
+        // healing stops at 0 and never goes negative
+        character.current_damage = 1;
+        character.rest_day(true);
+        character.rest_day(true);
+        assert_eq!(character.current_damage, 0);
+    }
+
+    #[test]
+    fn test_complication_check_only_without_healer() {
+        let mut character = unencumbered_shooter(); // BODY 10
+        character.current_damage = 4;
+        let mut roller = crate::dice::SequenceRoller::new(vec![]);
+        assert!(character.complication_check(true, &mut roller).is_none());
+
+        // without healer: BODY vs 10 + damage = 14. BODY 10 + die 5 = 15: passed.
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character.complication_check(false, &mut roller).unwrap();
+        assert_eq!(result.target, 14);
+        assert!(result.outcome.is_success());
+
+        // heavily wounded: wound penalties make BODY worse (Mortal thirds it)
+        character.current_damage = 14;
+        let mut roller = crate::dice::SequenceRoller::new(vec![5]);
+        let result = character.complication_check(false, &mut roller).unwrap();
+        // effective BODY 4 + die 5 = 9 vs 24: failed
+        assert!(!result.outcome.is_success());
+    }
+
+    #[test]
+    fn test_head_damage_below_crippling_doubles_but_does_not_kill() {
+        let mut character = populated_character();
+        // 8 incoming - 4 BTM = 4 after BTM: below the crippling limit.
+        // The crippling check uses the UNDOUBLED value; the damage doubles after.
+        let outcome = character.take_damage(8, HitZone::Head);
+        assert_eq!(character.current_damage, 8);
+        assert_eq!(outcome.real_damage, 8);
+        assert_eq!(character.damage_notes, "");
+        // the 4 points BTM took went onto the bruise scale
+        assert_eq!(character.current_bruise, 4);
     }
 
     fn assert_armor_protection(

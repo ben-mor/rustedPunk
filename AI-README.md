@@ -85,23 +85,44 @@ Each damage type has a private helper method. Full mechanics documented on publi
 
 ---
 
-## Character Damage Mechanics (`character.rs`)
+## Character Damage Mechanics (`character.rs`, `health.rs`)
 
-### `Character.hit(damage, zone, damage_type)` - IMPLEMENTED
+### `Character.hit(damage, zone, damage_type, is_gunshot, roller)` → `HitOutcome`
 - Processes damage through all worn armor layers (outside-in, reverse iteration)
-- Each layer's `Armor.hit()` returns remaining damage to pass to next layer
-- Applies 20% blunt trauma house rule: `absorbed_damage / 5` added back as damage
-- Calls `take_damage()` with final remaining damage after all armor
+- Damage absorbed by SOFT armor becomes Prellschaden point-for-point; hard
+  armor absorbs without consequence (Q20)
+- **Penetration cap** (gunshots only): more than 4 remaining damage rolls 1d10;
+  the shot does at most `4 + 1d10` — the rest exits through the back
+  (`through_and_through` in the outcome)
+- Then delegates to `resolve_damage` (same core as `take_damage`)
+- **HollowPoint** (Q17): mushrooms — halved vs hard armor (in `Armor.hit`),
+  full damage vs soft armor; damage reaching flesh DOUBLES and the projectile
+  never exits (no penetration cap)
 
-### `Character.take_damage(damage, zone)` - IMPLEMENTED
-- Bypasses armor, applies damage directly to character
-- Applies Body Type Modifier (BTM) with minimum 1 damage rule (CP2020 RAW),
-  implemented as `(damage - btm).max(1)`
-- **Head damage doubles** after BTM calculation
-- **Crippling damage** (8+ points after BTM):
-  - **Critical zones (Head/Chest/Vitals)**: Instant death, sets `current_damage = 100`
-  - **Other zones**: Mortal 0 state, minimum `current_damage = 13` (doesn't reduce if already higher)
-- Updates `damage_notes` with death/crippling messages
+### Healing (Q18)
+- `Character::rest_day(healer_present)`: heals 1/day with healer, 1 per two
+  days without (`healing_progress` carries the half-day)
+- `Character::complication_check(healer_present, roller)`: morning-after BODY
+  roll vs 10 + current damage; `None` with a healer (no check needed)
+
+### `Character.take_damage(damage, zone)` → `HitOutcome`
+- Bypasses armor. BTM is SUBTRACTED and CONVERTED to Prellschaden (min 1 real
+  damage remains): `converted = btm.min(damage - 1)`
+- **Prellschaden scale** (`current_bruise`, 0–4): every 5 points → 1 real
+  damage + KO check required (`ko_check_required`); a hit causing ONLY
+  Prellschaden instead sets `pending_roll_malus` (consumed by the next
+  check_skill/check_attribute)
+- **Crippling check** (8+ zone damage after BTM) uses the UNDOUBLED value;
+  **head doubling** applies afterwards:
+  - Critical zones (Head/Chest/Vitals): instant death, `current_damage = 100`
+  - Other zones: Mortal 0 state, minimum `current_damage = 13`
+
+### Wound states (`health.rs::WoundState`)
+- Blocks of 4 damage: Light (1-4, no malus), Serious (5-8, −2 REF), Critical
+  (9-12, REF/INT/COOL halved round up), Mortal 0-4 (13-32, all stats except
+  LUCK/EMP divided by 3 round up), Dead (>32)
+- `Character::wound_state()`; penalties are applied inside
+  `effective_attribute()` BEFORE encumbrance is subtracted (Q19)
 
 ---
 
