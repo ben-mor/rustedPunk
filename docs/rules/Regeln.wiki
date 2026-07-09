@@ -13,8 +13,14 @@ Würfelt man eine 10 addiert man diese und es wird weiter gewürfelt bis man kei
 Ein Wurf von 1 ist ein Fehlschlag, danach wird nochmal gewürfelt; 1: Kritischer Fehler, Schaden am eigenen Team / sich selbst. 2-5: Fehlschlag und sieht peinlich aus. 6-0: Normaler Fehlschlag.
 
 ===Glück===
-Man kann seinen Wurf modifizieren in dem man VOR dem Wurf Glückspunkte einsetzt. Diese verändern den Wurf direkt, d.H. Eine gewürfelte 9 und ein Glückspunkte zählen als natürliche 10.
-Man darf pro Spielabend nicht mehr Glückspunkte ausgeben als man LUCK hat. Weitere Würfe auf LUCK an diesem Abend sind entsprechend modifiziert.
+Glückspunkte werden VOR dem Wurf eingesetzt und verändern den Würfel direkt: eine gewürfelte 9 mit einem Glückspunkt zählt als natürliche 10 (und kaskadiert), eine gewürfelte 1 mit einem Glückspunkt zählt als 2 und ist kein Patzer.
+
+Glück hat drei Ebenen:
+# '''Start-Basis''': der Wert aus der Charaktererschaffung, ändert sich nie.
+# '''Aktuelle Basis''': kann für extreme „Die Welt dreht sich jetzt zu deinen Gunsten“-Ereignisse dauerhaft gesenkt werden. Regeneration und Obergrenze richten sich nach diesem Wert.
+# '''Aktueller Pool''': schwankt mit jedem Einsatz und bleibt über Sitzungen erhalten.
+
+Zu Beginn jeder Sitzung regeneriert der Pool die Hälfte der aktuellen Basis (aufgerundet), maximal bis zur aktuellen Basis. Beispiel: Basis 9, davon 8 ausgegeben (1 übrig) → nächste Sitzung +5 → Start mit 6.
 
 ===Mehrere Aktionen===
 Man kann weitere Aktionen pro Runde ausführen mit jeweils -3 auf alle.
@@ -69,7 +75,7 @@ gewürfelt. Soviel extra Schaden kann dieser Schuss noch anrichten bevor
 es ein Durchschuss wird.
 
 ====Mehr als 8 Schaden====
-Wenn in einem Treffer mehr als 8 Punkte Schaden auf einmal in einem Körperteil ankommen muss man einen Wurf BODY gegen 10+(Wundschaden-10) machen. Misslingt dieser ist der Körperteil kaputt. Kopf und Torso Treffer sind ab dann sofort tödlich.
+Kommen in einem Treffer mehr als 8 Punkte Schaden (nach BTM) in einem Körperteil an, ist das Körperteil zerstört. Kopf-, Brust- und Vitals-Treffer sind dann sofort tödlich; bei anderen Zonen ist man ab sofort mindestens Mortal 0 (13 Schaden) und dabei zu sterben.
 
 ====Kopftreffer====
 Kopftreffer machen immer doppelten Schaden. Das mehr als 8 Limit gilt aber gegen den unmodifizierten Schaden.

@@ -136,11 +136,37 @@ Encumbrance affects:
 
 ---
 
+## Dice Engine (`dice.rs`) — #11
+
+- All rolls go through the `DieRoller` trait: `RandomRoller` (rand crate) in
+  play, `SequenceRoller` (scripted values) in tests and for future replay.
+- `skill_check(attribute, skill, luck, difficulty, roller)` implements the
+  house rules: auto-success when attribute+skill+luck ≥ target (no roll),
+  exploding 10s (cascade), fumble on 1 with confirmation die (1 critical,
+  2-5 embarrassing, 6-10 normal failure), luck modifies the first die
+  directly (9+1 luck = natural 10 and explodes; 1+luck = no fumble).
+- `open_roll(...)` = same mechanics without a target.
+- `Character::check_skill(name, ...)` -> `Result` (error on unknown skill),
+  uses `effective_attribute` so encumbrance maluses apply automatically.
+  `Character::check_attribute(...)` for untrained rolls.
+- **Luck, three levels**: starting base (`AttributeValue.base`, chargen value,
+  never changes) / current base (`AttributeValue.actual`, permanently reducible
+  via `Character::sacrifice_luck` for world-turning events; regen rate + cap) /
+  current pool (`Character.current_luck`, persistent across sessions).
+  Committed luck is deducted by check_skill/check_attribute (also on
+  auto-success); overspending errors without rolling.
+  `Character::start_session()` regenerates ceil(current base / 2), capped at
+  the current base.
+- `Difficulty::{Easy=10, Normal=15, Hard=20, Custom(n)}`.
+
+---
+
 ## Quick Reference
 
 | What | Where |
 |------|-------|
 | Character stats | `character.rs` → `Character`, `Attribute` |
 | Skills | `character.rs` → `Skill`, `List` |
+| Dice & checks | `dice.rs` → `skill_check`, `open_roll`, `DieRoller`, `Difficulty` |
 | Inventory system | `inventory.rs` → `Inventory`, `Item`, `InventoryItem` |
 | Armor & hit zones | `armor.rs` → `Armor`, `HitZone` |

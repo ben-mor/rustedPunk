@@ -106,8 +106,20 @@ Design rules already established (keep them):
   dropped — the table forgot it and doesn't play it.)*
 - **Fumble**: natural 1 = failure; roll again: 1 = critical failure (harm own side),
   2–5 = embarrassing failure, 6–0 = normal failure.
-- **Luck**: points committed *before* the roll modify the die directly (9 + 1 luck
-  counts as a natural 10). Max luck spent per game evening = LUCK attribute.
+- **Luck**: points committed *before* the roll modify the die directly.
+  *(decided)*: symmetric reading — 9 + 1 luck counts as a natural 10 and
+  explodes; 1 + 1 luck counts as 2 and is no fumble.
+- **Luck budget** *(decided, replaces the old per-evening reset)*: luck has
+  three levels:
+  1. *Starting base* — the chargen value, never changes (`AttributeValue.base`).
+  2. *Current base* — permanently reducible for extreme "the world now turns in
+     your favor" events; regeneration rate and cap derive from it
+     (`AttributeValue.actual`, `Character::sacrifice_luck`).
+  3. *Current pool* — fluctuates with every roll (`Character.current_luck`).
+
+  Each new session regenerates ceil(current base / 2) points, capped at the
+  current base. Example: current base 9, 8 spent (1 left) → next session +5 →
+  starts with 6.
 - **Multiple actions**: each extra action per round → −3 on all actions.
 
 ### Damage & health (`health.rs`, `character.rs`) — for #13/#19

@@ -1,10 +1,44 @@
-use rusted_punk::{Armor, Attribute, Character, DamageType, HitZone, Item, List, Skill};
+use rusted_punk::{
+    Armor, Attribute, Character, DamageType, Difficulty, HitZone, Item, List, RandomRoller, Skill,
+};
 
 fn main() {
     armor_test();
     character_test();
     skill_test();
     list_test();
+    dice_test();
+}
+
+fn dice_test() {
+    let mut character = Character::new(
+        "Testschütze".to_string(),
+        "Solo".to_string(),
+        25,
+        5,
+        6,
+        5,
+        5,
+        5,
+        5,
+        7,
+        8,
+        5,
+    );
+    character
+        .skills
+        .push(Skill::new("Pistole".to_string(), Attribute::Reflexes, 4, 1));
+
+    let mut roller = RandomRoller;
+    for difficulty in [Difficulty::Easy, Difficulty::Normal, Difficulty::Hard] {
+        let result = character
+            .check_skill("Pistole", 0, difficulty, &mut roller)
+            .unwrap();
+        println!(
+            "Pistole vs {:?} ({}): {:?} — total {} (dice {:?})",
+            difficulty, result.target, result.outcome, result.total, result.die_rolls
+        );
+    }
 }
 
 fn armor_test() {
