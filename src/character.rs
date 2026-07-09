@@ -1,11 +1,11 @@
-use std::ops::{Deref, DerefMut};
 use crate::{armor::HitZone, Armor};
 use crate::{inventory::Inventory, DamageType};
+use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
 use std::collections::{BTreeMap, HashSet};
 use std::fmt;
-use serde::{Deserialize, Serialize};
+use std::ops::{Deref, DerefMut};
 use uuid::Uuid;
-use serde_with::{serde_as, DisplayFromStr};
 
 #[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Character {
@@ -65,11 +65,10 @@ impl std::str::FromStr for Attribute {
 }
 
 #[serde_as]
-#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Attributes(
-    #[serde_as(as = "BTreeMap<DisplayFromStr, _>")]
-    BTreeMap<Attribute, AttributeValue>
+    #[serde_as(as = "BTreeMap<DisplayFromStr, _>")] BTreeMap<Attribute, AttributeValue>,
 );
 
 impl Deref for Attributes {
@@ -104,7 +103,7 @@ impl fmt::Display for Attributes {
 ///
 /// For momentary effects (drugs, encumbrance, combat boosts), use
 /// `Character::effective_attribute()` which calculates the actual roll value.
-#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct AttributeValue {
     pub base: i32,
     pub actual: i32,
@@ -149,15 +148,69 @@ impl Character {
             skills: Vec::new(),
         };
 
-        character.attributes.insert(Attribute::Attractiveness, AttributeValue { base: att, actual: att });
-        character.attributes.insert(Attribute::Move, AttributeValue { base: mov, actual: mov });
-        character.attributes.insert(Attribute::Coolness, AttributeValue { base: coo, actual: coo });
-        character.attributes.insert(Attribute::Empathy, AttributeValue { base: emp, actual: emp });
-        character.attributes.insert(Attribute::Luck, AttributeValue { base: luck, actual: luck });
-        character.attributes.insert(Attribute::Intelligence, AttributeValue { base: int, actual: int });
-        character.attributes.insert(Attribute::Body, AttributeValue { base: body, actual: body });
-        character.attributes.insert(Attribute::Reflexes, AttributeValue { base: refl, actual: refl });
-        character.attributes.insert(Attribute::Tech, AttributeValue { base: tec, actual: tec });
+        character.attributes.insert(
+            Attribute::Attractiveness,
+            AttributeValue {
+                base: att,
+                actual: att,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Move,
+            AttributeValue {
+                base: mov,
+                actual: mov,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Coolness,
+            AttributeValue {
+                base: coo,
+                actual: coo,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Empathy,
+            AttributeValue {
+                base: emp,
+                actual: emp,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Luck,
+            AttributeValue {
+                base: luck,
+                actual: luck,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Intelligence,
+            AttributeValue {
+                base: int,
+                actual: int,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Body,
+            AttributeValue {
+                base: body,
+                actual: body,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Reflexes,
+            AttributeValue {
+                base: refl,
+                actual: refl,
+            },
+        );
+        character.attributes.insert(
+            Attribute::Tech,
+            AttributeValue {
+                base: tec,
+                actual: tec,
+            },
+        );
 
         character
     }
@@ -172,11 +225,7 @@ Character {{ \n\
 \tAttributes: {}\n\
 \tInventory: {}\n\
 }}",
-            self.name,
-            self.role,
-            self.age,
-            self.attributes,
-            self.inventory,
+            self.name, self.role, self.age, self.attributes, self.inventory,
         );
     }
 
@@ -199,10 +248,9 @@ Character {{ \n\
         let base_value = self.attributes[&attr].actual;
 
         match attr {
-            Attribute::Reflexes => (base_value
-                - self.encumberance()
-                - self.calculate_armor_encumberance())
-            .max(0),
+            Attribute::Reflexes => {
+                (base_value - self.encumberance() - self.calculate_armor_encumberance()).max(0)
+            }
             Attribute::Move => (base_value - self.encumberance()).max(0),
             _ => base_value,
         }
@@ -212,7 +260,7 @@ Character {{ \n\
     pub fn encumberance(&self) -> i32 {
         let inventory_weight = self.inventory.calculate_total_weight();
         let capacity = self.carry_capacity();
-        match (inventory_weight*10) / capacity {
+        match (inventory_weight * 10) / capacity {
             0..=4 => 0,
             5..=6 => 1,
             7..=9 => 2,
@@ -238,14 +286,14 @@ Character {{ \n\
         if self.inventory.get_item(armor_uuid).is_none() {
             unreachable!("Armor_uuid not found in inventory");
         }
-        if underneath.is_some() {
-            if self.inventory.get_item(underneath.unwrap()).is_none() {
+        if let Some(underneath_uuid) = underneath {
+            if self.inventory.get_item(underneath_uuid).is_none() {
                 unreachable!("underneath_uuid not found in inventory");
             }
             if let Some(index) = self
                 .worn_armor
                 .iter()
-                .position(|&uuid| uuid == underneath.unwrap())
+                .position(|&uuid| uuid == underneath_uuid)
             {
                 // Insert the new armor at that index (pushes existing armor one position higher)
                 self.worn_armor.insert(index, armor_uuid);
@@ -268,12 +316,10 @@ Character {{ \n\
         for i in (0..self.worn_armor.len()).rev() {
             let armor_uuid = self.worn_armor[i];
             let armor_item = self.inventory.get_item_mut(armor_uuid);
-            let armor_opt = armor_item.expect(&format!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
+            let armor_opt = armor_item.unwrap_or_else(|| panic!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
                 .as_any_mut().downcast_mut::<Armor>();
-            let armor = armor_opt.expect(&format!(
-                "There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
-                armor_uuid
-            ));
+            let armor = armor_opt.unwrap_or_else(|| panic!("There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
+                armor_uuid));
             let damage_result = armor.hit(remaining_damage, zone, damage_type);
             remaining_damage = damage_result.remaining_damage;
             absorbed_damage += damage_result.absorbed_damage;
@@ -295,7 +341,7 @@ Character {{ \n\
 
             // TODO: Need to implement the House Rule that this doubling only takes effect after the check if it will kill you immediately.
             if zone == HitZone::Head {
-                remaining_damage = remaining_damage * 2;
+                remaining_damage *= 2;
             }
             self.current_damage += remaining_damage;
             if remaining_damage >= 8 {
@@ -343,12 +389,10 @@ Character {{ \n\
     fn get_armor_ref_on_index(&self, i: usize) -> &Armor {
         let armor_uuid = self.worn_armor[i];
         let armor_item = self.inventory.get_item(armor_uuid);
-        let armor_opt = armor_item.expect(&format!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
+        let armor_opt = armor_item.unwrap_or_else(|| panic!("There was an Armor Uuid in the worn armor list ({}), but no corresponding item in the inventory.", armor_uuid))
             .as_any().downcast_ref::<Armor>();
-        let armor = armor_opt.expect(&format!(
-            "There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
-            armor_uuid
-        ));
+        let armor = armor_opt.unwrap_or_else(|| panic!("There was an Armor in the worn_armor list ({}), that wasn't an Armor in the Inventory.",
+            armor_uuid));
         armor
     }
 
@@ -362,7 +406,7 @@ Character {{ \n\
     }
 }
 
-#[derive (Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Skill {
     pub name: String,
     pub base: Attribute,
@@ -378,10 +422,7 @@ impl Skill {
             \tlevel: {}
             \tlevel up modifier: {}
         }}",
-            self.name,
-            self.base,
-            self.level,
-            self.level_up_modifier
+            self.name, self.base, self.level, self.level_up_modifier
         )
     }
 
@@ -397,7 +438,11 @@ impl Skill {
 
 impl fmt::Display for Skill {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "name: {}, level: {}, base: {}", self.name, self.level, self.base)
+        write!(
+            f,
+            "name: {}, level: {}, base: {}",
+            self.name, self.level, self.base
+        )
     }
 }
 
@@ -417,7 +462,7 @@ impl fmt::Display for List {
             // For every element except the first, add a comma.
             // Use the ? operator to return on errors.
             if count != 0 {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
             write!(f, "{}", v)?;
         }
@@ -542,7 +587,11 @@ mod tests {
         // damage of 8 or more is crippling and the person immediately goes into mortal 0 state, BTM or not.
 
         let expected_damage = 13;
-        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+        assert_eq!(
+            character.current_damage, expected_damage,
+            "{}: Expected {} damage but was {}",
+            test_context, expected_damage, character.current_damage
+        );
     }
 
     #[test]
@@ -556,7 +605,11 @@ mod tests {
         // damage of 8 or more is crippling and on the vitals you just die.
 
         let expected_damage = 100;
-        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+        assert_eq!(
+            character.current_damage, expected_damage,
+            "{}: Expected {} damage but was {}",
+            test_context, expected_damage, character.current_damage
+        );
     }
 
     #[test]
@@ -570,7 +623,11 @@ mod tests {
         // damage of 8 or more is crippling on the head you just die, also damage is doubled.
 
         let expected_damage = 100;
-        assert_eq!(character.current_damage, expected_damage, "{}: Expected {} damage but was {}", test_context, expected_damage, character.current_damage);
+        assert_eq!(
+            character.current_damage, expected_damage,
+            "{}: Expected {} damage but was {}",
+            test_context, expected_damage, character.current_damage
+        );
     }
 
     fn assert_armor_protection(
@@ -621,7 +678,8 @@ mod tests {
             );
         } else {
             assert!(
-                current_protection.is_some() && current_protection.unwrap() == &expected_remaining_protection,
+                current_protection.is_some()
+                    && current_protection.unwrap() == &expected_remaining_protection,
                 "{}: Expected some protection, but none was found on {} {}",
                 test_context,
                 armor_name,
@@ -658,7 +716,10 @@ mod tests {
 
         character.wear_armor(outer_armor_uuid, None);
         character.wear_armor(inner_armor_uuid, Some(outer_armor_uuid));
-        assert_eq!(character.worn_armor, vec![inner_armor_uuid, outer_armor_uuid]);
+        assert_eq!(
+            character.worn_armor,
+            vec![inner_armor_uuid, outer_armor_uuid]
+        );
     }
 
     #[test]
@@ -702,7 +763,11 @@ mod tests {
         let serialized_character = serialized_character_option.unwrap();
         print!("serialized_character: {:?}", serialized_character);
         let deserialized_character: Character = toml::from_str(&serialized_character).unwrap();
-        assert_eq!(character, deserialized_character, "character serialization round-trip didn't work {}", character);
+        assert_eq!(
+            character, deserialized_character,
+            "character serialization round-trip didn't work {}",
+            character
+        );
     }
 
     #[test]
@@ -751,7 +816,10 @@ mod tests {
         character.inventory.push(Box::new(kev_shirt()));
         assert_eq!(character.inventory.calculate_total_weight(), 50_900);
         assert_eq!(character.encumberance(), 1);
-        assert_eq!(character.effective_attribute(Attribute::Reflexes), basic_ref -1);
+        assert_eq!(
+            character.effective_attribute(Attribute::Reflexes),
+            basic_ref - 1
+        );
         assert_eq!(character.effective_attribute(Attribute::Move), 9);
         for _i in 0..20 {
             character.inventory.push(Box::new(kev_shirt()));
@@ -782,7 +850,10 @@ mod tests {
         assert_eq!(character.inventory.calculate_total_weight(), 160_900);
         assert_eq!(character.encumberance(), 8);
         // effective attributes never go below 0, even when the malus exceeds them
-        assert_eq!(character.effective_attribute(Attribute::Reflexes), (basic_ref - 8).max(0));
+        assert_eq!(
+            character.effective_attribute(Attribute::Reflexes),
+            (basic_ref - 8).max(0)
+        );
         assert_eq!(character.effective_attribute(Attribute::Move), 2);
     }
 }
