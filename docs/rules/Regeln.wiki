@@ -128,10 +128,10 @@ Dabei kommt es auf die Situation an wo die Schäden entstehen. Feuerschaden igno
 ====Niederknüppeln====
 Hat man keine Schusswaffen zur Hand kann man immer die nächste Schlagwaffe nehmen und es damit versuchen. In einer Welt in der starke Rüstung selten ist kommt man damit wahrscheinlich sogar ziemlich weit.
 
-Sie kommen in den Fertigkeiten: Kampfkunst, Kurze Waffen (Messer, etc.), Mittlere Waffen (Schwerter, Knüppel etc.) und lange Waffen (Speere, Kampfstäbe). Dabei bekommt man den vollen Skill nur auf Waffen die man gewöhnt ist, nutzt man eine Waffenart die man nicht gewohnt ist bekommt man +3 auf den Wurf, durch das Allgemeine Wissen über Waffen, abtrainierte Hemmschwelle etc.
+Sie kommen in den Fertigkeiten: Kampfkunst, Kurze Waffen (Messer, etc.), Mittlere Waffen (Schwerter, Knüppel etc.) und lange Waffen (Speere, Kampfstäbe). Dabei bekommt man den vollen Skill nur auf Waffen, die man gewöhnt ist. Nutzt man eine Waffe, die man nicht gewohnt ist, ist die Schwierigkeit um 3 erhöht — durch das allgemeine Wissen über Waffen, abtrainierte Hemmschwelle etc. bleibt ein Teil der Fähigkeit noch bestehen.
 
 =====Kampfkunstaktionen=====
-Es gibt die Kampfkunst Prügeln, ansonsten kann man auch eine systematisiertere (Ringen oder Boxen) Lernen.
+Es gibt die Kampfkunst Prügeln (keine Key Attacks), ansonsten kann man eine systematisiertere lernen: Boxen (+3 Punch, +3 Sweep, +1 Block) oder Ringen (+2 Sweep, +4 Grapple, +3 Throw, +4 Hold, +2 Choke, +4 Escape). Die Key-Attack-Boni gelten auf den Angriffswurf; der Fertigkeitswert wird 1:1 auf den Schaden addiert.
 Die Fähigkeit Ausweichen kann man zusätzlich einsetzen um dem Schaden ganz zu entgehen.
 
 * Strike: 1d3+ Bodymodifier Schaden (Kopf, Torso, Arme)

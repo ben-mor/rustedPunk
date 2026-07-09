@@ -1,7 +1,7 @@
 == Fertigkeiten ==
-Alle Nahkampffertigkeiten sind bis Stufe 3 "Nahkampf allgemein" danach getrennt nach Kurz/Mittel/Lang.
+Alle Nahkampffertigkeiten sind bis Stufe 3 "Nahkampf allgemein" danach getrennt nach Kurz/Mittel/Lang. Jede Spezialisierung setzt die Skala unabhängig fort. Beispiel: Nahkampf allgemein 3, dann Kurz auf 4 gekauft → 1W10+4 mit kurzen Waffen, 1W10+3 mit mittleren und langen. Mittel auf 4 muss separat gekauft werden.
 
-Nahkampf allgemein enthält Ausweichen.
+Nahkampf allgemein enthält Ausweichen (bleibt damit bei maximal 3).
 == Punktevergabe ==
 '''Meisterpunkte''': Ich vergebe die Grundpunkte für den Abenteuerfortschritt: 3 - 8 Punkte.
 
@@ -39,7 +39,7 @@ Der Body Type Modifier (BTM) wird vom ankommenden Schaden abgezogen und in Prell
 
 Wenn eine Schusswaffe mehr als 4 Punkte Schaden macht wird mit 1d10 gewürfelt. Soviel extra Schaden kann dieser Schuss noch anrichten bevor es ein Durchschuss wird.
 
-Eine Verletzung vom Typ "Kritisch" oder darüber hat eine 5% Chance auf Verkrüppelung des entsprechenden Körperteils wenn nicht besondere Medizinische Hilfe geleistet wird. (5/1000 wenn diese geleistet wird).
+Eine Verletzung vom Typ "Kritisch" oder darüber hat eine 5% Chance auf Verkrüppelung des entsprechenden Körperteils wenn nicht besondere Medizinische Hilfe geleistet wird. (5/1000 wenn diese geleistet wird). Gewürfelt wird direkt nach dem Kampf; was die Verkrüppelung konkret bedeutet, entscheidet der SL nach Situation.
 
 Kopftrefferschaden wird verdoppelt, aber die Frage ob man daran stirbt ist verändert. Siehe [[Regeln]].
 

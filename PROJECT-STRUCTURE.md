@@ -160,11 +160,15 @@ Design rules already established (keep them):
   10 + taken damage or complications arise — skipped entirely when a healer is
   present (practically always). Healing rate: 1 damage per two days, with a
   healer 1 per day.
-- **KO check** *(decided 2026-07-09)*: after taking real damage, BODY vs 10,
-  modified by the wound category's Stun malus (character sheet wound track:
-  Light 0, Serious −1, Critical −2, Mortal n −(3+n)). Failure = out of the
-  fight (KO, screaming, …), may repeat every round, first success = recovered.
-  Critical failure = GM decides, usually out longer.
+- **KO check** *(decided 2026-07-09, Q21 confirmed)*: after taking real damage,
+  BODY vs 10, modified by the wound category's Stun malus (character sheet
+  wound track: Light 0, Serious −1, Critical −2, Mortal n −(3+n)); sheet BODY,
+  no wound thirding. Failure = out of the fight (KO, screaming, …), may repeat
+  every round, first success = recovered. Critical failure = GM decides.
+- **Crippling roll** *(decided, Q22)*: rolled directly AFTER the fight, once
+  per critical-or-worse injury — 5% without proper medical care, 0.5% with
+  (Schnelle Heilung: 1% / 0.1%). What "crippled" means has no direct rule; the
+  tool reports the result, the GM decides based on the situation.
 - Fire damage ignores the ">8 damage" rule.
 
 ### Encumbrance (`character.rs`, `inventory.rs`) — implemented, #12 ✓
@@ -182,12 +186,24 @@ authoritative source since it is not on the wiki)*
 
 - All melee skills are "Nahkampf allgemein" (general melee, includes Dodge) up to
   level 3; above that they split into short / medium / long weapon classes.
-  *(decided: "general" is only the shared level 1–3 base, not a fourth branch.)*
-  Full skill only with accustomed weapons; unfamiliar weapon class → +3 difficulty.
-- Martial arts: named styles (Prügeln/brawling, boxing, wrestling …) with key
-  attacks (Strike 1d3+DAM, Kick 1d6+DAM, Block, Dodge, Disarm, Grapple, Throw
-  1d6+DAM + stun check −2, Hold +1/round, Escape, Choke 1d6/round); skill level
-  scales damage.
+  *(decided, Q23)*: each specialization CONTINUES the scale independently from
+  the shared base. Example: Nahkampf allgemein 3, then Kurz bought to 4 → rolls
+  1d10+4 with short weapons, 1d10+3 with medium/long; raising Mittel to 4 is a
+  separate purchase.
+- *(decided, Q24)*: Dodge stays on the general level (caps at 3). Whether the
+  explicit Ausweichen skill should base on general melee is undecided — for now
+  it doesn't.
+- *(decided, Q25)*: unfamiliar weapons within a known class → difficulty +3
+  (the wiki's "+3 auf den Wurf" was an incomplete sentence; general weapon
+  knowledge means part of the skill still applies).
+- Martial arts *(decided, Q26)*: styles at the table with key-attack bonuses —
+  **Prügeln** (none), **Boxen** (+3 Punch, +3 Sweep, +1 Block), **Ringen**
+  (+2 Sweep, +4 Grapple, +3 Throw, +4 Hold, +2 Choke, +4 Escape). Key-attack
+  bonuses add to the attack roll; the skill level is added 1:1 to damage.
+  Base actions per wiki: Strike/Punch 1d3+DAM, Kick 1d6+DAM, Sweep, Block,
+  Dodge, Disarm, Grapple, Throw 1d6+DAM (stun check −2), Hold (+1/round),
+  Escape, Choke (1d6/round). DAM per RB5 hand-to-hand table (BODY 2 → −2 …
+  10 → +2, 11-12 → +4, 13-14 → +6, 15+ → +8).
 - Role/class special abilities are abolished — they are ordinary skills
   (Authority→COOL, Interface→INT, Jury Rig→TECH, Meditech→TECH, Leadership) or
   advantages (Charisma, Combat Sense) or replaced by reputation (Credibility,
@@ -209,7 +225,10 @@ authoritative source since it is not on the wiki)*
 - Lifepath: for each year of age above 15, optionally roll "did something
   interesting happen" — *(decided: this is the CP2020 RAW lifepath system,
   GM-interpreted into the post-apocalyptic setting)* — or write a history by
-  hand (no boni, no mali).
+  hand (no boni, no mali). *(decided, Q29)*: implement the RAW lifepath tables
+  with a variant toggle (e.g. `chargen --classic` vs `chargen --desaster`) so
+  differently flavored table sets can be added later. Source: RB5's collated
+  Expanded Character Creation section (core manual is a text-less scan).
 - Skill points = INT + REF + 40 + age points (table in `docs/rules/Alterspunkte.wiki`:
   age 16→1 … 24→9, 25→11, 26→13, 27→15, 28→17, 29→20, 30→23, 31→26, 32→29).
 - Skill costs at creation: level N costs N points cumulative-per-level
@@ -225,9 +244,15 @@ authoritative source since it is not on the wiki)*
 ### Weapons (`weapons.rs`) — for #21
 
 - Stats come from **CP2020 RAW** (`docs/pdf/Cyberpunk 2020 - Reference Book 5.pdf`,
-  git-ignored local copy).
+  git-ignored local copy). *(decided, Q27)*: one representative per category
+  from the issue list; with multiple candidates pick a MIDDLE one (knife →
+  Combat Knife, not Knife and not Kendachi Monoknife). Sling, lance and Molotov
+  have no RB5 entries → best-guess stats marked for review.
 - Categories from issue #21: knives, clubs, axes, lances, brass knuckles, pistols,
   SMGs, rifles, shotguns, bows, rocket launcher, sling, shuriken, Molotov cocktail.
+- *(decided, Q28)*: availability/rarity/cost fields STAY — the tool should also
+  serve classical CP2020 settings, not just the post-desaster campaign; expect
+  this dual-setting support to grow.
 - Attachments: silencer, scope.
 - AK damage *(decided/verified in Reference Book 5)*: the classic AK-47/AKM is
   **5d6** (7.62sov, 30 mag, ROF 20, Very Reliable, 400 m) — the table plays 5d6.
@@ -278,19 +303,22 @@ The workshop trade system IS in scope.)*
 - **M3 — Dis-/advantages (#10)**: *done 2026-07-09* — storage with CP budget
   validation plus generic `Modifier` mechanism (attribute / skill-by-name /
   free tag) wired into checks, initiative, bruise scale and healing rate.
-  Not done: a data file cataloguing all ~65 wiki traits (fits better with
-  chargen, M6); KO-check resolution still pending.
-- **M4 — Skills special functions (#15)**: melee split at level 3, martial-arts
-  actions with scaled damage.
-- **M5 — Weapons (#21)**: Weapon as InventoryItem, categories from RAW stats,
-  fire modes, attachments, noise formula.
-- **M6 — Character generation (#9)**: point-buy validation, age points, lifepath,
-  equipment budget; then randomized NSC generation on top.
-- **M7 — Frontend**: long-term goal is a **web service hosted on Ben's server**:
-  players (and Ben) update characters through it, the server auto-rolls things
-  like full-auto attacks, and **AI agents can interact with it** (clean HTTP API,
-  possibly MCP). Design consequence: keep the rules engine a pure library with a
-  thin API layer; the current CLI `main.rs` stays a dev playground until then.
+  KO check landed separately (PR #30). Crippling roll (Q22) → M4 or M6.
+- **M4 — Skills special functions (#15)**: melee split at level 3 with
+  independently-continued specializations (Q23), Dodge capped on general (Q24),
+  unfamiliar-weapon +3 difficulty (Q25), martial-arts styles Prügeln/Boxen/
+  Ringen with key attacks and 1:1 skill-level damage (Q26), DAM table.
+- **M5 — Weapons (#21)**: Weapon as InventoryItem, one middle-of-the-road RAW
+  representative per category (Q27), availability/rarity/cost kept for classic
+  CP2020 support (Q28), fire modes, attachments, noise formula.
+- **M6 — Character generation (#9)**: point-buy validation, age points, RAW
+  lifepath with variant toggle --classic/--desaster (Q29), equipment budget,
+  trait catalog as reviewable TOML with best-guess modifiers (Q30); then
+  randomized NSC generation on top.
+- **M7 — Frontend**: **ON HOLD (Q31)** — Ben hasn't decided hosting/auth yet.
+  Long-term goal remains a web service on Ben's server with auto-rolls and an
+  AI-agent-friendly API; keep the rules engine a pure library with a thin API
+  layer; the current CLI `main.rs` stays a dev playground until then.
 - **M8 — Campaign tools**: workshop equipment-token trade simulator (in scope);
   no XP tracking.
 
