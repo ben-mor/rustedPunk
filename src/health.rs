@@ -35,6 +35,21 @@ impl WoundState {
         }
     }
 
+    /// The KO-check ("Stun Save") malus of this wound state, per the CP2020
+    /// wound track on the character sheet: Light −0, Serious −1, Critical −2,
+    /// Mortal 0 −3 and one more per Mortal step.
+    pub fn ko_malus(self) -> i32 {
+        match self {
+            WoundState::Uninjured | WoundState::Light => 0,
+            WoundState::Serious => 1,
+            WoundState::Critical => 2,
+            WoundState::Mortal(step) => 3 + step,
+            // a dead character has no KO check to make; the malus only keeps
+            // the arithmetic sane if it is ever queried
+            WoundState::Dead => 9,
+        }
+    }
+
     /// Applies this wound state's penalty to an attribute value.
     /// Halving and thirding round up, as the house rules demand.
     pub fn modify_attribute(self, attr: Attribute, value: i32) -> i32 {

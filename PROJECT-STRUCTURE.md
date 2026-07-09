@@ -160,6 +160,11 @@ Design rules already established (keep them):
   10 + taken damage or complications arise — skipped entirely when a healer is
   present (practically always). Healing rate: 1 damage per two days, with a
   healer 1 per day.
+- **KO check** *(decided 2026-07-09)*: after taking real damage, BODY vs 10,
+  modified by the wound category's Stun malus (character sheet wound track:
+  Light 0, Serious −1, Critical −2, Mortal n −(3+n)). Failure = out of the
+  fight (KO, screaming, …), may repeat every round, first success = recovered.
+  Critical failure = GM decides, usually out longer.
 - Fire damage ignores the ">8 damage" rule.
 
 ### Encumbrance (`character.rs`, `inventory.rs`) — implemented, #12 ✓

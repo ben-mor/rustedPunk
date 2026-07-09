@@ -99,6 +99,15 @@ Each damage type has a private helper method. Full mechanics documented on publi
   full damage vs soft armor; damage reaching flesh DOUBLES and the projectile
   never exits (no penetration cap)
 
+### KO check ("Stun Save")
+- Any hit causing real damage sets `ko_check_required` (pure Prellschaden
+  gives the next-roll malus instead)
+- `Character::ko_check(roller)`: BODY (sheet value + advantage modifiers,
+  NOT wound-thirded — the category malus covers that) − Stun malus vs 10.
+  Stun malus per wound track: Light 0, Serious −1, Critical −2, Mortal n −(3+n)
+- Failure = out of the fight, may repeat every round, first success recovers;
+  critical failure = GM decides (usually out longer)
+
 ### Healing (Q18)
 - `Character::rest_day(healer_present)`: heals 1/day with healer, 1 per two
   days without (`healing_progress` carries the half-day)

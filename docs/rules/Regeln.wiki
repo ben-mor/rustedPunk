@@ -72,6 +72,13 @@ Am Morgen nach einer Verwundung: BODY-Wurf gegen 10 + erlittenen Schaden, sonst 
 
 Geheilt wird ein Punkt alle zwei Tage; mit Heiler ein Punkt pro Tag.
 
+=== KO-Check ===
+Nach erlittenem (echtem) Schaden: BODY-Wurf gegen 10, modifiziert um die Schadenskategorie (Leicht −0, Schwer −1, Kritisch −2, Tödlich 0 −3, jede weitere Tödlich-Stufe −1 mehr — siehe Wound Track auf dem Charakterbogen).
+
+Misslingt der Wurf, ist der Charakter aus dem Kampf (KO, schreiend am Boden, wimmernd, …). Der Wurf darf jede Runde wiederholt werden; mit dem ersten Erfolg ist der Charakter erholt und wieder handlungsfähig. Bei einem kritischen Patzer entscheidet der SL — meistens ist man länger raus.
+
+Reiner Prellschaden erfordert keinen KO-Check (gibt stattdessen den Abzug auf den nächsten Wurf).
+
 ===Spezial===
 
 ==== Durchschlag bei Schusswaffen ====
