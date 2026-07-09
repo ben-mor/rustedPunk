@@ -1,0 +1,165 @@
+Die vorgestellten Regeln beziehen sich auf das im Spiel angewandte System, d.H. nach allen Hausregeln. Andere Runden können das Standardsystem verwenden das etwas anders ist.
+==Grundlegendes==
+Das System baut auf drei Werten im Bereich von 1 bis 10 auf.
+#Attribut (Reflexe etc.) von 2 - 10
+#Fähigkeit (Pistole etc.) von 0 - 10
+#Zehnseitiger Würfel von 1 - 10
+Die drei Werte werden addiert. Einfache Sachen gelingen ab 10+ Normale Sachen ab 15+ Schwere ab 20+.
+
+Hat man nach 1&2 den Zielwert bereits erreicht braucht man nicht zu würfeln.
+
+Würfelt man eine 10 addiert man diese und es wird weiter gewürfelt bis man keine 10 mehr hat.
+
+Ein Wurf von 1 ist ein Fehlschlag, danach wird nochmal gewürfelt; 1: Kritischer Fehler, Schaden am eigenen Team / sich selbst. 2-5: Fehlschlag und sieht peinlich aus. 6-0: Normaler Fehlschlag.
+
+===Glück===
+Man kann seinen Wurf modifizieren in dem man VOR dem Wurf Glückspunkte einsetzt. Diese verändern den Wurf direkt, d.H. Eine gewürfelte 9 und ein Glückspunkte zählen als natürliche 10.
+Man darf pro Spielabend nicht mehr Glückspunkte ausgeben als man LUCK hat. Weitere Würfe auf LUCK an diesem Abend sind entsprechend modifiziert.
+
+===Mehrere Aktionen===
+Man kann weitere Aktionen pro Runde ausführen mit jeweils -3 auf alle.
+In einer Ründe kann man maximal die Anzahl Schüsse einer Waffe abgeben die im Waffentyp vorgegeben sind, egal wie viele Aktionen man darauf verwendet.
+
+=== Teamaktionen ===
+Manche Aktivitäten kann man zu mehreren machen, sie werden dann meistens besser.
+
+==== Lehrer-Schüler ====
+Wenn jemand den Lehrerjob übernimmt macht der Schüler eine Probe auf die Fähigkeit die gelehrt werden soll (Schwierigkeit meistens 15). Der Lehrer macht eine Probe auf Lehren (gegen 15). Der Lehrer kann mit seinen Erfolgen die Misserfolge des Schülers ausgleichen. Sind danach beide gelungen kann der Schüler die nächste Stufe in diesem Skill zum halben Preis lernen. (Der Lehrer muss besser sein als der Schüler in der entsprechenden Fähigkeit).
+
+==== Gemeinschaftswerk - Skillpool ====
+Manche Sachen können in Gemeinschaft gemacht werden (z.B. Programme schreiben, Autos Reparieren, Essen Kochen) für diese macht jeder eine Probe gegen die geteilte Schwierigkeit ODER die geteilte Zeit (also: LKW zerschossen: Reparieren in einem Tag mit einem Menschen: Schwierigkeit 35 - zu zweit ein Tag: beide Schwierigkeit 18, zu zweit in einem halben Tag: beide Schwierigkeit 35). Die Erfolge des einen können genutzt werden um Misserfolge des anderen auszugleichen.
+
+==== Unterstützer ====
+Die meisten Sachen werden einfach besser wenn mehr Leute drauf gucken (z.B. Architektur). Jeder der mindestens eine 10 in dem Skill mitbringt kann demjenigen der die Probe ablegt +1 auf seinen Wurf geben.
+
+==== Grenzfälle und Überschneidungen ====
+In vielen Situationen sind mehrere der Teamaktionsregeln anwendbar. Ihr entscheidet euch dann Intime welche Art der Zusammenarbeit ihr wählt und die entsprechenden Regeln werden dann angewendet.
+
+==Gesundheit==
+Die Gesundheit ist in Blöcke zu je vier Trefferpunkten eingeteilt.
+
+Die ersten vier sind Kratzer und Kleinkram.
+
+Die zweifen vier sind Wunden und Unangenehmes.
+
+Die dritten vier sind kritische Verletzungen und echte Probleme.
+
+Ab dann bis zum achten Block sind die Bereiche für tödliche Wunden.
+
+Danach ist man zu stark desintegriert um noch von "Mensch" reden zu können.
+
+=== Prellschaden ===
+Jeder hat 5 Prellpunkte. Anstrengende Arbeiten, Treffer die von weicher 
+Rüstung gefangen werden und ähnliches gehen auf diese Skala. Ist die Skala bei 0 gibt es einen Schaden und sie beginnt wieder bei 5 zu zählen. (Spezielle Vorteile ändern diese Skala)
+
+===Abzüge===
+Im ersten Block (leichte Wunden): keine.
+
+Im zweiten Block (schwere Wunden): -2 auf Reflexe
+
+Im dritten Block (kritische Wunden): REF, INT, COOL halbiert (aufrunden)
+
+Ab dem vierten Block (tödlich): Alle Stats außer LUCK, EMP dritteln (aufrunden)
+
+===Spezial===
+
+==== Durchschlag bei Schusswaffen ====
+Wenn eine Schusswaffe mehr als 4 Punkte Schaden macht wird mit 1d10 
+gewürfelt. Soviel extra Schaden kann dieser Schuss noch anrichten bevor 
+es ein Durchschuss wird.
+
+====Mehr als 8 Schaden====
+Wenn in einem Treffer mehr als 8 Punkte Schaden auf einmal in einem Körperteil ankommen muss man einen Wurf BODY gegen 10+(Wundschaden-10) machen. Misslingt dieser ist der Körperteil kaputt. Kopf und Torso Treffer sind ab dann sofort tödlich.
+
+====Kopftreffer====
+Kopftreffer machen immer doppelten Schaden. Das mehr als 8 Limit gilt aber gegen den unmodifizierten Schaden.
+
+==Kampf==
+Es ist eine aggressive Welt und Kämpfe sind oft. Sich strategische Überlegungen zu machen ist der Unterschied zwischen einem weiterem Fleck am Boden einer vergessenen Stadt und einer Menge gewonnenen Waren.
+
+===Schnell===
+Wer zuerst schießt tötet auch zuerst. Da normalerweise der erste Treffer den Kampf entscheidet ist schnell sein eine veritable Strategie.
+
+====Initiative====
+Die Initiative ist 1d10+REF (plus Booster falls verfügbar).
+
+====Schnellziehen====
+Wer sich anstrengt kann schneller handeln. Man kann +3 auf seine Initiative bekommen wenn man -3 auf seine Aktion hinnimmt. Das muss man vorher ansagen.
+
+===Tödlich===
+Der Schaden ein Schusswaffe ist abhängig von ihrem Kaliber und beim Waffentyp mit angegeben. Die verwendete Munition modifiziert den Schaden. In euer Welt ist nicht allen Leuten bewusst das es unterschiedliche Munition gibt, woran man sie erkennt und wie man sie herstellt.
+
+====Panzerbrechend====
+Panzerbrechende Munition ist besonders hart und spitz. Rüstung zielt nur halb gegen diese Munition, jedoch wird der Schaden gegen weiche Ziele halbiert, da die Kugel einfach durchschlägt.
+
+====Dum Dum====
+Der Kontrast zu Panzerbrechender Munition, wirkt nur halb gegen harte Rüstung, dafür doppelt gegen weiche Ziele.
+
+====Autofeuer====
+Wenn man einigermaßen nah an einem Gegner dran ist kann man die Waffe auf automatisch stellen und das Magazin in die Richtung seines Gegners beschleunigen.
+
+Ist man nah dran bekommt man für alle 10 Kugeln die man abfeuert +1 auf den Angriffswurf, ansonsten -1 pro 10 Kugeln. Dann bestimmt man wieviele Kugeln getroffen haben: Für jeden Punkt den man besser ist als der Zielwert trifft eine Kugel. Es gibt keine Bonusse für Zielen, Zielfernrohr oder sonst etwas das auf 'Feinheiten' basiert.
+
+====Sprengen====
+Sprengwaffen (Granaten, etc.) sind in euer Welt ausgesprochen selten. Die Regeln dafür gibt es wenn ihr mal welche habt.
+
+====Niederbrennen====
+Wenn du einen Molotovcocktail auf deine Gegner wirfst oder sonstige Feuer auf Haut trifft macht das Schmerzen.
+Dabei kommt es auf die Situation an wo die Schäden entstehen. Feuerschaden ignoriert die "mehr als 8Punkte Schaden" Regel.
+
+====Niederknüppeln====
+Hat man keine Schusswaffen zur Hand kann man immer die nächste Schlagwaffe nehmen und es damit versuchen. In einer Welt in der starke Rüstung selten ist kommt man damit wahrscheinlich sogar ziemlich weit.
+
+Sie kommen in den Fertigkeiten: Kampfkunst, Kurze Waffen (Messer, etc.), Mittlere Waffen (Schwerter, Knüppel etc.) und lange Waffen (Speere, Kampfstäbe). Dabei bekommt man den vollen Skill nur auf Waffen die man gewöhnt ist, nutzt man eine Waffenart die man nicht gewohnt ist bekommt man +3 auf den Wurf, durch das Allgemeine Wissen über Waffen, abtrainierte Hemmschwelle etc.
+
+=====Kampfkunstaktionen=====
+Es gibt die Kampfkunst Prügeln, ansonsten kann man auch eine systematisiertere (Ringen oder Boxen) Lernen.
+Die Fähigkeit Ausweichen kann man zusätzlich einsetzen um dem Schaden ganz zu entgehen.
+
+* Strike: 1d3+ Bodymodifier Schaden (Kopf, Torso, Arme)
+* Kick: 1d6+ Bodymodifier Schaden (Beine, Torse, Arme)
+* Block: Schaden reduzieren
+* Dodge: Schaden entgehen (-2 auf den Angriff)
+* Disarm: Dem Gegner die Waffe aus der Hand schlagen
+* Grapple: vorbereitende Aktion für einen Throw, Choke oder Hold
+* Throw: Nachen einem Griff kann man damit einen Gegner zu Boden schicken 1d6 + Bodymodifier. Stun Check -2
+* Hold: Gegner in eine Position bringen aus der er sich nicht heraus bewegen kann. +1 für jede Runde die der Hold bereits besteht.
+* Escape: Konter für einen Grapple oder Hold.
+* Choke: 1d6 Punkte Schaden pro Runde an der Position des Grapple oder Hold.
+
+===Präzise===
+Wenn die erste Kugel schon das Linke Auge trifft wozu noch weitere versenken? So wie man auf maximale Schadenswirkung zielen kann, kann man auch auf maximale Präzision zielen.
+====Trefferzonen ausnutzen====
+Kopftreffer: -4 auf den Angriffswurf, Schaden wird verdoppelt.
+
+====Zielen====
+Man kann eine Runde mit Zielen verbringen, aber nur wenn sich das Ziel nicht zu sehr bewegt. Bis zu +3 kann so erreicht werden, aber nur +1 pro Runde.
+
+====Hinterhalt====
+Gegen einen Gegner der nicht weiß von wo der Schuss kommen wird gibt es einen Bonus von 5.
+Ein misstrauischer Gegner würfelt mit Wahrnehmung gegen das Tarnen oder Verstecken des Angreifers.
+
+Ein Hinterhalt hält nur eine Runde lang!
+
+====Kurzfeuerstoß====
+Manche Waffen haben einen 3 Schuss Feuerstoß, dieser gibt +3 auf den Angriff. Kann nur gegen ein einzelnes Ziel eingesetzt werden. Im Erfolgsfall treffen 1d2 Kugeln.
+
+====Zielhilfen====
+Man kann durch passende Instrumente seine Trefferchancen verbessern.
+
+* Hinlegen oder Auflegen: +1
+* Stativ oder Turrent: +2
+* Laserpointer: +1
+* Zielfernrohr: +1 (+2 für Extreme Distanzen)
+
+====Abwarten====
+Wenn man wartet bis sich jemand verlässlich nicht bewegt bekommt man +4. Das tritt auf wenn man auf Schlafende, bewusstlose oder ähnliches trifft.
+===Kampftaktiken===
+*<p style="margin-bottom: 0cm">Immer auf den Kopf des Gegners zielen.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Kopf mit Helm schützen, mindestens mit einer Art Hockeyhelm, der auch einen Visierschutz hat.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Schüsse sind teuer.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">In den Fähigkeiten auf eine Mischung aus Fern- und Nahkampftaktiken achten.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Deckung nicht aufgeben, auf Rückendeckung achten. Nicht angreifen, sondern lieber abwarten oder eingraben, wenn möglich.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Es ist mehr als eine Aktion pro Runde möglich (z.B. Schießen und danach in Deckung gehen, bringt aber -3 pro zusätzlicher Aktion auf den eigenen Angriff).</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Wenn man eine Position einnimmt und wartet, explizit ansagen, wie man sich positioniert (Am Besten ausspielen, um Missverständnissen vorzubeugen.). Alles was nicht angesagt wird, gilt nach Spielleiterinterpretation.</p>
+*<p style="text-align: JUSTIFY; margin-bottom: 0cm">Keine vorhersagbaren Handlungen machen, z.B. nacheinander aus jedem Fenster schauen, wo die Gegner sind.</p>

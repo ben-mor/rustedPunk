@@ -1,0 +1,195 @@
+Eine Liste der erlaubten Vor- und Nachteile. Ergänzungen, Erklärungen etc. darf jeder schreiben, neue hinzufügen nur nach Absprache mit mir.
+
+Charaktere dürfen bis zu 30 Punkte Vor bzw. Nachteile haben oder EINEN der grösser ist und sonst 5 Punkte.
+
+(also Absolutes Gedächtnis + Literat ist okay. Absolutes Gedächtnis + Literat + Höhere Bildung ist es nicht)
+==Vorteile==
+Vorteile sind alle die Eigenschaften die einem das Leben leichter machen und nicht erlernt werden können (und nicht ein Attribut sind).
+====Absolutes Gedächtnis 60 CP====
+Alle Punkte die in INT oder TECH basierte Skills investiert werden zählen doppelt. Man kann den Spielleiter fragen wie sich der Charakter erinnert und dann einen INT Wurf gegen 10 ablegen um eine akkurate Antwort zu bekommen.
+====Beidhändig 10 CP====
+Man bekommt keinen Abzug wenn man die schwächere Hand benutzt (links für Rechtshänder und andersherum).
+
+==== Bekanntes Gesicht 5 / 10 CP ====
+Man sieht aus wie eine bekannte Persönlichkeit. Wird auf der Strasse verwechselt und wird häufig erst mal positiv eingeschätzt. Für 10 CP hört man sich auch so an und kann die Persönlichkeit glaubhaft imitieren (mit Schauspiel).
+
+====Erhöhte Ausdauer 2 CP / Punkt====
+Steigert die Menge an "Kleintreffern" und ähnlichen Stressfaktoren die man aushalten kann bevor sie auf die Gesundheit durchschlagen.
+====Erweitertes Sichtfeld 1 CP====
+Man kann nicht nur die Normalmenschlichen 180° sehen sondern 210°. Kommt mit einem Abzug von 2 auf ATTR für "weit außeinander stehende Augen". In Situationen in denen dreidimensionales Sehen auf kurze Distanz gefordert ist, gibt es +1.
+====Fortschrittlich 5CP / TL====
+Eure Normalwelt ist auf TL 6 (etwa erster Weltkrieg). Wenn der Charakter in einer Umgebung aufgewachsen ist die deutlich weiter ist (im Dom, z.B.) kostet das 5CP für jeden TL den die Umgebung besser ist und man kann die dort verfügbaren Fertigkeiten lernen. Dies ist eine Spezialform von "Ungewöhnlicher Hintergrund".
+====Furchtlos 1 CP für 2 Level oder 4 CP für 4 Level.====
+Diesem Charakter macht man keine Angst. Alle Proben auf Erschrecken, Einschüchtern und anderes wo es um Angst geht haben diesen Bonus.
+
+====Gelenkigkeit 10 CP====
+Gibt einen Bonus von +3 auf alle Proben wo es darum geht sich in enge Ritzen zu quetschen, aus Schlingen zu winden oder ähnliches. (z.B. Auto-Mechanik, Verstecken (je nach Versteck), Klettern)
+====Gute Ohren 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Lauschen befassen erhalten den entsprechenden Bonus.
+====Gute Augen 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Sehen befassen erhalten den entsprechenden Bonus.
+====Gute Nase (+ Geschmack) 1 CP für 2 Level oder 4 CP für 4 Level====
+
+Alle Wahrnehmungswürfe die sich mit Riechen und Schmecken befassen erhalten den entsprechenden Bonus.
+====Tierempathie 10 CP====
+Gibt einen Bonus von +3 auf alle Proben die mit Tieren zu tun haben. Kommt mit dem Ehrenkodex "Tiere nicht quälen". (Steht einem Jäger aber in keiner Form im Weg)
+====Höhere Bildung 15 CP====
+Der Charakter hatte Gelegenheit auf einer Universität oder anderen Einrichtung mit einem breiten Wissensgebiet zu lernen. Vorraussetzung: Lesen für 10 CP. Ermöglicht den Erwerb von Fertigkeiten wie MediTech, Pharmazie, Physik, Biologie, Chemie, Forschung, etc. (Hinweis: bis zu 2 Level in diesen Fertigkeiten kann man ohne diesen Vorteil erwerben durch passenden Hintergrund)
+====Immun gegen Krankheiten 10/20 CP====
+Der Charakter würfelt nie gegen Krankheiten. Er wird eben nicht krank oder heilt mit vierfacher Geschwindigkeit falls er absichtlich infiziert wird. (Minimum: BODY 6) (Für 10 Punkte ist man einfach nur ziemlich zäh was sowas angeht und bekommt +5 auf alle Würfe bezüglich Langzeiteffekte von Verletzungen, Krankheiten, etc.)
+====Kampfreflexe 5/10 CP====
+Der Charakter hat viele Kämpfe bestanden und wird als erster Handeln wenn es ans Grobe geht.
+
+Leichte Version: +3 auf Initiative und Wahrnehmung in Konfliktsituationen
+
+Große Version: +6 auf Initiative und Wahrnehmung in Konfliktsituationen
+
+==== Konzentriert 2 CP für 2 Level oder 8 CP für 4 Level ====
+Der Charakter lässt sich nicht aus der Ruhe bringen. Egal ob im Kugelhagel, während strömendem Regen oder neben einem Konzert. Alle Proben auf Ablenkung etc. haben diesen Bonus. (wird zu Furchtlos addiert)
+
+====Lesen und Schreiben 5/10 CP====
+Der Charakter hat Lesen und Schreiben gelernt. Entweder gerade so (5 CP) dann kann man etwa ein Straßenschild lesen wenn man davor eine Minute stehen bleibt oder flüssig (10 CP)
+
+====Maschinenflüsterer 10 CP====
+Der Charakter erhält einen Bonus von +3 auf alle Aktivitäten die mit der Wartung, Reperatur und Pflege von Maschinen zu tun haben. Außerdem +3 um Fehler in den Entwürfen und Prototypen zu finden. (Aber nicht auf das Entwerfen oder Bauen von Maschinen) Der Charakter muss mindestens 15 CP in Maschinen orientierten Skills haben für diesen Vorteil.
+====Mathematische Begabung 10 CP====
+Der Charakter erhält einen Bonus von +3 auf alle Aktivitäten die mit Kopfrechnen zu tun haben (dazu zählt durchaus auch Physik, Höhere Mathematik oder Chemie)
+====Musikalische Begabung 10 CP====
+Der Charakter erhält einen Bonus von +3 auf alle Aktivitäten die mit Musik zu tun haben.
+====Nachtsicht 10 CP====
+Der Charakter bekommt keine Abzüge für schlechtes Licht sofern er sich schon mehr als 5 Minuten darin befindet. Abzüge für völlige Finsternis bleiben gleich. (Das gilt nicht für Detailarbeiten wie Lesen oder Schnitzen)
+====Reich 2 CP / Level====
+Für jeden aufgewandten Level verdoppelt sich der Faktor in der Berechnung. (also 0: 350, 1: 700, 2: 1400...) Je nach Charakterhintergrund habe ich ein Veto Recht.
+====Richtungssinn 10 CP====
+Der Charakter hat ein untrügliches Gespür und Gedächtnis für Wege und Richtungen. Alle Wege die der Charakter in der letzen Zeit (~4 Wochen) gegangen ist kann er auswendig. Ist er einen Weg öfter als 10 Mal gelaufen wird er ihn nie vergessen. Für alle Proben bei denen Richtung relevant ist bekommt der Charakter +3.
+====Schmerzunempfindlich 10 CP====
+Der Charakter erhält auf alle Aushalten und Folter Abwehren Proben +3. Prellschaden durch Treffer die in weicher Rüstung gehalten wurden u.ä. zählen halb. Die Abzüge durch Verletzungen zählen nur halb.
+
+====Schnelle Heilung 5 CP====
+Der Charakter heilt alle Verletzungen (nicht Krankheiten) mit doppelter Rate. Außerdem ist die Wahrscheinlichkeit einer Verkrüppleung durch eine kritische Verletzung auf 1% bzw. 1/1000 heruntergesetzt.
+====Schwer zu töten 5 CP / Stufe====
+Für jeden Level dieses Vorteils wird ein "Tödlich" Bereich des Charakterbogens markiert. Wenn in diesem Bereich der Tot-Check fehlschlägt fällt der Charakter in einen Scheintoten Zustand. Er erwacht nach der Anzahl Stunden seiner Verletzungen (z.B. Tot 1 beginnt bei 13 Punkten Schaden, d.H. in diesem Zustand ist man mindestens 13 Stunden scheintot) schwerstverletzt aber am Leben und stabil. Es ist dennoch möglich einen solchen Charkter zu töten in dem man ihm eine Verletzung zufügt die mit dem Leben nicht vereinbar ist oder hinreichend viel Schaden verursacht.
+====Sprachbegabung 2 CP / doppelt 6 CP verdreifacht====
+Der Charakter erhält alle Punkte in Sprachen entsprechend verstärkt.
+====Stimme 10 CP====
+Der Charakter erhält +3 auf alle Fertigkeiten bei denen Stimme und Sprechen wichtig sind.
+====Ungewöhnlicher Hintergrund (variable Kosten)====
+Der Charakter hat Zugriff auf Fertigkeiten oder Besitztümer (Cyberware...) die normalerweise nicht verfügbar sind. Kosten abhängig von den möglichen Vorteilen (nicht von den genutzen).
+==Nachteile==
+Nachteile sind alles was die Handlungsfähigkeit des Charakters einschränkt (deshalb fallen z.B. auch "Ehrlich" oder "Rechtschaffen" unter Nachteile).
+
+==== Abergläubisch 5 CP / 10 CP / 15 CP ====
+Der Charakter glaubt an die Aussagekraft von kleinen Gegebenheiten. Bei 5 CP liest er regelmässig sein Horoskop (o.ä) und richtet sein Leben danach aus. Bei 10 CP liefern auch alltägliche Ereignisse (schwarze Katzen, Tauben im Sinkflug, etc.) wichtige Voraussagen. Bei 15 CP ist alles ein Omen und der Charakter leidet unter krankhaftem Verfolgungswahn. Alle Stufen müssen vom Spieler ausgespielt werden. Wenn er es unterlässt erhält er einen Abzug von 5 Erfahrungspunkten.
+
+====Albinismus 15 CP====
+Alle Halbe Stunde in direkter Sonne, ohne Kleidung -> 1 Punkt Schaden. Auffälliges Äußeres, leicht zu beschreiben. -6 auf den Versuch sich in einer Menge zu verstecken. -6 bei allen Aktivitäten die Sehen in hellem Licht erforden, -5 auf alle Aktivitäten die räumliches Sehen erfordern, -4 auf alle anderen Aktivitäten die Sehen erfordern. (Dieser Nachteil kann abgeschwächt auftreten, Nachfragen.)
+
+====Altruismus 10CP====
+
+Der Charakter muss einen Forschungshintergrund dafür haben, also solche Dinge wie Chemie oder ähnlichem auf +4. Er stellt seine Forschungsergebnisse uneigennützig anderen Menschen zur Verfügung. Das gleiche gilt auch für andere Berufsfertigkeiten die normalerweise mit hohem Einkommen verbunden sind.
+
+==== Ängste variable CP ====
+Phobien, Publikum, Öffentlichkeit und andere nicht tatsächlich gefährliche Angstquellen. Je nach Häufigkeit und Einschränkung. Man kann mit einem passenden COOL Wert das dann trotzdem machen.
+
+====Arm 5CP / 10CP====
+Der Charakter startet mit der Kleidung am Leib, einer Waffe, wenig Munition und sonst nix (5CP). Für weitere 5CP hat der Charakter auch permanent Pech wenn es um das Ansammeln von Gütern geht. Alles was er eintauscht stellt sich hinterher als defekt oder von deutlich schlechterer Qualität heraus als vorher angenommen.
+====Bluter 50 CP====
+Wunden die dieser Charakter erleidet heilen nicht von selbst. Der Schaden einer Wunde ver-n-facht sich jede Minute bis die Wunde behandelt ist. Innere Verletzungen sind tödlich in 1D10 Wochen, wobei jede Woche ein Wurf auf KO mit Schwierigkeit 15 gemacht werden kann ob die Wunde sich nicht doch geschlossen hat. (Es existiert TL 8 Medizin dagegen, aber die ist _sehr_ teuer, wenn es sie überhaupt gibt)
+====Blutgier 5 CP====
+Der Charakter will seine Gegner TOT sehen. Um einen Gegner nicht sicher umzubringen (d.H. im Zweifel nochmal nach stechen) muss der Charakter ein COOL Wurf gegen 15 gelingen. Mit einer guten Begründung ("Die schießen auf mich!") ist die Schwierigkeit 10. Das gilt auch wenn der Charakter einen BEFEL bekommen hat seinen Gegner nicht zu töten, wobei der Befehl nur dann als "guter Grund" qualifiziert wenn der Charakter damit im Prinzip übereinstimmt. Wenn der Gegner in einem fairen Zweikampf antritt und ansonsten kein "Feind" ist muss nicht gewürfelt werden. "Nur ein toter Goblin ist ein guter Goblin." oder "Ich dachte er zieht ein Messer." sind häufige Ausreden an dieser Stelle.
+====Ehrenkodex 5 - 10 CP====
+Der Charakter folgt einem definierten Set an Regeln seiner sozialer Gruppe ("Nomadenkodex", "Hippokratischer Eid", "Gentleman"). Punkte abhängig von den Einschränkungen durch diese Regeln.
+====Ehrlich 5 CP====
+Der Charakter kann nicht lügen. Mit einem Wurf gegen COOL gegen 10 schafft er es nichts zu sagen. Um sich zu überwinden zu lügen muss ein COOL Wurf gegen 15 gelingen. Wenn der Wurf um weniger als 3 daneben ist schafft der Charakter es zu schweigen statt zu lügen. Es ist aber auf jeden Fall offensichtlich das er etwas verbergen will.
+====Einäugig 5 CP====
+Der Charakter hat nur noch ein funktionierendes Auge. -1 auf alle Proben die Tiefenschärfe erfordern. -2 wenn es schnell gehen muss (Kampf). Normalerweise -2 auf ATTR, aber unter Umständen kann man durch einen romantischen Helden das ausgleichen.
+====Einarmig 10 CP====
+Alle Aktionen die zwei Arme erforden können nur mit -6 durchgeführt werden oder fallen ganz aus. Im Zweifel ausspielen um zu sehen ob es geht.
+====Einhändig 3 CP====
+Dem Charakter fehlt eine Hand. Eine Prothese in Form eines Hakens oder Messers kann benutzt werden. -2 auf alle Aktionen die zwei Hände brauchen.
+====Empathielos 10 CP====
+Der Charakter hat kein Verständnis von den Gefühlen anderer Leute. Er kann nie Lügen durchschauen und bekommt -4 auf alle Handeln Proben über Dinge in denen er nicht Expertenwissen hat. Der Charakter ist nicht "gutgläubig" er wird Aussagen von anderen auf ihre Wahrheit normal überprüfen. Nur kann er nicht im Gesicht des anderen lesen ob dieser lügt. Der Charakter muss keine Proben machen um Grausamkeiten auszuführen, Menschen oder Tiere zu quälen oder sonstige Aktivitäten, bekommt aber trotzdem -4 auf Foltern da er nicht weiss wann jemand die Wahrheit sagt, also die gewonnenen Informationen nicht verwerten kann. Der Charakter hat durchaus selbst normale Gefühle, ist aber in der Regel nicht gut in der Lage diese auszudrücken. Dieser Nachteil schliesst "Humorlos" nicht mit ein (wobei der Charakter Witze die auf erwartete emotionale Reaktionen abzielen nicht verstehen wird).
+====Feige 5/15 CP====
+Der Charakter weicht Verletzungen aus wann immer er kann (auch unter unverhältnismässigen Umständen). Immer wenn er etwas tun muss das eine offensichtliche Chance hat ihn zu verletzen muss er COOL gegen 10 würfeln. Besteht eine Chance das er schwer verletzt wird oder stirbt gegen 15. Wird von dem Charakter aufgrund seiner sozialen Position kein Mut erwartet (Wissenschaftler, Krankenpfleger, ... 5 CP) so reagieren kampforientierte Menschen mit einer leichten Abneigung gegen den "Schwächling". Ist der Charakter in einer sozialen Position die Mut erwartet (15 CP) werden ihn andere kampforientierte Menschen verachten und ausgrenzen.
+====Farbenblind 5 CP====
+-4 auf Fertigkeiten die Farben stark brauchen (Kartenlesen, Elektrotechnik) -2 auf Fertigkeiten wo es nützlich wäre (Spuren Lesen, Handeln, Wert schätzen).
+====Fett 10 CP====
+Das Gewicht der Figur liegt bei einem BMI von über 31. Der Charakter kommt schneller ausser Atem (doppelte Erschöpfungspunkte). Er kann keine normale Kleidung tragen und hat ein schlechtes Ansehen. +2 auf alle Aktionen die festpinnen oder liegen bleiben o.ä. erfordern.
+==== Gefürchtetes Gesicht (5 CP / 10 CP) ====
+Man sieht aus wie ein gesuchter Verbrecher oder anderweitig gefürchtete Persönlichkeit. Menschen werden instinktiv Abstand halten und negativ auf den Charakter reagieren. Für 10 CP ist die Ähnlichkeit so gross das man schon mehr als einmal verhaftet wurde oder von den Feinden des Verbrechers gejagt, etc.
+====Geheimnis 5CP / 10CP====
+Der Charakter muss etwas verheimlichen das für ihn schlimme soziale Konsequenzen haben wird wenn es raus kommt. Kleine Geheimnisse fallen hier nicht drunter, aber sowas wie ein vertuschter Mord an einem beliebten Mitglied der Gemeinschaft. 10CP gibt es wenn man für das Geheimnis getötet wird falls es rauskommt.
+====Großmaul 5 CP====
+Der Charakter schmückt Geschichten (besonders solche über sich selbst) gern aus oder erfindet sie gleich ganz. Solange es aber um "realistische" Dinge geht wird er so ehrlich sein wie jeder andere auch. "Ich habe mal gegen einen Bären gekämpft und gewonnen. Und das mit verbundenen Augen und nur einer Zahnbürste in der Hand." ist typisch. "Da ist keiner" wenn da schon einer ist wäre untypisch. Der Charakter ist kein Lügner, sondern stellt sich selbst einfach nur gern etwas größer dar, als er ist.
+====Hedonist 5 CP====
+Der Charakter liebt das Leben und die Freunde und die Lust. Alles was schön, angenehm und unterhaltsam ist wird er suchen und Leid und Entbehrung wann immer möglich vermeiden. Er gibt sein Geld aus solange es eben hält. Er wird keiner Arbeit nachgehen die härter ist als notwendig. Wenn er einen extra Tag Urlaub bekommt wird er ihn nehmen.
+====Humorlos 5 CP====
+Der Charakter versteht keinen Humor. Er meint alles was er sagt immer ernst und geht auch bei anderen davon aus. (Er ist nicht dumm. Wenn ihm aber jemand sagt: "War nur ein Witz" hat er keine Chance festzustellen ob das wirklich so ist.)
+====Impulsiv 10 CP====
+Less talking, more action. Der Charakter verbringt nicht mehr als unbedingt notwendig damit über die Folgen seiner Taten nachzudenken. Sollte er durch die Gruppe angehalten werden einen Plan zu schmieden wird er den ersten nicht offensichtlich dummen Plan als gut befinden und zur Tat schreiten. Wahrscheinlich hat er auch als erster gesprochen und seinen Plan als den ersten nicht offensichtlich dummen vorgestellt.
+====Intolerant 5/10 CP====
+Der Charakter hat eine Abneigung gegen Andersartige. Trifft er einen solchen Menschen muss ihm eine Probe gegen COOL 10 bzw. 13 gelingen. Ist sie gelungen wird er den Andersartigen distanziert, aber höflich behandeln und (sofern es möglich ist) versuchen ihn von seiner Andersartigkeit weg zu bekehren.
+
+==== Kampfstarre 15 CP ====
+Immer wenn der Charakter in einem Kampf Schaden zu befürchten hat, muss er gegen Cool 13 würfeln. Nach einem Stupser / Schlag auf den Hinterkopf o.ä. bekommt der Charakter einen neuen Wurf und +1. Er darf jede Runde nochmal würfeln. Pro weitere Runde +1.
+
+====Kein Geruchs- und Geschmackssinn 5 CP====
+Der Charakter hat außer Süß, Salzig, Bitter, Sauer keinen Geschmackssinn und überhaupt keinen Geruchssinn. Er kann giftige Nahrung nicht am Geschmack erkennen, keinen Rauch riechen etc. Aber er hat auch keine Ansprüche an seine Nahrung und fühlt sich durch Gestank nicht belästigt.
+====Klein 15 CP====
+Der Charakter ist 120 cm oder kleiner. Er kann sich nicht in einer Gruppe verstecken, wird immer sofort erkannt und wird immer als "anders" wahrgenommen (positiv oder negativ, aber idR nicht neutral).
+
+Kleine Menschen haben nur einen Faktor von 2 für ihren RUN (statt 3 für normale), das wirkt sich dann entsprechend auf auch den LEAP aus.
+
+==== Langsame Heilung 5 CP ====
+Der Charakter heilt (Verletzungen) nur mit halber Rate. d.H. er würfelt nur alle zwei Tage ob er heilt. Heildrogen etc. wirken normal.
+
+====Lebensmüde 15 CP====
+Der Charakter hat keine Wertschätzung für das eigene Wohlergehen. Er wird keine Deckung suchen oder einem Kampf aus dem Weg gehen. Um gegen diese Grundeinstellung zu handeln muss ihm ein INT Wurf gegen 15 gelingen.
+====Leichtgläubig 10 CP====
+Der Charakter hat keinen Sinn für Lügen oder Geschichten. Er wird alles (was nicht explizit als Fiktion dargestellt ist) als die Wahrheit annehmen und entsprechend reagieren. Er kann selbst lügen, bekommt aber immer -2 abgezogen. Er kann nicht feststellen ob ihm jemand seine Geschichte abkauft.
+====Markenzeichen variable CP====
+Der Charakter hinterlässt immer "seine" Spur am Ort seines Handeln. Seien es Initialen in den Maschinen die er repariert, eine Spielkarte die er seinen Opfern in die Hand legt oder seinen Gegner immer mit dessen eigenen Waffe tötet. Die CP beziehen sich auf die potenziell negativen Auswirkungen des Markenzeichens und die Dauer die es kostet das Zeichen anzubringen.
+
+==== Muss fertig werden 5 CP / 10 CP ====
+Du kannst nicht aufhören, nachdem du einen Task angefangen hast. Egal ob du müde oder hungrig bist, der Arbeitsschritt muss fertig werden bevor du eine Pause machst und die Arbeit muss fertig werden bevor du weg gehst. Wurf auf Coolness gegen 15 / 20 um es trotzdem zu tun. (+5 wenn dein Leben davon abhängt)
+
+====Neugierde 5 CP====
+Der Charakter will alles erkunden und zwar sofort. Um es nicht zu tun muss ein COOL Wurf gegen 10 gelingen. Für jeden weiteren Wurf am gleichen Tag (intime) wird die Schwierigkeit eins größer. Auch dieser Charakter wird nicht einfach in einen Wald laufen, sondern sich vergewissern das keine große Gefahr droht, eine kleine Gefahr wird er aber kaum beachten wenn im Wald etwas interesanntes zu sein scheint.
+====Pazifist 15 CP====
+Der Charakter lehnt Gewalt als Mittel der Konfliktlösung ab. Er wird nie zuerst schießen und auch versuchen andere davon abzubringen das zu tun. Er wird auch nicht weiterkämpfen wenn sich die Gegenseite (glaubhaft) ergiebt und / oder das Feuer einstellt. Kriegsfreudige Menschen (z.B. solche mit dem Nachteil 'Blutgier') werden auf einen Pazifisten negativ reagieren.
+====Pech 10 CP====
+Jedesmal wenn ein Wurf eine '1' zeigt ist dieser Wurf schief gegangen. Egal ob eine 1 ausgereicht hätte es zu schaffen. Dieser Charakter muss auch dann würfeln wenn er die Mindestmenge für eine Aktion bereits erreicht hat. Außerdem sollte der Spieler das Pech immer wieder in alltäglichen Situationen ausspielen für die er nicht würfeln muss.
+====Rechtschaffenheit 5 CP====
+Der Charakter hält sich an die Gesetze. Auf Biegen und Brechen. Er wird auch andere davon abhalten illegale Aktivitäten zu unternehmen. Dabei bezieht er sich immer auf das aus seiner Sicht "herrschende" Recht. Das heißt ein Patriotischer Charatker wird immer das Recht seines Landes als das "richtige" ansehen und danach handeln auch wenn er sich in einem anderen Rechtssystem befindet. Rechtschaffenheit ist eine Spezialform des Nachteils Ehrenkodex. (In eurer Welt gibt es nicht viele Gesetze und noch weniger sind ausformuliert, daher ist es keine so große Einschränkung rechtschaffen zu sein)
+====Schüchtern 5 CP====
+Der Charkter fühlt sich in der Gegenwart von Fremden unwohl und gehemmt. Es wird stärker je mehr Fremde da sind die ihm Aufmerksamkeit schenken. Es fällt ihm dann schwer laut und deutlich zu reden und wahrscheinlich wird es es ganz sein lassen. -2 auf alle Fähigkeiten die Reden vor Publikum u.ä. erfordern.
+====Primitiv 5CP / TL====
+Eure Normalwelt ist auf TL 6 (etwa erster Weltkrieg). Wenn der Charakter in einer Umgebung aufgewachsen ist die diesen TL nicht hat (Schamanistisches Dorf im Wald) bekommt man für jeden TL darunter 5 CP und kann entsprechend die Fähigkeiten aus dem TL dort lernen.
+====Riesig 10 CP====
+Der Charakter ist 210 cm oder größer. Er kann sich nicht in einer Gruppe verstecken und hat einen um 5 erhöhten Wiedererkennungswert. Leute reagieren distanziert auf dieses Charakter (Außnahme: im Kampf). Er hat -2 auf Entfesseln, kann keine normale Kleidung tragen und die meisten Sitzgelegenheiten (z.B. auch im Auto) sind zu klein für ihn und nur mit -3 zu benutzen.
+====Schlechte Ohren 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Lauschen befassen erhalten den entsprechenden Malus.
+====Schlechte Augen 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Sehen befassen erhalten den entsprechenden Malus.
+====Schlechte Nase (+ Geschmack) 1 CP für 2 Level oder 4 CP für 4 Level====
+
+Alle Wahrnehmungswürfe die sich mit Riechen und Schmecken befassen erhalten den entsprechenden Malus.
+====Schmächtig 5 CP====
+Der Charakter ist für seine Größe deutlich unter gewichtig (BMI < 19). Der Charakter darf keinen BODY Wert von 6 oder höher haben. Normale Kleidung sieht immer schlecht aus und der Charakter muss einen Gürtel o.ä. verwenden um Hosen und Röcke auf der Hüfte zu halten.
+
+==== Tiefer Schlaf 5 CP ====
+Der Charakter ist unglaublich schwer zu wecken und auch erstmal nicht richtig da wenn er die Augen aufmacht. Er wird, wenn man ihn nicht weckt, jeden Tag verschlafen. Wecker zählen als "geweckt werden". Schüsse, etc. auch.
+
+Er muss würfeln (BODY oder COOL gegen 15) wenn er geweckt werden soll und erhält -6 auf alle Aktionen danach (wird um 1 besser alle zehn Minuten)
+
+====Wehleidig 10 CP====
+Der Schaden den der Charakter durch Schmerzen (z.B. Kugel in weicher Rüstung) bekommt wird verdoppelt. Jeder Treffer mit mehr als einem Punkt Schaden muss durch einen COOL Wurf gegen 10 + bisheriger Gesamtschaden gekontert werden, will der Charakter nicht anfangen zu schrein und wimmern. Ist es bekannt reagieren Leute normalerweise abschätzig auf diesen Charakter.
+====Mangelnde Hörfilter 5 CP====
+Der Charakter bekommt -4 auf alle Würfe die mit Sprache verstehen zu tun haben. Wenn es darum geht unter anstrengenden (aber normalerweise nicht würfelwerten) Umständen (z.B. in einer Bar) jemanden zu verstehen muss dieser Char mit -4 würfeln. Dabei ist der Charakter weder dumm, noch kann er schlecht hören (er kann sogar den Vorteil "Gute Ohren" haben), er hat einfach ein Problem mit gesprochener Sprache. Unter normaler Umständen muss auch dieser Charakter nicht würfeln (außer er hat zusätzlich Schlechte Ohren).
+====Schlechte Ohren 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Lauschen befassen erhalten den entsprechenden Malus. Kann durch ein Hörgerät ausgelichen werden.
+====Schlechte Augen 1 CP für 2 Level oder 4 CP für 4 Level====
+Alle Wahrnehmungswürfe die sich mit Sehen befassen erhalten den entsprechenden Malus. Kann durch tragen einer Brille ausgelichen werden. (eine zufällig gefundene Brille hat einen 10% bzw. 5% Chance zu helfen)
+====Schlechte Nase (+ Geschmack) 1 CP für 2 Level oder 4 CP für 4 Level====
+
+Alle Wahrnehmungswürfe die sich mit Riechen und Schmecken befassen erhalten den entsprechenden Malus.

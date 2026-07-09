@@ -1,0 +1,86 @@
+Diese Werte beziehen sich auf einen hypotetischen Ort irgendwo in Transbaikalien. Die Preise von Ort zu Ort schwanken, aber das ist so der Grundsatz. (Im Dom gelten ganz andere Preise)
+==Alltag==
+===Essen, etc. ===
+Wenn es was besonderes ist, sind auch kleine Mengen wertvoll (z.B. seltene Konserven) ansonsten ist Essen nur in größeren Mengen eine sinnvolle Tauschware. (50Kg Reis sind 10 Tage in ner Herberge, 5 Kg Reis sind ein Essen)
+Messer, Besteck, anderer Metallkleinkram: kaum wertvoll, Rostfreier Stahl hat sich gehalten, man kann Sachen umschmieden lassen... Aber ein Set Messer von vor dem Desaster, unbenutzt... Wertvoll wie ein gutes Essen. Ein gutes Kampf- & Outdoormesser auch.
+
+===Brillen===
+manchmal wertvoll. Eine Brille die einigermaßen richtig geschliffen ist hat den Wert von einer Tankfüllung Sprit. Eine Brille die nicht passend geschliffen ist (also nur zum weitertauschen) hat den Wert von einem Kampfmesser.
+
+===Geschirr, Glas und Keramiken===
+Einfache Tassen, Teller etc.: nicht besonders Wertvoll. Ein Set Essgeschirr ist ein einfaches Essen wert.
+
+===Haushaltselektronik (Toaster, Fön, Kühlschrank)===
+Wert wankt stark. Wenn es lokal eine einigermaßen stabile Stromversorgung gibt sind die Sachen mittel wertvoll. Es hätte schon gern jeder eins, aber andererseits... so wichtig ist es nicht und es gab mal sehr viele davon.
+
+===Batterien, Taschenlampen, Armbanduhren und andere tragbare Elektronik===
+Solange sie funktionieren sind sie spürbar wertvoll. Für eine funktionierende Armbanduhr bekommt man eine kleine Waffe und andere mittlere Annehmlichkeiten.
+
+===Kleidung===
+Wenn sie noch intakt ist, durchaus wertvoll. Für ein eingeschweißtes T-Shirt bekommt man eine Nacht im Gasthof, einen vollen Tank oder ähnliches. Für ein schönes Kleid unter Umständen auch eine Nacht mit einer Prostituierten.
+
+===Sonstige Alltagsgegenstände===
+Zahnbürste, Haarbürste, etc. kaum wertvoll. Es gibt davon solche Unmengen in den Ruinen das man damit nur Kleinsachen eintauschen kann (einen Drink in der Bar gibt es für ein paar Zahnbürsten). Lohnt sich eigentlich nur als Beifang.
+
+=== Kosmetik ===
+Wertvoll, da es Normalerweise keine von vor dem Desaster mehr gibt. Haarfarbe, Zahnpasta, Makeup etc. Hält keine 70 Jahre unter normalen Bedingungen. Das heißt sie muss in den wenigen Fabriken hergestellt werden die es noch gibt und dann transportiert werden.
+
+===Metallschmuck ===
+ist kaum wertvoll. Es gibt so viel davon auf den Straßen und in den Häusern der Ruinenstädte.
+
+==Fahrzeuge==
+Fahrzeuge sind im Allgemeinen in drei Wertkategorien: Wertlos (Schrott), Schwankend (Reperabel) und Wertvoll (Funktioniert). Die meisten Leute die ein Fahrzeug besitzen haben ein Motorrad, einen Van oder einen LKW.
+
+Dabei ist ein LKW nicht per se wertvoller als ein Motorrad. Man muss auch jemanden finden der einen haben will. Generell lässt sich aber sagen das ein Fahrzeug einen signifikaten Wert hat. Normalerweise erhält man eines als Geschenk für eine relevante Tat oder baut es sich selbst zusammen. Oder man hat es bekommen weil man Teil der Gruppe ist die zu den Ruinen fährt um etwas zu holen.
+
+Reperaturen werden mit kleineren Dingen bezahlt (z.B. mit reperablen Fahrzeugen, Ersatzteilen o.ä.)
+
+Vor dem Desaster sind die meisten Fahrzeuge nicht mit Diesel oder anderem Brennstoff gefahren, sondern mit Strom. Die Batterien hab sichern den letzten 70 Jahren aber zersetzt und meistens das Auto gleich mit. Manchmal sind sie auch in Flammen aufgegangen und haben Stadtteile mit abgebrannt.
+Da alle eure Fahrzeuge mit Diesel gefahren werden müssten sie umgerüstet werden. Sie haben also irgendwo einen Tank und Dieselmotor angeflanscht. Man kann sich vorstellen das das nicht immer eine so gute Idee ist...
+Ausgenommen davon sind Lkw die vorher schon mit Diesel gefahren wurden.
+Auf jeden Fall sind Autos als älter als das Desaster und so langsam gehen euch benutzbare Reifen aus. Da ihr keine neuen Luftreifen herstellen könnt werden alte Reifen zu Vollgummireifen eingeschmolzen.
+
+=== LKW===
+LKW sind eine praktische Angelegenheit. Man kann damit Sachen, Leute oder beiden transportieren. Die Werte sind für ein typisches Modell, wem sie nicht passen der darf mit mir drum würfeln.
+
+* Manövergeschwindigkeit 50 km/h (25 wenn voll beladen)
+* Höchstgeschwindigkeit 60 km/h zumindest auf euren Straßen
+* Tank 240 Liter
+* Verbrauch 20 - 60 Liter / 100 km.
+* Sitzplätze 3 vorne. Und manchmal Schlafkojen in denen auch während der Fahrt Leute liegen können.
+* Beschleunigung 10 km/h pro Runde
+* Bremsen 20 km/h pro Runde
+* Strukturpunkte 80
+* Schutzwert 10
+
+==Waffen==
+Waffen sind in der Welt sehr üblich und trotzdem sehr wertvoll. Am üblichsten für Reisende ist die AK-47. Menschen die hauptsächlich an einem Ort bleiben tragen von keine Waffe bis normalerweise nichts größeres als eine mittlere Pistole.
+
+Die Waffen werden irgendwo westlich an der Transsib hergestellt und kommen über die Bahn hier her. Daher sind sie wertvoll. Wenn man eine Waffe von vor dem Desaster findet und repariert bekommt ist sie meistens besser, aber passende Munition ist schwierig zu finden.
+
+=== AK-47 ===
+Eine zuverlässige stabile Waffe die es wohl schon immer gab. Sie verwendet Munition im 7,62 x 39 mm. Werte:
+* Gewehr
+* 6D6+2 Schaden, Panzerbrechend. ( Schutzwert wird halbiert, Schaden auch, ab 8 Schadenspunkten wird von einem Durchschlag ausgegangen)
+* Reichweite 300 Meter
+* Sehr zuverlässig
+* Nicht versteckbar
+* 1/15 Schuss pro Runde
+
+Nachteile: Laut, die Munition ist teuer wenn sie neu sein soll.
+
+=== Grach ===
+Eine praktische Pistole die man im Zweifel auch verstecken kann. Verwendet die billige 9mm Munition. Werte:
+* Pistole
+* 2d6+1 Schaden
+* Reichweite 100 Meter
+* Magazin 18 Schuss
+* 1/2 Schuss pro Ründe
+
+=== Schwere Waffen ===
+Wenn Dinge anfangen zu explodieren, renn weg. Schwere Waffen sind Geschichten von vor dem Desaster. Außer Manchmal.
+
+== High Tech ==
+Darunter fällt fast alles was moderner ist als 1950 in unserer Welt. Also vom programmierbaren Taschenrechner über einen Computer, Hörgeräte, Microwellenofen, tragbare Musikgeräte, Cyberware, Hochleistungsrechner, Mensch-Maschine Schnittstellen, Weltraumtechnologie, fliegende Autos, Roboter, Hoovercrafts...
+
+Solche Dinge, wenn sie denn funktionieren, sind herausragend wertvoll. Für einen programmierbaren Taschenrechner bekommt man ein Auto, eine LKW Ladung voll Sprit und ähnliche mittelgroße Sachen. Für einen Computer ist man ein Held in der Stadt und bekommt ein Haus, einen vollgeladenen Lkw, oder andere große Vorteile.

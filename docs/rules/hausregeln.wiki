@@ -1,0 +1,100 @@
+== Fertigkeiten ==
+Alle Nahkampffertigkeiten sind bis Stufe 3 "Nahkampf allgemein" danach getrennt nach Kurz/Mittel/Lang.
+
+Nahkampf allgemein enthält Ausweichen.
+== Punktevergabe ==
+'''Meisterpunkte''': Ich vergebe die Grundpunkte für den Abenteuerfortschritt: 3 - 8 Punkte.
+
+'''Fixpunkte''': Es gibt 5 Punkte für jeden der seit dem letzten Abenteuer seine Chronik geschrieben hat.
+
+'''Player of the Day''': Jeder Spieler vergibt einen Punkt nach Gutdünken an einen der anderen Spieler.
+
+'''Ereignispunkte''': Es gibt einen Punkt für jeden nicht geschafften Wurf.
+
+Es gab mehrere [[Punktevergabe_Alternativen|Alternativen]], bei Interesse kann man nochmal diskutieren.
+== Charakter ==
+Das Rollenmodell fällt aus den Regeln raus. Es gibt also keine Spezialfertigkeiten mehr sondern das sind entweder normale Fertigkeiten oder Vorteile.
+* Authorität ist eine Fertigkeit, COOL basiert.
+* Charismatische Führung entfällt. Charisma ist ein Vorteil, Führungskraft ist eine Fertigkeit.
+* Kampfinstinkte ist ein Vorteil
+* Glaubwürdigkeit entfällt. Dein Ruf gilt hier.
+* Familie entfällt. Ruf.
+* Interface ist eine Fertigkeit, INT basiert.
+* Jury Rig ist eine Fertigkeit, TECH basiert.
+* Meditech ist eine Fertigkeit, TECH basiert.
+* Ressourcen entfällt. Ruf.
+* Streetdeal entfällt. Streetwise deckt den Skill ab.
+
+Vor- und Nachteile aus Gurps, siehe [[VorUndNachteile]].
+
+[[Charaktererschaffung]] angepasst.
+
+== Schaden ==
+
+Ausdauer und Prellschaden. Jeder hat 5 Prellpunkte. Anstrengende Arbeiten, Treffer die von weicher Rüstung gefangen werden und ähnliches gehen auf diese Skala. Ist die Skala bei 0 gibt es einen Schaden und sie beginnt wieder bei 5 zu zählen. Wenn man Schaden nimmt der nur Prellschaden ist, erhält man diese Menge Abzug auf seinen nächsten Wurf (muss aber keinen KO Check machen). Wird der Prellschaden zu echtem Schaden bekommt man keinen Abzug, muss aber einen KO Check machen.
+
+Wenn eine Schusswaffe mehr als 4 Punkte Schaden macht wird mit 1d10 gewürfelt. Soviel extra Schaden kann dieser Schuss noch anrichten bevor es ein Durchschuss wird.
+
+Eine Verletzung vom Typ "Kritisch" oder darüber hat eine 5% Chance auf Verkrüppelung des entsprechenden Körperteils wenn nicht besondere Medizinische Hilfe geleistet wird. (5/1000 wenn diese geleistet wird).
+
+Kopftrefferschaden wird verdoppelt, aber die Frage ob man daran stirbt ist verändert. Siehe [[Regeln]].
+
+== Würfel ==
+Ist der Minimalwert (also Attribut + Fertigkeit + eingesetztes Glück) größer als die Zielvorgabe wird nicht gewürfelt, automatischer Erfolg, immer (auch im Kampf).
+
+Ein Wurf von 1 ist ein Fehlschlag, danach wird nochmal gewürfelt; 1: Kritischer Fehler, Schaden am eigenen Team / sich selbst. 2-5: Fehlschlag und sieht peinlich aus. 6-0: Normaler Fehlschlag
+
+Ein Wurf von 10 ist eine besondere Leistung in dieser Fertigkeit. Ein CP für diese Fertigkeit und nochmal würfeln und dazu zählen (kaskadiert).
+==Schalldämpfer und Lärm eines Schuss==
+Schusswaffen sind laut. Sehr Laut. Das liegt an zwei Elementen: Eine fette Explosion und ein Projektil, das die Schallmauer durchbricht. Wenn ich also einen Schalldämpfer benutze, muss ich mir aus taktischer Sicht bewusst sein, dass er die Waffe nicht leise macht.
+
+Massive Objekte (wie Hügel, etc.) stoppen den Schall völlig. SL Entscheidung.
+
+Um einen Schuss zu hören muss man wissen wie laut er war: Wurf gegen Hören, Schwierigkeit 15. Da keiner Lust hat das für jede Waffe und jedes Projektil zu recherchieren, gilt folgende Formel bis es jemand recherchiert:
+===Formel===
+Bonus: Mittlerer Schaden der Waffe * 3
+
+Modifikationen:
+
+*-2 pro normale Wand
+*-6 für schallgedämpfte Wände
+*-2 pro 50 Meter Abstand
+*+2 für jede Kugel die pro Runde abgefeuert wird
+Um also eine AK (5D6 Schaden) in einer Entfernung von 200 Meterrn zu hören:
+
+(5*(6/2)) * 3 = 45 (-2*4) = 38 Bonus
+
+Aus 1200 Metern
+
+(5*(6/2)) * 3 = 45 (-2*12) = 21 Bonus
+
+Eine kleine 9mm (2d6+2) in einer Entfernung von 200 Meterrn zu hören:
+
+(2*(6/2)+2) * 3 = 24 (-2*4) = 16 Bonus
+
+Aus 1200 Metern
+
+(5*(6/2)) * 3 = 24 (-2*12) = 0 Bonus
+===Schalldämpfer===
+Ein Standard-Schalldämpfer senkt die initiale Lautstärke um 1/2.
+
+Also: AK kommt auf 23, 9mm auf: 12.
+===Richtung===
+um die Richtung des Schusses bestimmen zu können muss der Wurf um mindestens 10 gelungen sein.
+
+== Handel in der Werstattrunde ==
+Basis sind Equipment Tokens: Man würfelt Luck + bestehende Tokens (höchstens 15) gegen die Wahrscheinlichkeit des Items (häufige Sachen: 10, seltene Sachen: 20, legendäre Sachen: 40). Dann reduziert man die bestehenden Tokens um 1.<br />Die Werkstatt verliert jeden Tag ein Equimenttoken pro Person die versorgt werden muss (einschließlich essen).
+
+Erste Phase ist "was geht an diesem Tag" Ein Wurf gegen das durchschnittliche Glück aller Beteiligten gegen 10. Punkte über 10 werden mit der Anzahl Leute multipliziert die mitarbeiten. Das ergbiebt die Menge an Tokens die dieser Tag produzieren könnte.
+''(z.B. 5 Leute mit einem durchschnittlichen Luck von 6: Wurf von 6 = 12 -10 {Schwierigkeit} = 2 *5 {Anzahl Leute} = 10)''
+
+Wenn man bei dem Luck Wurf eine 10 würfelt passiert heute eine besondere Handelssituation. Man würfelt danach regulär nochmal auf Luck. (Nur eine 10 / Tag)
+
+Zweite Phase ist die Realisierung:
+
+Aus der Runde wird der Durchschnittswert von Menschenkenntnis, Verhandeln und Tech gebildet (wobei jeder der oben als "mitarbeitet" zählt mindestens einen Wert hinzufügen muss und jeder Skill muss mindestens einmal vorhanden sein).
+Darauf wird gegen 15 gewürfelt. Keine Botches, keine Krits. Das Ergebnis mit der Anzahl Leute multiplizieren.
+
+''(z.B. 5 Leute: Menschenkenntnis 13, Menschenkenntnis 15, Verhandeln 17, Autotech 12, Basic Tech 16. Durchschnitt 14,6 Runden zu 15 + Wurf von 5 = 20 - 15 {Schwierigkeit} = 5 * 5 {Anzahl Leute} = 25.)''
+
+Der kleinere Wert aus Phase 1 & 2 ergibt die Anzahl Tokens dieses Tages.

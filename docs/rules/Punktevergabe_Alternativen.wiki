@@ -1,0 +1,33 @@
+Cyberpunk verwendet ein Punktesystem das zwischen 2 und 7 Punkten pro Abend von 4 Stunden Spielzeit. Wir sollten also auf ein System kommen das 10 - 15 Punkte / Samstag vergibt.
+
+Zur Orientierung:
+* Fertigkeiten kosten, im Grundsatz "Aktuelle Fertigkeitspunkte +1 x 10".
+* Vorteile (sofern sie nachträglich erwerbbar sind) kosten: CP * 15
+* Attribute (sofern sie erwerbbar sind) kosten: CP +1 * 15
+
+== Aktuelles System: ==
+Siehe [[Hausregeln#Punktevergabe]]
+
+== Es gibt 2 Punkte für jeden der seine Termine mindestens eine Woche vor dem Spiel eingetragen hat.Mögliche Komponenten aus denen wir unser System zusammen bauen können ==
+
+=== Selbstbewertung ===
+Jeder gibt sich eine gewisse Anzahl an Punkten, abhängig davon wie gut er selbst der Meinung ist gespielt zu haben. Möglicherweise mit Rücksprache mit den anderen. Möglicherweise mit vordefiniertem System.
+
+=== Meisterpunkte ===
+Der Spielleiter vergibt (einen Teil der) Punkte an die Gruppe im Ganzen oder an Spieler im Einzelnen.
+
+=== Player of the Day ===
+Die Spieler und der SL bestimmen zusammen einen Spieler der heute besonders gut war und der bekommt ein definiertes Set an Punkten.
+
+=== Abstimmungspunkte ===
+Jeder schreibt die Anzahl Punkte die man selbst bekommen sollte auf ein Stück Papier, ich mach das gleiche für die Runde im Allgemeinen. Dann wird verglichen. Ist der eigene Wert weniger als 2 von meinem entfernt gilt es, sonst wird abgestimmt.
+
+=== Fixpunkte ===
+Eine feste Anzahl Punkte die es für den Spielabend gibt. Sozusagen ein "Mindesteinkommen".
+
+z.B. Es gibt 2 Punkte für jeden der seine Termine mindestens eine Woche vor dem Spiel eingetragen hat.
+
+Es gibt 5 Punkte für jeden der seit dem letzten Abenteuer seine Chronik geschrieben hat.
+
+===Ereignispunkte===
+Es gibt Punkte für konkrete Ereignisse während des Spiels. z.B. "Wurf nicht geschafft" oder "Charakter trotz Widrigkeiten ausgespielt" oder "Gruppe über Charakter gestellt" oder "Kamerad geholfen."
